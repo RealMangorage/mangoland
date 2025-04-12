@@ -1,11 +1,16 @@
 package org.mangorage.mangoland;
 
-import org.mangorage.mangoland.data.ByteArrayKey;
 import org.mangorage.mangoland.persistance.Persistence;
+import org.mangorage.mangoland.types.AddInstruction;
+import org.mangorage.mangoland.types.IntegerToStringInstruction;
 import org.mangorage.mangoland.types.InvalidInstruction;
 import org.mangorage.mangoland.types.PrintInstruction;
 import org.mangorage.mangoland.util.ByteUtil;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +33,8 @@ public final class Instructions {
 
     static {
         register("org.mangorage#print", 0, new PrintInstruction());
+        register("org.mangorage#add", 1, new AddInstruction());
+        register("org.mangorage#IntegerToString", 2, new IntegerToStringInstruction());
     }
 
     private static final byte[] INST_START = new byte[]{0x0, 0x7, 0xf, 0x1f};
@@ -70,58 +77,26 @@ public final class Instructions {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Arrays.toString(INST_END)
 
-        System.out.println(
-                Arrays.toString(
-                        compile(new String[] {
-                                "org.mangorage#print; 'one two three'"
-                        })
-                )
+
+        Files.write(
+                Path.of("myprogram.mangoland"),
+                compile(new String[] {
+                        "org.mangorage#add; '1' '1' -> '$1'",
+                        "org.mangorage#add; '$1' '1' -> '$1'",
+                        "org.mangorage#add; '$1' '$1' -> '$1'",
+
+                        "org.mangorage#IntegerToString; '$1'",
+                        "org.mangorage#print; '$1'"
+                }),
+                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );
 
         process(
-                compile(new String[] {
-                        "org.mangorage#print; 'one two three'",
-                        "org.mangorage#print; 'one two three'",
-                        "org.mangorage#print; 'one two three'",
-                        "org.mangorage#print; '$1'"
-                })
+                Files.readAllBytes(Path.of("myprogram.mangoland"))
         );
-
-
-        /**
-         org.mangorage#print; 'Test' // As Shown below
-         org.mangorage#add; '1' '2' > '$1' // Example
-         org.mangorage#print; '$1' // Example
-         */
-        process(new byte[]{
-                0x0, 0x7, 0xf, 0x1f, // INST START
-
-                0x0, 0x0, 0x0, 0x0, // print
-
-                // Hello World!
-                0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x57,
-                0x6F, 0x72, 0x6C, 0x64, 0x21,
-
-                0x1, 0x4, 0xe, 0x1e // INST END
-        });
-
-        process(new byte[]{
-                0x0, 0x7, 0xf, 0x1f, // INST START
-
-                0x0, 0x0, 0x0, 0x0, // print
-
-                // Variable Marker
-                0x14, 0x24, 0xc, 0x1d,
-
-                // Variable Id
-                0x1, 0x2, 0x4, 0xe,
-
-
-                0x1, 0x4, 0xe, 0x1e // INST END
-        });
     }
 
 }

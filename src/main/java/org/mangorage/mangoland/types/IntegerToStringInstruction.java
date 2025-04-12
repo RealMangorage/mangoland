@@ -8,22 +8,16 @@ import org.mangorage.mangoland.util.StringUtil;
 
 import java.util.Arrays;
 
-public final class PrintInstruction implements Instruction {
+public final class IntegerToStringInstruction implements Instruction {
     @Override
-    public void process(byte[] instruction, final Persistence persistence) {
+    public void process(byte[] instruction, Persistence persistence) {
         if (instruction.length > 4 && hasVariable(instruction)) {
-            System.out.println(
-                    new String(
-                            persistence.getVariable(
-                                    Arrays.copyOfRange(instruction, 4, instruction.length)
-                            )
-                    )
-            );
-        } else {
-            System.out.println(
-                    new String(
-                            instruction
-                    )
+            var variable = Arrays.copyOfRange(instruction, 4, instruction.length);
+            persistence.setVariable(
+                    variable,
+                    String.valueOf(
+                            ByteUtil.bytesToInt(persistence.getVariable(variable))
+                    ).getBytes()
             );
         }
     }
@@ -40,8 +34,8 @@ public final class PrintInstruction implements Instruction {
         var parameter = array[0];
         if (parameter.startsWith("$")) {
             return ByteUtil.merge(ByteConstants.VARIABLE_INST, parameter.replaceFirst("\\$", "").getBytes());
-        } else {
-            return parameter.getBytes();
         }
+
+        return new byte[0];
     }
 }

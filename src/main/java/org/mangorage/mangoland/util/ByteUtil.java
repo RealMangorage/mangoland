@@ -2,6 +2,7 @@ package org.mangorage.mangoland.util;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Objects;
 
 public final class ByteUtil {
     public static byte[][] extractBetween(byte[] data, byte[] startMarker, byte[] endMarker) {
@@ -60,13 +61,15 @@ public final class ByteUtil {
     }
 
     public static int bytesToInt(byte[] bytes) {
-        if (bytes.length != 4) {
-            throw new IllegalArgumentException("You need exactly 4 bytes.");
+        if (bytes == null || bytes.length != 4) {
+            throw new IllegalArgumentException("Expected 4 bytes, got " + (bytes == null ? "null" : bytes.length));
         }
 
-        return (bytes[0] & 0xFF) << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
+        return (bytes[3] & 0xFF) << 24 |
+                (bytes[2] & 0xFF) << 16 |
+                (bytes[1] & 0xFF) << 8  |
+                (bytes[0] & 0xFF);
     }
-
     public static byte[] intToBytesLE(int value) {
         return ByteBuffer.allocate(4).order(java.nio.ByteOrder.LITTLE_ENDIAN).putInt(value).array();
     }
