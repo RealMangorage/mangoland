@@ -86,7 +86,7 @@ public final class Instructions {
                         "org.mangorage#print; 'one two three'",
                         "org.mangorage#print; 'one two three'",
                         "org.mangorage#print; 'one two three'",
-                        "org.mangorage#print; 'one two three'"
+                        "org.mangorage#print; '$1'"
                 })
         );
 

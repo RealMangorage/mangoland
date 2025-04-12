@@ -11,7 +11,7 @@ public final class Persistence {
     public Persistence() {
         // Taken from a variable!
         variables.put(
-                ByteArrayKey.of(new byte[]{0x1, 0x2, 0x4, 0xe}), new byte[]{
+                ByteArrayKey.of(new byte[]{0x31}), new byte[]{
                         84, 97, 107, 101, 110, 32, 102, 114, 111, 109, 32,
                         97, 32, 118, 97, 114, 105, 97, 98, 108, 101, 33
                 }
