@@ -24,6 +24,10 @@ public final class ByteArrayKey {
         return Arrays.equals(this.data, ((ByteArrayKey) obj).data);
     }
 
+    public boolean equals(byte[] array) {
+        return Arrays.equals(this.data, array);
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(data);

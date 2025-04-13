@@ -65,7 +65,7 @@ public final class Mangoland {
             INSTRUCTION_MAP.getOrDefault(
                     ByteArrayKey.of(Arrays.copyOfRange(instruction, 0, 4)),
                     InvalidInstruction.INSTANCE
-            ).process(Arrays.copyOfRange(instruction, 4, instruction.length), persistence);
+            ).process(Arrays.copyOfRange(instruction, 4, instruction.length), persistence, DATA_TYPES);
         }
     }
 
@@ -103,7 +103,7 @@ public final class Mangoland {
         Files.write(
                 Path.of("myprogram.mangoland"),
                 compile(new String[] {
-                        "org.mangorage#print; 'Test'"
+                        "org.mangorage#print; '$1'"
                 }),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );

@@ -1,5 +1,6 @@
 package org.mangorage.mangoland.core.instruction.impl;
 
+import org.mangorage.mangoland.core.datatype.DataTypes;
 import org.mangorage.mangoland.core.instruction.Instruction;
 import org.mangorage.mangoland.core.persistance.Persistence;
 
@@ -9,7 +10,7 @@ public final class InvalidInstruction implements Instruction {
     InvalidInstruction() {}
 
     @Override
-    public void process(final byte[] instruction, final Persistence persistence) {
+    public void process(final byte[] instruction, final Persistence persistence, final DataTypes dataTypes) {
         throw new IllegalStateException("Invalid Instruction");
     }
 
