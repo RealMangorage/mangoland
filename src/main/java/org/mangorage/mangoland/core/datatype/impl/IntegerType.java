@@ -17,4 +17,17 @@ public final class IntegerType implements DataType<Integer> {
         return ByteUtil.bytesToInt(data);
     }
 
+    @Override
+    public byte[] cast(DataType<?> from, byte[] data) {
+        if (DataTypes.STRING_TYPE.equals(from.getDataType())) {
+            // Convert Integer to String
+            return ByteUtil.intToBytesLE(
+                    Integer.parseInt(
+                            new String(data)
+                    )
+            );
+        }
+        return data;
+    }
+
 }

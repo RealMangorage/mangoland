@@ -17,8 +17,4 @@ public final class GeneralUtil {
                 })
                 .toArray(Parameter[]::new);
     }
-
-    public static Parameter[] getParameters(String code, DataTypes dataTypes) {
-        return null;
-    }
 }

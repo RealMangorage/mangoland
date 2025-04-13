@@ -1,6 +1,7 @@
 package org.mangorage.mangoland;
 
 import org.mangorage.mangoland.core.datatype.DataTypes;
+import org.mangorage.mangoland.core.datatype.impl.DataTypeType;
 import org.mangorage.mangoland.core.datatype.impl.IntegerType;
 import org.mangorage.mangoland.core.datatype.impl.StringType;
 import org.mangorage.mangoland.core.datatype.impl.VariableType;
@@ -57,6 +58,7 @@ public final class Mangoland {
 
 
         registerDataType("var", DataTypes.VARIABLE, new VariableType());
+        registerDataType("data_type", DataTypes.DATA_TYPE, new DataTypeType());
         registerDataType("string", DataTypes.STRING_TYPE, new StringType());
         registerDataType("integer", DataTypes.INTEGER_TYPE, new IntegerType());
 
@@ -115,9 +117,13 @@ public final class Mangoland {
                 compile(new String[] {
                         "org.mangorage#add '2' '3' -> '$1'",
                         "org.mangorage#add '2' '$1' -> '$1'",
-                        "org.mangorage#parse",
+                        "org.mangorage#parse '$1' -> '$1' as '?string' from '?integer'",
                         "org.mangorage#print; '$1'",
 
+                        "org.mangorage#parse '$1' -> '$1' as '?integer' from '?string'",
+                        "org.mangorage#add '56' '$1' -> '$1'",
+                        "org.mangorage#parse '$1' -> '$1' as '?string' from '?integer'",
+                        "org.mangorage#print; '$1'",
                 }),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );
