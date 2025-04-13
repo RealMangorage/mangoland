@@ -11,9 +11,19 @@ public final class DataTypes {
     public static final ByteArrayKey INTEGER_TYPE = ByteArrayKey.of(new byte[] { 0x3B, 0x09, 0x5C, 0x22 });
 
     private final Map<ByteArrayKey, DataType> dataMap = new HashMap<>();
+    private final Map<String, DataType> dataMapByKeyword = new HashMap<>();
 
     // typeName is unused, just so I can just know what the heck it is, from dev side...
-    public void registerDataType(final String typeName, final ByteArrayKey dataTypeId, final DataType dataType) {
+    public void registerDataType(final String keyword, final ByteArrayKey dataTypeId, final DataType dataType) {
         dataMap.put(dataTypeId, dataType);
+        dataMapByKeyword.put(keyword, dataType);
+    }
+
+    public DataType getDataType(ByteArrayKey byteArrayKey) {
+        return dataMap.get(byteArrayKey);
+    }
+
+    public DataType getDataType(String keyword) {
+        return dataMapByKeyword.get(keyword);
     }
 }

@@ -15,7 +15,7 @@ public final class InvalidInstruction implements Instruction {
     }
 
     @Override
-    public byte[] compile(String code) {
+    public byte[] compile(String code, DataTypes dataTypes) {
         throw new IllegalStateException("Invalid Instruction");
     }
 }

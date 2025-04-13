@@ -1,6 +1,10 @@
 package org.mangorage.mangoland.core.datatype;
 
-// Can be an integer
-public interface DataType {
+import org.mangorage.mangoland.core.misc.ByteArrayKey;
 
+// Can be an integer
+public interface DataType<T> {
+    ByteArrayKey getDataType();
+
+    T asObject(byte[] data);
 }

@@ -19,7 +19,7 @@ public final class PrintInstruction implements Instruction {
 
             byte[] TYPE = Arrays.copyOfRange(param, 0, 4);
             int length = ByteUtil.bytesToInt(Arrays.copyOfRange(param, 4, 8));
-            byte[] data = Arrays.copyOfRange(param, 8, 8 + length);
+            byte[] data = Arrays.copyOfRange(param, 8, param.length);
 
             if (DataTypes.VARIABLE.equals(TYPE)) {
                 System.out.println(
@@ -38,7 +38,7 @@ public final class PrintInstruction implements Instruction {
     }
 
     @Override
-    public byte[] compile(String code) {
+    public byte[] compile(String code, DataTypes dataTypes) {
         var array = StringUtil.extractQuotedStrings(code);
         if (array.length != 1) throw new CompileException("Unable to compile. Can only have one parameter for #print, got " + array.length);
 

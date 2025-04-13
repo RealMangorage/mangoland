@@ -12,5 +12,5 @@ import org.mangorage.mangoland.core.persistance.Persistence;
 public interface Instruction {
     void process(final byte[] instruction, final Persistence persistence, final DataTypes dataTypes);
 
-    byte[] compile(String code);
+    byte[] compile(String code, DataTypes dataTypes);
 }

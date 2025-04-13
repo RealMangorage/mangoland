@@ -24,6 +24,10 @@ public final class ByteArrayKey {
         return Arrays.equals(this.data, ((ByteArrayKey) obj).data);
     }
 
+    public boolean equals(ByteArrayKey byteArrayKey) {
+        return Arrays.equals(this.data, byteArrayKey.data);
+    }
+
     public boolean equals(byte[] array) {
         return Arrays.equals(this.data, array);
     }

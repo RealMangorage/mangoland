@@ -4,16 +4,14 @@ import org.mangorage.mangoland.core.datatype.DataType;
 import org.mangorage.mangoland.core.datatype.DataTypes;
 import org.mangorage.mangoland.core.misc.ByteArrayKey;
 
-public class StringType implements DataType<String> {
+public final class VariableType implements DataType<Void> {
     @Override
     public ByteArrayKey getDataType() {
-        return DataTypes.STRING_TYPE;
+        return DataTypes.VARIABLE;
     }
 
     @Override
-    public String asObject(byte[] data) {
-        return new String(
-                data
-        );
+    public Void asObject(byte[] data) {
+        return null;
     }
 }

@@ -1,13 +1,17 @@
 package org.mangorage.mangoland;
 
 import org.mangorage.mangoland.core.datatype.DataTypes;
+import org.mangorage.mangoland.core.datatype.impl.IntegerType;
+import org.mangorage.mangoland.core.datatype.impl.StringType;
+import org.mangorage.mangoland.core.datatype.impl.VariableType;
 import org.mangorage.mangoland.core.instruction.Instruction;
+import org.mangorage.mangoland.core.instruction.impl.AddInstruction;
+import org.mangorage.mangoland.core.instruction.impl.ParseInstruction;
 import org.mangorage.mangoland.core.misc.ByteArrayKey;
 import org.mangorage.mangoland.core.persistance.Persistence;
 import org.mangorage.mangoland.core.instruction.impl.InvalidInstruction;
 import org.mangorage.mangoland.core.instruction.impl.PrintInstruction;
 import org.mangorage.mangoland.core.datatype.DataType;
-import org.mangorage.mangoland.core.datatype.impl.StringType;
 import org.mangorage.mangoland.core.util.ByteUtil;
 
 import java.io.IOException;
@@ -48,7 +52,13 @@ public final class Mangoland {
 
     static {
         registerInst("org.mangorage#print", ByteUtil.intToBytesLE(0), new PrintInstruction());
-        registerDataType("String", DataTypes.STRING_TYPE, new StringType());
+        registerInst("org.mangorage#add", ByteUtil.intToBytesLE(1), new AddInstruction());
+        registerInst("org.mangorage#parse", ByteUtil.intToBytesLE(2), new ParseInstruction());
+
+
+        registerDataType("var", DataTypes.VARIABLE, new VariableType());
+        registerDataType("string", DataTypes.STRING_TYPE, new StringType());
+        registerDataType("integer", DataTypes.INTEGER_TYPE, new IntegerType());
 
         // Stored Variable Struct
         // [TYPE] [LENGTH] [DATA]
@@ -80,7 +90,7 @@ public final class Mangoland {
                     byte[] start = ByteUtil.merge(INST_START.get(), set.getValue().get());
 
                     Instruction instruction = INSTRUCTION_MAP.get(set.getValue());
-                    byte[] remainder = instruction.compile(line.substring(line.indexOf(";") + 2));
+                    byte[] remainder = instruction.compile(line.substring(line.indexOf(";") + 2), DATA_TYPES);
 
                     byte[] end = ByteUtil.merge(start, remainder);
 
@@ -103,7 +113,11 @@ public final class Mangoland {
         Files.write(
                 Path.of("myprogram.mangoland"),
                 compile(new String[] {
-                        "org.mangorage#print; '$1'"
+                        "org.mangorage#add '2' '3' -> '$1'",
+                        "org.mangorage#add '2' '$1' -> '$1'",
+                        "org.mangorage#parse",
+                        "org.mangorage#print; '$1'",
+
                 }),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );
