@@ -1,4 +1,4 @@
-package org.mangorage.mangoland.util;
+package org.mangorage.mangoland.core.util;
 
 import java.util.ArrayList;
 import java.util.List;

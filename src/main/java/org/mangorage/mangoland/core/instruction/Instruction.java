@@ -1,6 +1,6 @@
-package org.mangorage.mangoland;
+package org.mangorage.mangoland.core.instruction;
 
-import org.mangorage.mangoland.persistance.Persistence;
+import org.mangorage.mangoland.core.persistance.Persistence;
 
 /**
 

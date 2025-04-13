@@ -1,6 +1,6 @@
-package org.mangorage.mangoland.persistance;
+package org.mangorage.mangoland.core.persistance;
 
-import org.mangorage.mangoland.data.ByteArrayKey;
+import org.mangorage.mangoland.core.misc.ByteArrayKey;
 
 import java.util.HashMap;
 import java.util.Map;

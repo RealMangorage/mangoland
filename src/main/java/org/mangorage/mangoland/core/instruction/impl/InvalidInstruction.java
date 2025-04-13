@@ -1,7 +1,7 @@
-package org.mangorage.mangoland.types;
+package org.mangorage.mangoland.core.instruction.impl;
 
-import org.mangorage.mangoland.Instruction;
-import org.mangorage.mangoland.persistance.Persistence;
+import org.mangorage.mangoland.core.instruction.Instruction;
+import org.mangorage.mangoland.core.persistance.Persistence;
 
 public final class InvalidInstruction implements Instruction {
     public static final Instruction INSTANCE = new InvalidInstruction();

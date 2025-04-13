@@ -1,4 +1,4 @@
-package org.mangorage.mangoland.util;
+package org.mangorage.mangoland.core.util;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

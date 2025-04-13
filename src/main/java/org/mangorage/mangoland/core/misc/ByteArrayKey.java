@@ -1,4 +1,4 @@
-package org.mangorage.mangoland.data;
+package org.mangorage.mangoland.core.misc;
 
 import java.util.Arrays;
 
@@ -11,6 +11,10 @@ public final class ByteArrayKey {
 
     ByteArrayKey(byte[] data) {
         this.data = data;
+    }
+
+    public byte[] get() {
+        return data;
     }
 
     @Override
