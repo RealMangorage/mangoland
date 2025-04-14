@@ -4,10 +4,10 @@ import org.mangorage.mangoland.engine.api.DataType;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
-import org.mangorage.mangoland.engine.api.Instruction;
+import org.mangorage.mangoland.engine.api.instruction.Instruction;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
-import org.mangorage.mangoland.script.util.ByteConstants;
-import org.mangorage.mangoland.script.util.ByteUtil;
+import org.mangorage.mangoland.script.util.ParameterConstants;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.GeneralUtil;
 import org.mangorage.mangoland.script.util.StringUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
@@ -46,14 +46,14 @@ public final class ParseInstruction implements Instruction {
                 result = ByteUtil.merge(
                         result,
                         ByteUtil.merge(
-                                ByteConstants.PARAMETER_START.get(),
+                                ParameterConstants.PARAMETER_START.get(),
                                 ByteUtil.merge(
                                         ScriptDataTypes.DATA_TYPE.get(),
                                         ByteUtil.merge(
                                                 ByteUtil.intToBytes(4),
                                                 ByteUtil.merge(
                                                         dataTypes.getDataType(param.replaceFirst("\\?", "")).getDataType().get(),
-                                                        ByteConstants.PARAMETER_END.get()
+                                                        ParameterConstants.PARAMETER_END.get()
                                                 )
                                         )
                                 )
@@ -67,14 +67,14 @@ public final class ParseInstruction implements Instruction {
             result = ByteUtil.merge(
                     result,
                     ByteUtil.merge(
-                            ByteConstants.PARAMETER_START.get(),
+                            ParameterConstants.PARAMETER_START.get(),
                             ByteUtil.merge(
                                     ScriptDataTypes.VARIABLE.get(),
                                     ByteUtil.merge(
                                             ByteUtil.intToBytes(4),
                                             ByteUtil.merge(
                                                     data,
-                                                    ByteConstants.PARAMETER_END.get()
+                                                    ParameterConstants.PARAMETER_END.get()
                                             )
                                     )
                             )

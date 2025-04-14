@@ -1,4 +1,4 @@
-package org.mangorage.mangoland.script.util;
+package org.mangorage.mangoland.engine.util;
 
 import java.util.Arrays;
 

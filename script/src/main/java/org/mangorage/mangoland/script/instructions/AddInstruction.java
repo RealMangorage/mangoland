@@ -3,9 +3,9 @@ package org.mangorage.mangoland.script.instructions;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
-import org.mangorage.mangoland.engine.api.Instruction;
-import org.mangorage.mangoland.script.util.ByteConstants;
-import org.mangorage.mangoland.script.util.ByteUtil;
+import org.mangorage.mangoland.engine.api.instruction.Instruction;
+import org.mangorage.mangoland.script.util.ParameterConstants;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.GeneralUtil;
 import org.mangorage.mangoland.script.util.StringUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
@@ -60,14 +60,14 @@ public final class AddInstruction implements Instruction {
                     ByteUtil.merge(
                             result,
                             ByteUtil.merge(
-                                    ByteConstants.PARAMETER_START.get(),
+                                    ParameterConstants.PARAMETER_START.get(),
                                     ByteUtil.merge(
                                             isVariable ? ScriptDataTypes.VARIABLE.get() : ScriptDataTypes.INTEGER_TYPE.get(),
                                             ByteUtil.merge(
                                                     ByteUtil.intToBytes(data.length),
                                                     ByteUtil.merge(
                                                             data,
-                                                            ByteConstants.PARAMETER_END.get()
+                                                            ParameterConstants.PARAMETER_END.get()
                                                     )
                                             )
                                     )

@@ -3,9 +3,9 @@ package org.mangorage.mangoland.script.instructions;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
-import org.mangorage.mangoland.engine.api.Instruction;
-import org.mangorage.mangoland.script.util.ByteConstants;
-import org.mangorage.mangoland.script.util.ByteUtil;
+import org.mangorage.mangoland.engine.api.instruction.Instruction;
+import org.mangorage.mangoland.script.util.ParameterConstants;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.StringUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 
@@ -14,7 +14,7 @@ import java.util.Arrays;
 public final class PrintInstruction implements Instruction {
     @Override
     public void process(byte[] instruction, final RuntimeEnv env) {
-        var params = ByteUtil.extractBetween(instruction, ByteConstants.PARAMETER_START.get(), ByteConstants.PARAMETER_END.get());
+        var params = ByteUtil.extractBetween(instruction, ParameterConstants.PARAMETER_START.get(), ParameterConstants.PARAMETER_END.get());
         if (params.length > 0) {
             var param = params[0]; // TYPE LENGTH DATA
 
@@ -48,14 +48,14 @@ public final class PrintInstruction implements Instruction {
         var param = variable ? paramPre.replaceFirst("\\$", "").getBytes() : paramPre.getBytes();
 
         return ByteUtil.merge(
-                ByteConstants.PARAMETER_START.get(),
+                ParameterConstants.PARAMETER_START.get(),
                 ByteUtil.merge(
                         variable ? ScriptDataTypes.VARIABLE.get() : ScriptDataTypes.STRING_TYPE.get(),
                         ByteUtil.merge(
                                 ByteUtil.intToBytes(param.length),
                                 ByteUtil.merge(
                                         param,
-                                        ByteConstants.PARAMETER_END.get()
+                                        ParameterConstants.PARAMETER_END.get()
                                 )
                         )
                 )

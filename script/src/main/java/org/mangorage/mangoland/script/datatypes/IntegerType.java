@@ -2,7 +2,7 @@ package org.mangorage.mangoland.script.datatypes;
 
 import org.mangorage.mangoland.engine.api.DataType;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
-import org.mangorage.mangoland.script.util.ByteUtil;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 
 public final class IntegerType implements DataType<Integer> {

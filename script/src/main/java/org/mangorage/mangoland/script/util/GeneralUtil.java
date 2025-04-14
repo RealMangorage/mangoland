@@ -2,12 +2,13 @@ package org.mangorage.mangoland.script.util;
 
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 
 import java.util.Arrays;
 
 public final class GeneralUtil {
     public static Parameter[] getParameters(byte[] instruction, CompileEnv env) {
-        var params = ByteUtil.extractBetween(instruction, ByteConstants.PARAMETER_START.get(), ByteConstants.PARAMETER_END.get());
+        var params = ByteUtil.extractBetween(instruction, ParameterConstants.PARAMETER_START.get(), ParameterConstants.PARAMETER_END.get());
         return Arrays.stream(params)
                 .map(param -> {
                     var dataType = ByteArrayKey.of(Arrays.copyOfRange(param, 0, 4));

@@ -1,6 +1,5 @@
-package org.mangorage.mangoland.script.instructions;
+package org.mangorage.mangoland.engine.api.instruction;
 
-import org.mangorage.mangoland.engine.api.Instruction;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 
