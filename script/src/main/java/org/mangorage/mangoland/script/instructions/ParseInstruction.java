@@ -1,6 +1,7 @@
 package org.mangorage.mangoland.script.instructions;
 
 import org.mangorage.mangoland.engine.api.DataType;
+import org.mangorage.mangoland.engine.api.Variable;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
@@ -27,9 +28,12 @@ public final class ParseInstruction implements Instruction {
 
         env.getPersistence().setVariable(
                 paramTwo,
-                paramThree.cast(
-                        paramFour,
-                        paramOne
+                Variable.of(
+                        paramThree,
+                        paramThree.cast(
+                                paramFour,
+                                paramOne.getData()
+                        )
                 )
         );
     }
@@ -48,14 +52,11 @@ public final class ParseInstruction implements Instruction {
                         ByteUtil.merge(
                                 ParameterConstants.PARAMETER_START.get(),
                                 ByteUtil.merge(
-                                        ScriptDataTypes.DATA_TYPE.get(),
-                                        ByteUtil.merge(
-                                                ByteUtil.intToBytes(4),
-                                                ByteUtil.merge(
-                                                        dataTypes.getDataType(param.replaceFirst("\\?", "")).getDataType().get(),
-                                                        ParameterConstants.PARAMETER_END.get()
-                                                )
-                                        )
+                                    ScriptDataTypes.DATA_TYPE.get(),
+                                            ByteUtil.merge(
+                                                    dataTypes.getDataType(param.replaceFirst("\\?", "")).getDataType().get(),
+                                                    ParameterConstants.PARAMETER_END.get()
+                                            )
                                 )
                         )
                 );
@@ -69,15 +70,12 @@ public final class ParseInstruction implements Instruction {
                     ByteUtil.merge(
                             ParameterConstants.PARAMETER_START.get(),
                             ByteUtil.merge(
-                                    ScriptDataTypes.VARIABLE.get(),
-                                    ByteUtil.merge(
-                                            ByteUtil.intToBytes(4),
-                                            ByteUtil.merge(
-                                                    data,
-                                                    ParameterConstants.PARAMETER_END.get()
-                                            )
-                                    )
-                            )
+                                ScriptDataTypes.VARIABLE.get(),
+                                        ByteUtil.merge(
+                                                data,
+                                                ParameterConstants.PARAMETER_END.get()
+                                        )
+                                )
                     )
             );
         }

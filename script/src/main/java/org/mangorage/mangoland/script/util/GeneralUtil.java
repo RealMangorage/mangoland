@@ -12,8 +12,7 @@ public final class GeneralUtil {
         return Arrays.stream(params)
                 .map(param -> {
                     var dataType = ByteArrayKey.of(Arrays.copyOfRange(param, 0, 4));
-                    var length = ByteUtil.bytesToInt(Arrays.copyOfRange(param, 4, 8));
-                    return new Parameter(env.getDataType(dataType), length, Arrays.copyOfRange(param, 8, param.length));
+                    return new Parameter(env.getDataType(dataType), Arrays.copyOfRange(param, 4, param.length));
                 })
                 .toArray(Parameter[]::new);
     }

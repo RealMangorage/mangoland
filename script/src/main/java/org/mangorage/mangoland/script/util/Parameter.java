@@ -5,12 +5,10 @@ import org.mangorage.mangoland.engine.api.ByteArrayKey;
 
 public final class Parameter {
     private final DataType<?> dataType;
-    private final int length;
     private final byte[] data;
 
-    public Parameter(DataType<?> dataType, int length, byte[] data) {
+    public Parameter(DataType<?> dataType, byte[] data) {
         this.dataType = dataType;
-        this.length = length;
         this.data = data;
     }
 
@@ -23,12 +21,12 @@ public final class Parameter {
         return (T) dataType.asObject(data);
     }
 
-    public DataType<?> getDataType() {
-        return dataType;
+    public <T> T asObject(Class<T> tClass) {
+        return asObject();
     }
 
-    public int getLength() {
-        return length;
+    public DataType<?> getDataType() {
+        return dataType;
     }
 
     public byte[] getData() {

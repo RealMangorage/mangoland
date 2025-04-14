@@ -66,6 +66,7 @@ public final class Mangoland {
                         "org.mangorage#add '56' '$1' -> '$1'",
                         "org.mangorage#parse '$1' -> '$1' as '?string' from '?integer'",
                         "org.mangorage#print; '$1'",
+                        "org.mangorage#print 'Finished!'"
                 }, ENV),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );

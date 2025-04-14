@@ -1,5 +1,6 @@
 package org.mangorage.mangoland.script.instructions;
 
+import org.mangorage.mangoland.engine.api.Variable;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
@@ -26,17 +27,23 @@ public final class AddInstruction implements Instruction {
             if (paramOne.is(ScriptDataTypes.INTEGER_TYPE)) {
                 a = paramOne.asObject();
             } else if (paramOne.is(ScriptDataTypes.VARIABLE)) {
-                a = ByteUtil.bytesToInt(env.getPersistence().getVariable(paramOne.getData()));
+                a = env.getPersistence().getVariable(paramOne.getData()).asObject();
             }
 
             if (paramTwo.is(ScriptDataTypes.INTEGER_TYPE)) {
                 b = paramTwo.asObject();
             } else if (paramTwo.is(ScriptDataTypes.VARIABLE)) {
-                b = ByteUtil.bytesToInt(env.getPersistence().getVariable(paramTwo.getData()));
+                b = env.getPersistence().getVariable(paramTwo.getData()).asObject();
             }
 
             if (paramThree.is(ScriptDataTypes.VARIABLE)) {
-                env.getPersistence().setVariable(paramThree.getData(), ByteUtil.intToBytes(a + b));
+                env.getPersistence().setVariable(
+                        paramThree.getData(),
+                        Variable.of(
+                                env.getDataType(ScriptDataTypes.INTEGER_TYPE),
+                                ByteUtil.intToBytes(a + b)
+                        )
+                );
             }
         }
     }
@@ -64,11 +71,8 @@ public final class AddInstruction implements Instruction {
                                     ByteUtil.merge(
                                             isVariable ? ScriptDataTypes.VARIABLE.get() : ScriptDataTypes.INTEGER_TYPE.get(),
                                             ByteUtil.merge(
-                                                    ByteUtil.intToBytes(data.length),
-                                                    ByteUtil.merge(
-                                                            data,
-                                                            ParameterConstants.PARAMETER_END.get()
-                                                    )
+                                                    data,
+                                                    ParameterConstants.PARAMETER_END.get()
                                             )
                                     )
                             )

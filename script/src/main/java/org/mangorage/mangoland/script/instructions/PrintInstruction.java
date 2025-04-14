@@ -4,38 +4,27 @@ import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.script.exception.CompileException;
 import org.mangorage.mangoland.engine.api.instruction.Instruction;
+import org.mangorage.mangoland.script.util.GeneralUtil;
 import org.mangorage.mangoland.script.util.ParameterConstants;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.StringUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 
-import java.util.Arrays;
-
 public final class PrintInstruction implements Instruction {
     @Override
     public void process(byte[] instruction, final RuntimeEnv env) {
-        var params = ByteUtil.extractBetween(instruction, ParameterConstants.PARAMETER_START.get(), ParameterConstants.PARAMETER_END.get());
-        if (params.length > 0) {
-            var param = params[0]; // TYPE LENGTH DATA
 
-            byte[] TYPE = Arrays.copyOfRange(param, 0, 4);
-            int length = ByteUtil.bytesToInt(Arrays.copyOfRange(param, 4, 8));
-            byte[] data = Arrays.copyOfRange(param, 8, param.length);
+        var params = GeneralUtil.getParameters(instruction, env);
+        var param = params[0]; // TYPE LENGTH DATA
 
-            if (ScriptDataTypes.VARIABLE.equals(TYPE)) {
-                System.out.println(
-                        new String(
-                                env.getPersistence().getVariable(data)
-                        )
-                );
-            } else if (ScriptDataTypes.STRING_TYPE.equals(TYPE)) {
-                System.out.println(
-                        new String(
-                                data
-                        )
-                );
-            }
+        if (ScriptDataTypes.VARIABLE.equals(param.getDataType().getDataType())) {
+            System.out.println(
+                    env.getPersistence().getVariable(param.getData()).asObject(String.class)
+            );
+        } else if (ScriptDataTypes.STRING_TYPE.equals(param.getDataType().getDataType())) {
+            System.out.println(param.asObject(String.class));
         }
+
     }
 
     @Override
@@ -52,11 +41,8 @@ public final class PrintInstruction implements Instruction {
                 ByteUtil.merge(
                         variable ? ScriptDataTypes.VARIABLE.get() : ScriptDataTypes.STRING_TYPE.get(),
                         ByteUtil.merge(
-                                ByteUtil.intToBytes(param.length),
-                                ByteUtil.merge(
-                                        param,
-                                        ParameterConstants.PARAMETER_END.get()
-                                )
+                                param,
+                                ParameterConstants.PARAMETER_END.get()
                         )
                 )
         );
