@@ -1,0 +1,19 @@
+package org.mangorage.mangoland.script.util;
+
+import org.mangorage.mangoland.engine.api.env.CompileEnv;
+import org.mangorage.mangoland.engine.api.ByteArrayKey;
+
+import java.util.Arrays;
+
+public final class GeneralUtil {
+    public static Parameter[] getParameters(byte[] instruction, CompileEnv env) {
+        var params = ByteUtil.extractBetween(instruction, ByteConstants.PARAMETER_START.get(), ByteConstants.PARAMETER_END.get());
+        return Arrays.stream(params)
+                .map(param -> {
+                    var dataType = ByteArrayKey.of(Arrays.copyOfRange(param, 0, 4));
+                    var length = ByteUtil.bytesToInt(Arrays.copyOfRange(param, 4, 8));
+                    return new Parameter(env.getDataType(dataType), length, Arrays.copyOfRange(param, 8, param.length));
+                })
+                .toArray(Parameter[]::new);
+    }
+}
