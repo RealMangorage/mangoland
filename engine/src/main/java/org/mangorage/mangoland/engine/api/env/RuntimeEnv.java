@@ -8,6 +8,5 @@ public sealed interface RuntimeEnv extends CompileEnv permits RuntimeEnvImpl {
         return new RuntimeEnvImpl(compileEnv, persistence);
     }
 
-    void setVariable(final byte[] key, final byte[] value);
-    byte[] getVariable(final byte[] key);
+    Persistence getPersistence();
 }

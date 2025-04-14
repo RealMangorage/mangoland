@@ -25,7 +25,7 @@ public final class PrintInstruction implements Instruction {
             if (ScriptDataTypes.VARIABLE.equals(TYPE)) {
                 System.out.println(
                         new String(
-                                env.getVariable(data)
+                                env.getPersistence().getVariable(data)
                         )
                 );
             } else if (ScriptDataTypes.STRING_TYPE.equals(TYPE)) {

@@ -18,14 +18,14 @@ public final class ParseInstruction implements Instruction {
         var params = GeneralUtil.getParameters(instruction, env);
 
         // Variables
-        var paramOne = env.getVariable(params[0].getData());
+        var paramOne = env.getPersistence().getVariable(params[0].getData());
         var paramTwo = params[1].getData();
 
         // Data Types
         DataType<?> paramThree = env.getDataType(ByteArrayKey.of(params[2].getData()));
         DataType<?> paramFour = env.getDataType(ByteArrayKey.of(params[3].getData()));
 
-        env.setVariable(
+        env.getPersistence().setVariable(
                 paramTwo,
                 paramThree.cast(
                         paramFour,

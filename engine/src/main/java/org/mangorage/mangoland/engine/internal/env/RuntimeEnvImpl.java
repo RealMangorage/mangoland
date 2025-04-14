@@ -17,13 +17,8 @@ public final class RuntimeEnvImpl implements RuntimeEnv {
     }
 
     @Override
-    public void setVariable(byte[] key, byte[] value) {
-        persistence.setVariable(key, value);
-    }
-
-    @Override
-    public byte[] getVariable(byte[] key) {
-        return persistence.getVariable(key);
+    public Persistence getPersistence() {
+        return persistence;
     }
 
     @Override
