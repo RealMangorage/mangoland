@@ -27,18 +27,18 @@ public final class AddInstruction implements Instruction {
             if (paramOne.is(ScriptDataTypes.INTEGER_TYPE)) {
                 a = paramOne.asObject();
             } else if (paramOne.is(ScriptDataTypes.VARIABLE)) {
-                a = env.getPersistence().getVariable(paramOne.getData()).asObject();
+                a = env.getPersistence().getVariable(paramOne.getVariable().getData()).asObject();
             }
 
             if (paramTwo.is(ScriptDataTypes.INTEGER_TYPE)) {
                 b = paramTwo.asObject();
             } else if (paramTwo.is(ScriptDataTypes.VARIABLE)) {
-                b = env.getPersistence().getVariable(paramTwo.getData()).asObject();
+                b = env.getPersistence().getVariable(paramTwo.getVariable().getData()).asObject();
             }
 
             if (paramThree.is(ScriptDataTypes.VARIABLE)) {
                 env.getPersistence().setVariable(
-                        paramThree.getData(),
+                        paramThree.getVariable().getData(),
                         Variable.of(
                                 ScriptDataTypes.INTEGER_TYPE,
                                 ByteUtil.intToBytes(a + b)
@@ -63,20 +63,11 @@ public final class AddInstruction implements Instruction {
 
             if (!isVariable && i == 2) throw new CompileException("Output/3rd parameter needs to be a variable...");
 
-            result =
-                    ByteUtil.merge(
-                            result,
-                            ByteUtil.merge(
-                                    InstructionConstants.PARAMETER_START.get(),
-                                    ByteUtil.merge(
-                                            isVariable ? ScriptDataTypes.VARIABLE.getDataType().get() : ScriptDataTypes.INTEGER_TYPE.getDataType().get(),
-                                            ByteUtil.merge(
-                                                    data,
-                                                    InstructionConstants.PARAMETER_END.get()
-                                            )
-                                    )
-                            )
-                    );
+
+            result = ByteUtil.merge(
+                    result,
+                    isVariable ? ScriptDataTypes.VARIABLE.createParameter(data).getFullData() : ScriptDataTypes.INTEGER_TYPE.createParameter(data).getFullData()
+            );
         }
 
         return result;

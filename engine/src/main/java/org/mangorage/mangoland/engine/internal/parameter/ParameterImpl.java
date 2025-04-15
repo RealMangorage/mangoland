@@ -3,6 +3,8 @@ package org.mangorage.mangoland.engine.internal.parameter;
 import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.parameter.Parameter;
 import org.mangorage.mangoland.engine.api.variable.Variable;
+import org.mangorage.mangoland.engine.constants.InstructionConstants;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 
 public final class ParameterImpl implements Parameter {
 
@@ -29,7 +31,19 @@ public final class ParameterImpl implements Parameter {
         return variable.getDataType();
     }
 
-    public byte[] getData() {
-        return variable.getData();
+    @Override
+    public Variable getVariable() {
+        return variable;
     }
+
+    @Override
+    public byte[] getFullData() {
+        return ByteUtil.merge(
+                InstructionConstants.PARAMETER_START.get(),
+                variable.getFullData(),
+                InstructionConstants.PARAMETER_END.get()
+        );
+    }
+
+
 }

@@ -19,7 +19,7 @@ public final class PrintInstruction implements Instruction {
 
         if (ScriptDataTypes.VARIABLE.equals(param.getDataType())) {
             System.out.println(
-                    env.getPersistence().getVariable(param.getData()).asObject(String.class)
+                    env.getPersistence().getVariable(param.getVariable().getData()).asObject(String.class)
             );
         } else if (ScriptDataTypes.STRING_TYPE.equals(param.getDataType())) {
             System.out.println(param.asObject(String.class));
@@ -33,18 +33,9 @@ public final class PrintInstruction implements Instruction {
         if (array.length != 1) throw new CompileException("Unable to compile. Can only have one parameter for #print, got " + array.length);
 
         var paramPre = array[0];
-        var variable = paramPre.startsWith("$");
-        var param = variable ? paramPre.replaceFirst("\\$", "").getBytes() : paramPre.getBytes();
+        var isVariable = paramPre.startsWith("$");
+        var data = isVariable ? paramPre.replaceFirst("\\$", "").getBytes() : paramPre.getBytes();
 
-        return ByteUtil.merge(
-                InstructionConstants.PARAMETER_START.get(),
-                ByteUtil.merge(
-                        variable ? ScriptDataTypes.VARIABLE.getDataType().get() : ScriptDataTypes.STRING_TYPE.getDataType().get(),
-                        ByteUtil.merge(
-                                param,
-                                InstructionConstants.PARAMETER_END.get()
-                        )
-                )
-        );
+        return isVariable ? ScriptDataTypes.VARIABLE.createParameter(data).getFullData() : ScriptDataTypes.STRING_TYPE.createParameter(data).getFullData();
     }
 }

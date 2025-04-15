@@ -9,11 +9,16 @@ public sealed interface Variable permits VariableImpl {
     }
 
     DataType<?> getDataType();
-    byte[] getData();
 
     <T> T asObject();
 
     default <T> T asObject(Class<T> clazz) {
         return asObject();
-    };
+    }
+
+    byte[] getData();
+
+    // Useful if you need the data type
+    // to be included in the array
+    byte[] getFullData();
 }

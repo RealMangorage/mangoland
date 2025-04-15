@@ -1,6 +1,7 @@
 package org.mangorage.mangoland.engine.util;
 
 import java.util.Arrays;
+import java.util.List;
 
 public final class ByteUtil {
     public static byte[][] extractBetween(byte[] data, byte[] startMarker, byte[] endMarker) {
@@ -80,13 +81,29 @@ public final class ByteUtil {
         };
     }
 
-    public static byte[] merge(byte[] a, byte[] b) {
-        if (a == null) a = new byte[0];
-        if (b == null) b = new byte[0];
+    public static byte[] merge(byte[]... arrays) {
+        if (arrays == null || arrays.length == 0)
+            return new byte[0];
 
-        byte[] result = new byte[a.length + b.length];
-        System.arraycopy(a, 0, result, 0, a.length);
-        System.arraycopy(b, 0, result, a.length, b.length);
+        if (arrays.length == 1)
+            return arrays[0];
+
+        int totalLength = 0;
+        for (byte[] array : arrays) {
+            if (array != null) {
+                totalLength += array.length;
+            }
+        }
+
+        byte[] result = new byte[totalLength];
+        int pos = 0;
+        for (byte[] array : arrays) {
+            if (array != null) {
+                System.arraycopy(array, 0, result, pos, array.length);
+                pos += array.length;
+            }
+        }
+
         return result;
     }
 }

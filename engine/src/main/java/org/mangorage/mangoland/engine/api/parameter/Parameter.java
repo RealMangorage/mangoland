@@ -19,5 +19,9 @@ public sealed interface Parameter permits ParameterImpl {
 
     DataType<?> getDataType();
 
-    byte[] getData();
+    Variable getVariable();
+
+    // Useful if you need the data type & parameter
+    //   markers to be included in the array
+    byte[] getFullData();
 }

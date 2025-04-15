@@ -1,6 +1,8 @@
 package org.mangorage.mangoland.engine.api.datatype;
 
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
+import org.mangorage.mangoland.engine.api.parameter.Parameter;
+import org.mangorage.mangoland.engine.api.variable.Variable;
 
 import java.util.function.Function;
 
@@ -15,6 +17,14 @@ public interface DataType<T> {
     }
 
     ByteArrayKey getDataType();
+
+    default Variable createVariable(final byte[] data) {
+        return Variable.of(this, data);
+    }
+
+    default Parameter createParameter(final byte[] data) {
+        return Parameter.of(createVariable(data));
+    }
 
     T asObject(byte[] data);
 

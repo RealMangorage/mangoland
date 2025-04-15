@@ -2,6 +2,7 @@ package org.mangorage.mangoland.engine.internal.variable;
 
 import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.variable.Variable;
+import org.mangorage.mangoland.engine.util.ByteUtil;
 
 public final class VariableImpl implements Variable {
     private final DataType<?> type;
@@ -20,6 +21,11 @@ public final class VariableImpl implements Variable {
     @Override
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public byte[] getFullData() {
+        return ByteUtil.merge(type.getDataType().get(), data);
     }
 
     @SuppressWarnings("unchecked")

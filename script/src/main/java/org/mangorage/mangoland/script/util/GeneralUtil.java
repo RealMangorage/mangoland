@@ -4,7 +4,6 @@ import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
 
 import org.mangorage.mangoland.engine.api.parameter.Parameter;
-import org.mangorage.mangoland.engine.api.variable.Variable;
 import org.mangorage.mangoland.engine.constants.InstructionConstants;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 
@@ -17,9 +16,7 @@ public final class GeneralUtil {
                 .map(param -> {
                     var dataType = ByteArrayKey.of(Arrays.copyOfRange(param, 0, 4));
                     var data =  Arrays.copyOfRange(param, 4, param.length);
-                    return Parameter.of(
-                            Variable.of(env.getDataType(dataType), data)
-                    );
+                    return env.getDataType(dataType).createParameter(data);
                 })
                 .toArray(Parameter[]::new);
     }
