@@ -1,15 +1,22 @@
 package org.mangorage.mangoland.script.datatypes;
 
-import org.mangorage.mangoland.engine.api.DataType;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 
 public final class IntegerType implements DataType<Integer> {
 
+    private final ByteArrayKey internalId;
+
+    public IntegerType(final ByteArrayKey internalId) {
+        this.internalId = internalId;
+    }
+
+
     @Override
     public ByteArrayKey getDataType() {
-        return ScriptDataTypes.INTEGER_TYPE;
+        return internalId;
     }
 
     @Override
@@ -19,7 +26,7 @@ public final class IntegerType implements DataType<Integer> {
 
     @Override
     public byte[] cast(DataType<?> from, byte[] input) {
-        if (ScriptDataTypes.STRING_TYPE.equals(from.getDataType())) {
+        if (ScriptDataTypes.STRING_TYPE.equals(from)) {
             // Parse the byte array into an integer, handle negative sign
             int result = 0;
             int sign = 1;

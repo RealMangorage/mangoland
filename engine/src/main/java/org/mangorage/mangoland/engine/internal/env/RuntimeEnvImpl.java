@@ -1,6 +1,6 @@
 package org.mangorage.mangoland.engine.internal.env;
 
-import org.mangorage.mangoland.engine.api.DataType;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.Persistence;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;

@@ -1,6 +1,7 @@
-package org.mangorage.mangoland.engine.api;
+package org.mangorage.mangoland.engine.api.variable;
 
-import org.mangorage.mangoland.engine.internal.VariableImpl;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
+import org.mangorage.mangoland.engine.internal.variable.VariableImpl;
 
 public sealed interface Variable permits VariableImpl {
     static Variable of(final DataType<?> dataType, final byte[] data) {

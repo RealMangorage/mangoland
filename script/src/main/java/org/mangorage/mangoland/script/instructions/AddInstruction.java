@@ -1,11 +1,11 @@
 package org.mangorage.mangoland.script.instructions;
 
-import org.mangorage.mangoland.engine.api.Variable;
+import org.mangorage.mangoland.engine.api.variable.Variable;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
+import org.mangorage.mangoland.engine.constants.InstructionConstants;
 import org.mangorage.mangoland.script.exception.CompileException;
 import org.mangorage.mangoland.engine.api.instruction.Instruction;
-import org.mangorage.mangoland.script.util.ParameterConstants;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.GeneralUtil;
 import org.mangorage.mangoland.script.util.StringUtil;
@@ -40,7 +40,7 @@ public final class AddInstruction implements Instruction {
                 env.getPersistence().setVariable(
                         paramThree.getData(),
                         Variable.of(
-                                env.getDataType(ScriptDataTypes.INTEGER_TYPE),
+                                ScriptDataTypes.INTEGER_TYPE,
                                 ByteUtil.intToBytes(a + b)
                         )
                 );
@@ -67,12 +67,12 @@ public final class AddInstruction implements Instruction {
                     ByteUtil.merge(
                             result,
                             ByteUtil.merge(
-                                    ParameterConstants.PARAMETER_START.get(),
+                                    InstructionConstants.PARAMETER_START.get(),
                                     ByteUtil.merge(
-                                            isVariable ? ScriptDataTypes.VARIABLE.get() : ScriptDataTypes.INTEGER_TYPE.get(),
+                                            isVariable ? ScriptDataTypes.VARIABLE.getDataType().get() : ScriptDataTypes.INTEGER_TYPE.getDataType().get(),
                                             ByteUtil.merge(
                                                     data,
-                                                    ParameterConstants.PARAMETER_END.get()
+                                                    InstructionConstants.PARAMETER_END.get()
                                             )
                                     )
                             )

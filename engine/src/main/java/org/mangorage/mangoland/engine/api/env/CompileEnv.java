@@ -1,6 +1,6 @@
 package org.mangorage.mangoland.engine.api.env;
 
-import org.mangorage.mangoland.engine.api.DataType;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
 import org.mangorage.mangoland.engine.internal.env.CompileEnvImpl;
 

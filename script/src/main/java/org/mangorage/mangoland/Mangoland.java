@@ -5,10 +5,6 @@ import org.mangorage.mangoland.engine.api.env.builder.CompileEnvBuilder;
 import org.mangorage.mangoland.engine.api.instruction.InstructionSet;
 import org.mangorage.mangoland.engine.api.instruction.InstructionSetBuilder;
 import org.mangorage.mangoland.script.ScriptDataTypes;
-import org.mangorage.mangoland.script.datatypes.DataTypeType;
-import org.mangorage.mangoland.script.datatypes.IntegerType;
-import org.mangorage.mangoland.script.datatypes.StringType;
-import org.mangorage.mangoland.script.datatypes.VariableType;
 import org.mangorage.mangoland.script.instructions.AddInstruction;
 import org.mangorage.mangoland.script.instructions.ParseInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
@@ -34,10 +30,10 @@ public final class Mangoland {
             .build();
 
     private static final CompileEnv ENV = CompileEnvBuilder.create()
-            .register("var", ScriptDataTypes.VARIABLE, new VariableType())
-            .register("data_type", ScriptDataTypes.DATA_TYPE, new DataTypeType())
-            .register("string", ScriptDataTypes.STRING_TYPE, new StringType())
-            .register("integer",ScriptDataTypes.INTEGER_TYPE, new IntegerType())
+            .register("var", ScriptDataTypes.VARIABLE)
+            .register("data_type", ScriptDataTypes.DATA_TYPE)
+            .register("string", ScriptDataTypes.STRING_TYPE)
+            .register("integer",ScriptDataTypes.INTEGER_TYPE)
             .build();
 
     static {

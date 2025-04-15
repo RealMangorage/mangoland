@@ -1,7 +1,7 @@
-package org.mangorage.mangoland.engine.internal;
+package org.mangorage.mangoland.engine.internal.variable;
 
-import org.mangorage.mangoland.engine.api.DataType;
-import org.mangorage.mangoland.engine.api.Variable;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
+import org.mangorage.mangoland.engine.api.variable.Variable;
 
 public final class VariableImpl implements Variable {
     private final DataType<?> type;

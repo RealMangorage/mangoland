@@ -2,7 +2,7 @@ package org.mangorage.mangoland.engine.internal;
 
 import org.mangorage.mangoland.engine.api.Persistence;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
-import org.mangorage.mangoland.engine.api.Variable;
+import org.mangorage.mangoland.engine.api.variable.Variable;
 
 import java.util.HashMap;
 import java.util.Map;
