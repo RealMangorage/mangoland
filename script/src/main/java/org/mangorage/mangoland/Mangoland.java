@@ -52,7 +52,7 @@ public final class Mangoland implements IScriptProvider {
             .build();
 
     @Override
-    public byte[] compile(String code) {
+    public byte[] compile(final String code) {
         return INSTRUCTION_SET.compile(
                 code.split("\n"),
                 ENV
@@ -60,14 +60,14 @@ public final class Mangoland implements IScriptProvider {
     }
 
     @Override
-    public void execute(byte[] instructions) {
+    public void execute(final byte[] instructions) {
         INSTRUCTION_SET.process(
                 instructions,
                 ENV
         );
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
         Files.write(
                 Path.of("myprogram.mangoland"),
                 INSTRUCTION_SET.compile(new String[] {

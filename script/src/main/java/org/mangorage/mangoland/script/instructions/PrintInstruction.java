@@ -12,8 +12,8 @@ public final class PrintInstruction implements Instruction {
     @Override
     public void process(byte[] instruction, final RuntimeEnv env) {
 
-        var params = GeneralUtil.getParameters(instruction, env);
-        var param = params[0]; // TYPE LENGTH DATA
+        final var params = GeneralUtil.getParameters(instruction, env);
+        final var param = params[0]; // TYPE LENGTH DATA
 
         if (ScriptDataTypes.VARIABLE.equals(param.getDataType())) {
             System.out.println(
@@ -27,7 +27,7 @@ public final class PrintInstruction implements Instruction {
 
     @Override
     public byte[] compile(final String code, final CompileEnv env) {
-        var params = StringUtil.extractQuotedStrings(code, env);
+        final var params = StringUtil.extractQuotedStrings(code, env);
         if (params.length != 1) throw new CompileException("Unable to compile. Can only have one parameter for #print, got " + params.length);
         return params[0].getFullData();
     }

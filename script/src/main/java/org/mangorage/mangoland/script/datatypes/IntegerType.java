@@ -13,14 +13,13 @@ public final class IntegerType implements DataType<Integer> {
         this.internalId = internalId;
     }
 
-
     @Override
     public ByteArrayKey getDataType() {
         return internalId;
     }
 
     @Override
-    public Integer asObject(byte[] data) {
+    public Integer asObject(final byte[] data) {
         return ByteUtil.bytesToInt(data);
     }
 
@@ -42,7 +41,7 @@ public final class IntegerType implements DataType<Integer> {
 
             // Process the rest of the digits
             for (; i < input.length; i++) {
-                byte b = input[i];
+                final byte b = input[i];
                 if (b < '0' || b > '9') {
                     throw new IllegalArgumentException("Invalid byte in array: " + b);
                 }

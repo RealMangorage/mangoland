@@ -17,7 +17,7 @@ public sealed interface Variable permits VariableImpl {
 
     <T> T asObject();
 
-    default <T> T asObject(Class<T> clazz) {
+    default <T> T asObject(final Class<T> clazz) {
         return asObject();
     }
 

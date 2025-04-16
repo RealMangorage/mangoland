@@ -12,12 +12,12 @@ import org.mangorage.mangoland.script.util.StringUtil;
 public final class ParseInstruction implements Instruction {
     @Override
     public void process(final byte[] instruction, final RuntimeEnv env) {
-        var params = GeneralUtil.getParameters(instruction, env);
+        final var params = GeneralUtil.getParameters(instruction, env);
 
-        var variable = env.getPersistence().getVariable(params[0].getVariable().getData());
-        var destination = params[1];
-        var destinationData = destination.getVariable().getData();
-        var destinationDataType = destination.getDataType();
+        final var variable = env.getPersistence().getVariable(params[0].getVariable().getData());
+        final var destination = params[1];
+        final var destinationData = destination.getVariable().getData();
+        final var destinationDataType = destination.getDataType();
 
         env.getPersistence()
                 .setVariable(
@@ -36,7 +36,7 @@ public final class ParseInstruction implements Instruction {
 
     @Override
     public byte[] compile(final String code, final CompileEnv env) {
-        var params = StringUtil.extractQuotedStrings(code, env);
+        final var params = StringUtil.extractQuotedStrings(code, env);
         if (params.length != 2) throw new CompileException("Expected 2 parameters, got " + params.length);
         return ByteUtil.merge(
                 params[0].getFullData(),

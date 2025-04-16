@@ -15,8 +15,8 @@ public class InstructionSetBuilderImpl implements InstructionSetBuilder {
     public InstructionSetBuilderImpl() {}
 
     @Override
-    public InstructionSetBuilder register(String packageId, byte[] instId, Instruction instruction) {
-        var id = ByteArrayKey.of(instId);
+    public InstructionSetBuilder register(final String packageId, final byte[] instId, final Instruction instruction) {
+        final var id = ByteArrayKey.of(instId);
         instructionMap.put(id, instruction);
         packageToInstruction.put(packageId, id);
         return this;

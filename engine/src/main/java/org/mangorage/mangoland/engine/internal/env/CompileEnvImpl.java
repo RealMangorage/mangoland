@@ -17,11 +17,11 @@ public final class CompileEnvImpl implements CompileEnv {
     }
 
 
-    public DataType<?> getDataType(ByteArrayKey byteArrayKey) {
+    public DataType<?> getDataType(final ByteArrayKey byteArrayKey) {
         return dataMap.get(byteArrayKey);
     }
 
-    public DataType<?> getDataType(String keyword) {
+    public DataType<?> getDataType(final String keyword) {
         return dataMapByKeyword.get(keyword);
     }
 }

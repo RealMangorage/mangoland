@@ -14,11 +14,11 @@ public final class AddInstruction implements Instruction {
 
     @Override
     public void process(final byte[] instruction, final RuntimeEnv env) {
-        var params = GeneralUtil.getParameters(instruction, env);
+        final var params = GeneralUtil.getParameters(instruction, env);
         if (params.length == 3) {
-            var paramOne = params[0];
-            var paramTwo = params[1];
-            var paramThree = params[2];
+            final var paramOne = params[0];
+            final var paramTwo = params[1];
+            final var paramThree = params[2];
 
             int a = 0;
             int b = 0;
@@ -50,7 +50,7 @@ public final class AddInstruction implements Instruction {
 
     @Override
     public byte[] compile(final String code, final CompileEnv env) {
-        var params = StringUtil.extractQuotedStrings(code, env);
+        final var params = StringUtil.extractQuotedStrings(code, env);
         if (params.length != 3) throw new CompileException("Expected 3 parameters, got " + params.length);
         return ByteUtil.merge(
                 params[0].getFullData(),

@@ -5,10 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public interface IScriptProvider {
-    byte[] compile(String code);
-    void execute(byte[] instructions);
+    byte[] compile(final String code);
+    void execute(final byte[] instructions);
 
-    default byte[] compileScript(Path file) {
+    default byte[] compileScript(final Path file) {
         try {
             return compile(
                     Files.readString(file)
@@ -18,7 +18,7 @@ public interface IScriptProvider {
         }
     }
 
-    default void executeCompiledScript(Path file) {
+    default void executeCompiledScript(final Path file) {
         try {
             execute(
                     Files.readAllBytes(file)
@@ -28,12 +28,12 @@ public interface IScriptProvider {
         }
     }
 
-    default void executeUnCompiledScript(Path file) {
+    default void executeUnCompiledScript(final Path file) {
         execute(compileScript(file));
     }
 
-    default void executeScript(Path file) {
-        String extension = Util.getExtension(file);
+    default void executeScript(final Path file) {
+        final String extension = Util.getExtension(file);
 
         if (extension.equals("ml")) {
             executeCompiledScript(file);

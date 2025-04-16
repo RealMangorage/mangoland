@@ -40,12 +40,8 @@ public final class MangolandJava {
     private static final Map<String, IScriptProvider> scriptProviders = load();
 
     private static Map<String, IScriptProvider> load() {
-        final URL[] providers = fetchJars();
-
-        URLClassLoader cl = new URLClassLoader(providers);
-
-        Scanner scanner = ScannerBuilder.of()
-                .addClassloader(cl)
+        final Scanner scanner = ScannerBuilder.of()
+                .addClassloader(new URLClassLoader(fetchJars()))
                 .addClasspath(Thread.currentThread().getContextClassLoader())
                 .build();
 
@@ -56,7 +52,7 @@ public final class MangolandJava {
 
         scanner.findClassesWithAnnotation(ScriptProvider.class)
                 .forEach(clz -> {
-                    var annotation = clz.getAnnotation(ScriptProvider.class);
+                    final var annotation = clz.getAnnotation(ScriptProvider.class);
                     try {
                         providerMap.put(
                                 annotation.id(),
@@ -70,7 +66,7 @@ public final class MangolandJava {
         return Map.copyOf(providerMap);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(final String[] args) throws IOException {
 
         System.out.println("Args:");
         System.out.println(
@@ -101,9 +97,9 @@ public final class MangolandJava {
             return;
         }
 
-        var provider = scriptProviders.get(args[0]);
-        String cmd = args[1];
-        var file = Path.of(args[2]);
+        final var provider = scriptProviders.get(args[0]);
+        final String cmd = args[1];
+        final var file = Path.of(args[2]);
 
         if (cmd.equals("execute")) {
             System.out.println("Running %s now".formatted(file));
@@ -114,7 +110,7 @@ public final class MangolandJava {
             System.exit(0);
             return;
         } else if (cmd.equals("compile")) {
-            var output = Util.stripExtension(file) + ".ml";
+            final var output = Util.stripExtension(file) + ".ml";
 
             System.out.println("Compiling %s now".formatted(file));
             System.out.println("----------------------------------------");
@@ -133,16 +129,16 @@ public final class MangolandJava {
     }
 
     public static URL[] fetchJars() {
-        File providerDir = new File("providers");
+        final File providerDir = new File("providers");
         if (!providerDir.exists() || !providerDir.isDirectory()) return new URL[0];
 
-        File[] jarFiles = providerDir.listFiles((dir, name) -> name.endsWith(".jar"));
+        final File[] jarFiles = providerDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (jarFiles == null) {
             return new URL[0];
         }
 
-        List<URL> urls = new ArrayList<>();
-        for (File jar : jarFiles) {
+        final List<URL> urls = new ArrayList<>();
+        for (final File jar : jarFiles) {
             try {
                 urls.add(jar.toURI().toURL());
             } catch (MalformedURLException e) {

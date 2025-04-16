@@ -30,9 +30,9 @@ public interface DataType<T> {
 
     ByteArrayKey getDataType();
 
-    T asObject(byte[] data);
+    T asObject(final byte[] data);
 
-    byte[] cast(DataType<?> from, byte[] data);
+    byte[] cast(final DataType<?> from, final byte[] data);
 
-    byte[] compile(String code);
+    byte[] compile(final String code);
 }

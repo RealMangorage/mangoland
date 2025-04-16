@@ -18,17 +18,17 @@ public final class VariableType implements DataType<Void> {
 
 
     @Override
-    public Void asObject(byte[] data) {
+    public Void asObject(final byte[] data) {
         return null;
     }
 
     @Override
-    public byte[] cast(DataType<?> from, byte[] data) {
+    public byte[] cast(final DataType<?> from, final byte[] data) {
         return data;
     }
 
     @Override
-    public byte[] compile(String code) {
+    public byte[] compile(final String code) {
         return code.getBytes();
     }
 }

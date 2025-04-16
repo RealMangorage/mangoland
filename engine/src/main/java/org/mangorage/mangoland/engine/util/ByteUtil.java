@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class ByteUtil {
-    public static byte[][] extractBetween(byte[] data, byte[] startMarker, byte[] endMarker) {
+    public static byte[][] extractBetween(final byte[] data, final byte[] startMarker, final byte[] endMarker) {
         if (startMarker.length != 4 || endMarker.length != 4)
             throw new IllegalArgumentException("Your markers aren’t 4 bytes long, fix your damn input.");
 
@@ -44,11 +44,11 @@ public final class ByteUtil {
     }
 
     // Brutally ugly brute-force byte matcher
-    private static int indexOf(byte[] data, byte[] target) {
+    private static int indexOf(final byte[] data, final byte[] target) {
         return indexOf(data, target, 0);
     }
 
-    private static int indexOf(byte[] data, byte[] target, int fromIndex) {
+    private static int indexOf(final byte[] data, final byte[] target, final int fromIndex) {
         outer:
         for (int i = fromIndex; i <= data.length - target.length; i++) {
             for (int j = 0; j < target.length; j++) {
@@ -60,7 +60,7 @@ public final class ByteUtil {
     }
 
     // LE
-    public static int bytesToInt(byte[] bytes) {
+    public static int bytesToInt(final byte[] bytes) {
         if (bytes == null || bytes.length != 4) {
             throw new IllegalArgumentException("Expected 4 bytes, got " + (bytes == null ? "null" : bytes.length));
         }
@@ -72,7 +72,7 @@ public final class ByteUtil {
     }
 
     // LE
-    public static byte[] intToBytes(int value) {
+    public static byte[] intToBytes(final int value) {
         return new byte[] {
                 (byte) value,
                 (byte)(value >>> 8),
@@ -81,7 +81,7 @@ public final class ByteUtil {
         };
     }
 
-    public static byte[] merge(byte[]... arrays) {
+    public static byte[] merge(final byte[]... arrays) {
         if (arrays == null || arrays.length == 0)
             return new byte[0];
 
@@ -89,15 +89,15 @@ public final class ByteUtil {
             return arrays[0];
 
         int totalLength = 0;
-        for (byte[] array : arrays) {
+        for (final byte[] array : arrays) {
             if (array != null) {
                 totalLength += array.length;
             }
         }
 
-        byte[] result = new byte[totalLength];
+        final byte[] result = new byte[totalLength];
         int pos = 0;
-        for (byte[] array : arrays) {
+        for (final byte[] array : arrays) {
             if (array != null) {
                 System.arraycopy(array, 0, result, pos, array.length);
                 pos += array.length;

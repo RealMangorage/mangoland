@@ -12,15 +12,14 @@ import java.util.regex.Pattern;
 public final class StringUtil {
     private static final Pattern quotePattern = Pattern.compile("(?:\\(([^)]+)\\)\\s*)?'([^']*)'");
 
-
     public static Parameter[] extractQuotedStrings(final String input, final CompileEnv env) {
-        List<Parameter> result = new ArrayList<>();
-        var matcher = quotePattern.matcher(input);
+        final List<Parameter> result = new ArrayList<>();
+        final var matcher = quotePattern.matcher(input);
         while (matcher.find()) {
-            String type = matcher.group(1); // might be null if no type was there
-            String value = matcher.group(2);
+            final String type = matcher.group(1); // might be null if no type was there
+            final String value = matcher.group(2);
 
-            DataType<?> dataType = env.getDataType(type);
+            final DataType<?> dataType = env.getDataType(type);
             result.add(
                     Parameter.of(
                             Variable.of(

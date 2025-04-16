@@ -22,12 +22,12 @@ public final class RuntimeEnvImpl implements RuntimeEnv {
     }
 
     @Override
-    public DataType<?> getDataType(ByteArrayKey byteArrayKey) {
+    public DataType<?> getDataType(final ByteArrayKey byteArrayKey) {
         return compileEnv.getDataType(byteArrayKey);
     }
 
     @Override
-    public DataType<?> getDataType(String keyword) {
+    public DataType<?> getDataType(final String keyword) {
         return compileEnv.getDataType(keyword);
     }
 }

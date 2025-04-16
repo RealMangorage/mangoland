@@ -13,6 +13,6 @@ public sealed interface Persistence permits org.mangorage.mangoland.engine.inter
         return new PersistenceImpl();
     }
 
-    Variable getVariable(byte[] id);
-    void setVariable(byte[] id, Variable value);
+    Variable getVariable(final byte[] id);
+    void setVariable(final byte[] id, final Variable value);
 }

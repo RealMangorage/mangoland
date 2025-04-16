@@ -16,7 +16,7 @@ import org.mangorage.mangoland.engine.internal.parameter.ParameterImpl;
     with the object. DOES NOT include the PARAM START/END markers
  */
 public sealed interface Parameter permits ParameterImpl {
-    static Parameter of(Variable variable) {
+    static Parameter of(final Variable variable) {
         return new ParameterImpl(variable);
     }
 
