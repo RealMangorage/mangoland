@@ -6,7 +6,11 @@ import org.mangorage.mangoland.engine.api.variable.Variable;
 
 import java.util.function.Function;
 
-// Can be an integer
+/**
+    Represents a {@link DataType} that can be used to define what an Object is
+
+    Such as Integer/String/Boolean/etc
+ */
 public interface DataType<T> {
     static <T> DataType<T> of(final byte[] key, final Function<ByteArrayKey, DataType<T>> function) {
         return of(ByteArrayKey.of(key), function);

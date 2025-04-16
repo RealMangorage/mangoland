@@ -14,12 +14,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-
 /**
+ An example of how to get mangoland (ml) to be used
 
-     INST   INST    INST    INST
-     SPOT  HEADER   DATA    END
-    [1234] [1234]  [....]  [1234]
+    You can have your own custom set of Instruction {@link org.mangorage.mangoland.engine.api.instruction.Instruction}
+    You can have your own custom set of Data Types {@link org.mangorage.mangoland.engine.api.datatype.DataType}
+
+    Below you will find how to get these parts into executable/comping form.
+
+    Read the JavaDocs on the linked Classes for more info on how they are used/
+
+
+    This class/module servers as an example of how to use the engine to create
+    your OWN language of your choosing.
  */
 
 public final class Mangoland {
