@@ -1,4 +1,5 @@
 rootProject.name = 'mangoland'
 include 'engine'
 include 'script'
+include 'java'
 

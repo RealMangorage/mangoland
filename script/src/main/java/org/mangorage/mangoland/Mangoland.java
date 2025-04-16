@@ -1,5 +1,7 @@
 package org.mangorage.mangoland;
 
+import org.mangorage.mangland.java.api.IScriptProvider;
+import org.mangorage.mangland.java.api.ScriptProvider;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.builder.CompileEnvBuilder;
 import org.mangorage.mangoland.engine.api.instruction.InstructionSet;
@@ -10,12 +12,18 @@ import org.mangorage.mangoland.script.instructions.ParseInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+
 /**
- An example of how to get mangoland (ml) to be used
+    This will compile and execute the example script define in
+    the Main function
+
+
+    An example of how to get mangoland (ml) to be used
 
     You can have your own custom set of Instruction {@link org.mangorage.mangoland.engine.api.instruction.Instruction}
     You can have your own custom set of Data Types {@link org.mangorage.mangoland.engine.api.datatype.DataType}
@@ -29,7 +37,8 @@ import java.nio.file.StandardOpenOption;
     your OWN language of your choosing.
  */
 
-public final class Mangoland {
+@ScriptProvider(id = "mangoland", version = 1)
+public final class Mangoland implements IScriptProvider {
     private static final InstructionSet INSTRUCTION_SET = InstructionSetBuilder.of()
             .register("org.mangorage#print", ByteUtil.intToBytes(0), new PrintInstruction())
             .register("org.mangorage#add", ByteUtil.intToBytes(1), new AddInstruction())
@@ -42,6 +51,22 @@ public final class Mangoland {
             .register("string", ScriptDataTypes.STRING_TYPE)
             .register("integer",ScriptDataTypes.INTEGER_TYPE)
             .build();
+
+    @Override
+    public byte[] compile(String code) {
+        return INSTRUCTION_SET.compile(
+                code.split("\n"),
+                ENV
+        );
+    }
+
+    @Override
+    public void execute(byte[] instructions) {
+        INSTRUCTION_SET.process(
+                instructions,
+                ENV
+        );
+    }
 
     public static void main(String[] args) throws IOException {
         Files.write(
@@ -66,5 +91,4 @@ public final class Mangoland {
                 ENV
         );
     }
-
 }

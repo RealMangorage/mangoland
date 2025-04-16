@@ -1,0 +1,30 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1' // or the latest, if you can read
+    id 'java'
+}
+
+group = 'org.mangorage'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation project(":engine")
+    implementation 'org.mangorage:scanner:1.1.0'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.mangorage.mangland.java.internal.MangolandJava' // yeah, make sure this class exists, clown
+        )
+    }
+}
+
+shadowJar {
+    setArchiveClassifier("")
+    setArchiveBaseName("mangoland-java")
+}
