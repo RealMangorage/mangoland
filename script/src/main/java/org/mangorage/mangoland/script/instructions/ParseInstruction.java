@@ -11,7 +11,7 @@ import org.mangorage.mangoland.script.util.StringUtil;
 
 public final class ParseInstruction implements Instruction {
     @Override
-    public void process(final byte[] instruction, final RuntimeEnv env) {
+    public int execute(final byte[] instruction, final RuntimeEnv env) {
         final var params = GeneralUtil.getParameters(instruction, env);
 
         final var variable = env.getPersistence().getVariable(params[0].getVariable().getData());
@@ -31,7 +31,7 @@ public final class ParseInstruction implements Instruction {
                         )
                 );
 
-
+        return 0;
     }
 
     @Override

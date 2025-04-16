@@ -22,6 +22,6 @@ import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
     1 Parameter [INST START, 4 Bytes] [INST ID, 4 Bytes] [PARAM START, 4 Bytes] [DataType, 4 bytes] [Parameter Data, any bytes] [PARAM END, 4 Bytes] [INST END, 4 bytes] (Atleast 24 bytes)
  */
 public interface Instruction {
-    void process(final byte[] instruction, final RuntimeEnv runtimeEnv);
+    int execute(final byte[] instruction, final RuntimeEnv env);
     byte[] compile(final String code, final CompileEnv env);
 }

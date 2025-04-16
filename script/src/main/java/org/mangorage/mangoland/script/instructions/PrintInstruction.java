@@ -10,7 +10,7 @@ import org.mangorage.mangoland.script.ScriptDataTypes;
 
 public final class PrintInstruction implements Instruction {
     @Override
-    public void process(byte[] instruction, final RuntimeEnv env) {
+    public int execute(byte[] instruction, final RuntimeEnv env) {
 
         final var params = GeneralUtil.getParameters(instruction, env);
         final var param = params[0]; // TYPE LENGTH DATA
@@ -23,6 +23,7 @@ public final class PrintInstruction implements Instruction {
             System.out.println(param.asObject(String.class));
         }
 
+        return 0;
     }
 
     @Override

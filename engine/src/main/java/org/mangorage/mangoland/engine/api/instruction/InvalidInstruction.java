@@ -14,7 +14,7 @@ public final class InvalidInstruction implements Instruction {
     InvalidInstruction() {}
 
     @Override
-    public void process(final byte[] instruction, final RuntimeEnv env) {
+    public int execute(final byte[] instruction, final RuntimeEnv env) {
         throw new IllegalStateException("Invalid Instruction");
     }
 

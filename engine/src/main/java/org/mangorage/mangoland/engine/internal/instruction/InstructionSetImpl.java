@@ -24,9 +24,16 @@ public final class InstructionSetImpl implements InstructionSet {
 
     @Override
     public void process(final byte[] instructions, final CompileEnv env) {
-        Persistence persistence = Persistence.of();
+        final Persistence persistence = Persistence.of();
+        int skip = 0;
+
         for (final byte[] instruction : ByteUtil.extractBetween(instructions, InstructionConstants.INSTRUCTION_START.get(), InstructionConstants.INSTRUCTION_END.get())) {
-            instructionMap.getOrDefault(
+            if (skip > 0) {
+                skip--;
+                continue;
+            }
+
+            skip = instructionMap.getOrDefault(
                     ByteArrayKey.of(
                             Arrays.copyOfRange(
                                     instruction,
@@ -35,7 +42,7 @@ public final class InstructionSetImpl implements InstructionSet {
                             )
                     ),
                     InvalidInstruction.INSTANCE
-            ).process(
+            ).execute(
                     Arrays.copyOfRange(
                             instruction,
                             4,

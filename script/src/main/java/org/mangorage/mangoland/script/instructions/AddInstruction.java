@@ -13,7 +13,7 @@ import org.mangorage.mangoland.script.ScriptDataTypes;
 public final class AddInstruction implements Instruction {
 
     @Override
-    public void process(final byte[] instruction, final RuntimeEnv env) {
+    public int execute(final byte[] instruction, final RuntimeEnv env) {
         final var params = GeneralUtil.getParameters(instruction, env);
         if (params.length == 3) {
             final var paramOne = params[0];
@@ -45,6 +45,8 @@ public final class AddInstruction implements Instruction {
                 );
             }
         }
+
+        return 0;
     }
 
 

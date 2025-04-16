@@ -8,6 +8,7 @@ import org.mangorage.mangoland.engine.api.instruction.InstructionSet;
 import org.mangorage.mangoland.engine.api.instruction.InstructionSetBuilder;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 import org.mangorage.mangoland.script.instructions.AddInstruction;
+import org.mangorage.mangoland.script.instructions.IfInstruction;
 import org.mangorage.mangoland.script.instructions.ParseInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
@@ -38,17 +39,18 @@ import java.nio.file.StandardOpenOption;
 
 @ScriptProvider(id = "mangoland", version = 1)
 public final class Mangoland implements IScriptProvider {
-    private static final InstructionSet INSTRUCTION_SET = InstructionSetBuilder.of()
+    private final InstructionSet INSTRUCTION_SET = InstructionSetBuilder.of()
             .register("print", ByteUtil.intToBytes(0), new PrintInstruction())
             .register("add", ByteUtil.intToBytes(1), new AddInstruction())
             .register("parse", ByteUtil.intToBytes(2), new ParseInstruction())
+            .register("if", ByteUtil.intToBytes(3), new IfInstruction())
             .build();
 
-    private static final CompileEnv ENV = CompileEnvBuilder.create()
+    private final CompileEnv ENV = CompileEnvBuilder.create()
             .register("var", ScriptDataTypes.VARIABLE)
             .register("data_type", ScriptDataTypes.DATA_TYPE)
             .register("string", ScriptDataTypes.STRING_TYPE)
-            .register("integer",ScriptDataTypes.INTEGER_TYPE)
+            .register("integer", ScriptDataTypes.INTEGER_TYPE)
             .build();
 
     @Override
@@ -68,20 +70,25 @@ public final class Mangoland implements IScriptProvider {
     }
 
     public static void main(final String[] args) throws IOException {
+        IScriptProvider provider = new Mangoland();
         Files.write(
                 Path.of("myprogram.mangoland"),
-                INSTRUCTION_SET.compile(new String[] {
-                        "print (string) 'Hello!'",
-                        "add (integer) '1' + (integer) '1' (var)'1'",
-                        "parse (var) '1' as (string) '1'",
-                        "print (var) '1'"
-                }, ENV),
+                provider.compile(
+                        """
+                        if (string) '1' == (string) '12' -> (integer) '1',
+                        print (string) 'Hello!',
+                        add (integer) '1' + (integer) '1' (var)'1',
+                        parse (var) '1' as (string) '2',
+                        print (var) '2'
+                        """
+                ),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );
 
-        INSTRUCTION_SET.process(
-                Files.readAllBytes(Path.of("myprogram.mangoland")),
-                ENV
+        provider.execute(
+                Files.readAllBytes(
+                        Path.of("myprogram.mangoland")
+                )
         );
     }
 }
