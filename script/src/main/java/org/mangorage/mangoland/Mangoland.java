@@ -43,20 +43,7 @@ public final class Mangoland {
             .register("integer",ScriptDataTypes.INTEGER_TYPE)
             .build();
 
-    static {
-        // Stored Variable Struct
-        // [TYPE] [LENGTH] [DATA]
-
-
-        // Type -> 0x0, 0x0, 0x0, 0x0 -> VARIABLE
-
-        // #add -> [INST START] [PARAM START] [TYPE -> 4 bytes] [LENGTH -> 4 bytes] [VALUE -> X (length) bytes] [PARAM END] [INST STOP]
-    }
-
     public static void main(String[] args) throws IOException {
-        // Arrays.toString(INST_END)
-
-
         Files.write(
                 Path.of("myprogram.mangoland"),
                 INSTRUCTION_SET.compile(new String[] {
