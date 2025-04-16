@@ -26,4 +26,9 @@ public final class VariableType implements DataType<Void> {
     public byte[] cast(DataType<?> from, byte[] data) {
         return data;
     }
+
+    @Override
+    public byte[] compile(String code) {
+        return code.getBytes();
+    }
 }

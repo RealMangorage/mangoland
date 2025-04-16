@@ -18,12 +18,17 @@ public final class DataTypeType implements DataType<DataType<?>> {
     }
 
     @Override
-    public DataType<?> asObject(byte[] data) {
+    public DataType<?> asObject(final byte[] data) {
         return null;
     }
 
     @Override
-    public byte[] cast(DataType<?> from, byte[] data) {
+    public byte[] cast(final DataType<?> from, byte[] data) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] compile(final String code) {
         return new byte[0];
     }
 }

@@ -25,7 +25,7 @@ public final class IntegerType implements DataType<Integer> {
     }
 
     @Override
-    public byte[] cast(DataType<?> from, byte[] input) {
+    public byte[] cast(final DataType<?> from, final byte[] input) {
         if (ScriptDataTypes.STRING_TYPE.equals(from)) {
             // Parse the byte array into an integer, handle negative sign
             int result = 0;
@@ -54,6 +54,13 @@ public final class IntegerType implements DataType<Integer> {
             return ByteUtil.intToBytes(result);
         }
         return input;
+    }
+
+    @Override
+    public byte[] compile(final String code) {
+        return ByteUtil.intToBytes(
+                Integer.parseInt(code)
+        );
     }
 
 }

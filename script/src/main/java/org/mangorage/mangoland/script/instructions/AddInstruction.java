@@ -13,7 +13,7 @@ import org.mangorage.mangoland.script.ScriptDataTypes;
 public final class AddInstruction implements Instruction {
 
     @Override
-    public void process(byte[] instruction, final RuntimeEnv env) {
+    public void process(final byte[] instruction, final RuntimeEnv env) {
         var params = GeneralUtil.getParameters(instruction, env);
         if (params.length == 3) {
             var paramOne = params[0];
@@ -49,26 +49,13 @@ public final class AddInstruction implements Instruction {
 
 
     @Override
-    public byte[] compile(String code, CompileEnv env) {
-        var params = StringUtil.extractQuotedStrings(code);
+    public byte[] compile(final String code, final CompileEnv env) {
+        var params = StringUtil.extractQuotedStrings(code, env);
         if (params.length != 3) throw new CompileException("Expected 3 parameters, got " + params.length);
-
-        var result = new byte[0];
-
-        for (int i = 0; i < params.length; i++) {
-            final var param = params[i];
-            final boolean isVariable = param.startsWith("$");
-            final byte[] data = isVariable ? param.replaceFirst("\\$", "").getBytes() : ByteUtil.intToBytes(Integer.parseInt(param));
-
-            if (!isVariable && i == 2) throw new CompileException("Output/3rd parameter needs to be a variable...");
-
-
-            result = ByteUtil.merge(
-                    result,
-                    isVariable ? ScriptDataTypes.VARIABLE.createParameter(data).getFullData() : ScriptDataTypes.INTEGER_TYPE.createParameter(data).getFullData()
-            );
-        }
-
-        return result;
+        return ByteUtil.merge(
+                params[0].getFullData(),
+                params[1].getFullData(),
+                params[2].getFullData()
+        );
     }
 }

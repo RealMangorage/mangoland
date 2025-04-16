@@ -20,8 +20,6 @@ public interface DataType<T> {
         return function.apply(key);
     }
 
-    ByteArrayKey getDataType();
-
     default Variable createVariable(final byte[] data) {
         return Variable.of(this, data);
     }
@@ -30,7 +28,11 @@ public interface DataType<T> {
         return Parameter.of(createVariable(data));
     }
 
+    ByteArrayKey getDataType();
+
     T asObject(byte[] data);
 
     byte[] cast(DataType<?> from, byte[] data);
+
+    byte[] compile(String code);
 }

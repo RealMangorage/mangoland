@@ -27,13 +27,8 @@ public final class PrintInstruction implements Instruction {
 
     @Override
     public byte[] compile(final String code, final CompileEnv env) {
-        var array = StringUtil.extractQuotedStrings(code);
-        if (array.length != 1) throw new CompileException("Unable to compile. Can only have one parameter for #print, got " + array.length);
-
-        var paramPre = array[0];
-        var isVariable = paramPre.startsWith("$");
-        var data = isVariable ? paramPre.replaceFirst("\\$", "").getBytes() : paramPre.getBytes();
-
-        return isVariable ? ScriptDataTypes.VARIABLE.createParameter(data).getFullData() : ScriptDataTypes.STRING_TYPE.createParameter(data).getFullData();
+        var params = StringUtil.extractQuotedStrings(code, env);
+        if (params.length != 1) throw new CompileException("Unable to compile. Can only have one parameter for #print, got " + params.length);
+        return params[0].getFullData();
     }
 }

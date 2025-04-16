@@ -12,7 +12,6 @@ import org.mangorage.mangoland.script.instructions.ParseInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,9 +39,9 @@ import java.nio.file.StandardOpenOption;
 @ScriptProvider(id = "mangoland", version = 1)
 public final class Mangoland implements IScriptProvider {
     private static final InstructionSet INSTRUCTION_SET = InstructionSetBuilder.of()
-            .register("org.mangorage#print", ByteUtil.intToBytes(0), new PrintInstruction())
-            .register("org.mangorage#add", ByteUtil.intToBytes(1), new AddInstruction())
-            .register("org.mangorage#parse", ByteUtil.intToBytes(2), new ParseInstruction())
+            .register("print", ByteUtil.intToBytes(0), new PrintInstruction())
+            .register("add", ByteUtil.intToBytes(1), new AddInstruction())
+            .register("parse", ByteUtil.intToBytes(2), new ParseInstruction())
             .build();
 
     private static final CompileEnv ENV = CompileEnvBuilder.create()
@@ -72,16 +71,10 @@ public final class Mangoland implements IScriptProvider {
         Files.write(
                 Path.of("myprogram.mangoland"),
                 INSTRUCTION_SET.compile(new String[] {
-                        "org.mangorage#add '-2' '0' -> '$1'",
-
-                        "org.mangorage#parse '$1' -> '$1' as '?string' from '?integer'",
-                        "org.mangorage#print; '$1'",
-
-                        "org.mangorage#parse '$1' -> '$1' as '?integer' from '?string'",
-                        "org.mangorage#add '56' '$1' -> '$1'",
-                        "org.mangorage#parse '$1' -> '$1' as '?string' from '?integer'",
-                        "org.mangorage#print; '$1'",
-                        "org.mangorage#print 'Finished!'"
+                        "print (string) 'Hello!'",
+                        "add (integer) '1' + (integer) '1' (var)'1'",
+                        "parse (var) '1' as (string) '1'",
+                        "print (var) '1'"
                 }, ENV),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
         );

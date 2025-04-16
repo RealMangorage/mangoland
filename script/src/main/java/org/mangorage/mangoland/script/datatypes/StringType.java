@@ -19,18 +19,23 @@ public class StringType implements DataType<String> {
 
 
     @Override
-    public String asObject(byte[] data) {
+    public String asObject(final byte[] data) {
         return new String(
                 data
         );
     }
 
     @Override
-    public byte[] cast(DataType<?> from, byte[] data) {
+    public byte[] cast(final DataType<?> from, final byte[] data) {
         if (ScriptDataTypes.INTEGER_TYPE.equals(from)) {
             // Convert Integer to String
             return String.valueOf(ByteUtil.bytesToInt(data)).getBytes();
         }
         return data;
+    }
+
+    @Override
+    public byte[] compile(final String code) {
+        return code.getBytes();
     }
 }

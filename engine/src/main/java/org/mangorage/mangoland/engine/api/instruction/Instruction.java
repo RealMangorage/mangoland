@@ -23,5 +23,5 @@ import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
  */
 public interface Instruction {
     void process(final byte[] instruction, final RuntimeEnv runtimeEnv);
-    byte[] compile(String code, CompileEnv dataTypes);
+    byte[] compile(final String code, final CompileEnv env);
 }
