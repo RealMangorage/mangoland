@@ -9,7 +9,7 @@ import org.mangorage.mangoland.engine.api.instruction.InstructionSetBuilder;
 import org.mangorage.mangoland.script.ScriptDataTypes;
 import org.mangorage.mangoland.script.instructions.AddInstruction;
 import org.mangorage.mangoland.script.instructions.IfInstruction;
-import org.mangorage.mangoland.script.instructions.ParseInstruction;
+import org.mangorage.mangoland.script.instructions.CastInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 
@@ -39,14 +39,14 @@ import java.nio.file.StandardOpenOption;
 
 @ScriptProvider(id = "mangoland", version = 1)
 public final class Mangoland implements IScriptProvider {
-    private final InstructionSet INSTRUCTION_SET = InstructionSetBuilder.of()
+    private final InstructionSet instructionSet = InstructionSetBuilder.of()
             .register("print", ByteUtil.intToBytes(0), new PrintInstruction())
             .register("add", ByteUtil.intToBytes(1), new AddInstruction())
-            .register("parse", ByteUtil.intToBytes(2), new ParseInstruction())
+            .register("cast", ByteUtil.intToBytes(2), new CastInstruction())
             .register("if", ByteUtil.intToBytes(3), new IfInstruction())
             .build();
 
-    private final CompileEnv ENV = CompileEnvBuilder.create()
+    private final CompileEnv compileEnv = CompileEnvBuilder.create()
             .register("var", ScriptDataTypes.VARIABLE)
             .register("data_type", ScriptDataTypes.DATA_TYPE)
             .register("string", ScriptDataTypes.STRING_TYPE)
@@ -55,17 +55,17 @@ public final class Mangoland implements IScriptProvider {
 
     @Override
     public byte[] compile(final String code) {
-        return INSTRUCTION_SET.compile(
+        return instructionSet.compile(
                 code.split("\n"),
-                ENV
+                compileEnv
         );
     }
 
     @Override
     public void execute(final byte[] instructions) {
-        INSTRUCTION_SET.process(
+        instructionSet.process(
                 instructions,
-                ENV
+                compileEnv
         );
     }
 
@@ -75,10 +75,10 @@ public final class Mangoland implements IScriptProvider {
                 Path.of("myprogram.mangoland"),
                 provider.compile(
                         """
-                        if (string) '1' == (string) '12' -> (integer) '1',
+                        if (string) '1' == (string) '1' -> (integer) '1',
                         print (string) 'Hello!',
-                        add (integer) '1' + (integer) '1' (var)'1',
-                        parse (var) '1' as (string) '2',
+                        add (integer) '1' + (integer) '1' (var) '1',
+                        cast (var) '1' as (string) '2',
                         print (var) '2'
                         """
                 ),

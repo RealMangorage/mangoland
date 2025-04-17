@@ -21,9 +21,5 @@ public sealed interface Variable permits VariableImpl {
         return asObject();
     }
 
-    byte[] getData();
-
-    // Useful if you need the data type
-    // to be included in the array
-    byte[] getFullData();
+    byte[] getData(final int flags);
 }

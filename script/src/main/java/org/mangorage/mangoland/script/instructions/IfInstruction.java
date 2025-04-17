@@ -3,6 +3,7 @@ package org.mangorage.mangoland.script.instructions;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.engine.api.instruction.Instruction;
+import org.mangorage.mangoland.engine.constants.CommonFlags;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.exception.CompileException;
 import org.mangorage.mangoland.script.util.GeneralUtil;
@@ -17,8 +18,8 @@ public final class IfInstruction implements Instruction {
 
         if (
                 !Arrays.equals(
-                        params[0].getVariable().getFullData(),
-                        params[1].getVariable().getFullData()
+                        params[0].getVariable().getData(CommonFlags.includeData),
+                        params[1].getVariable().getData(CommonFlags.includeData)
                 )
         ) {
             return params[2].asObject();
@@ -33,9 +34,9 @@ public final class IfInstruction implements Instruction {
         if (params.length != 3) throw new CompileException("Expected 3 parameters, got " + params.length);
         if (!params[2].getDataType().equals(env.getDataType("integer"))) throw new CompileException("Can only have integer type as return value for If Instructions");
         return ByteUtil.merge(
-                params[0].getFullData(),
-                params[1].getFullData(),
-                params[2].getFullData()
+                params[0].getData(CommonFlags.includeAll),
+                params[1].getData(CommonFlags.includeAll),
+                params[2].getData(CommonFlags.includeAll)
         );
     }
 }

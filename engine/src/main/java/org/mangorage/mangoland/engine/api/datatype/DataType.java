@@ -28,11 +28,10 @@ public interface DataType<T> {
         return Parameter.of(createVariable(data));
     }
 
-    ByteArrayKey getDataType();
+    ByteArrayKey getInternalId();
 
     T asObject(final byte[] data);
 
     byte[] cast(final DataType<?> from, final byte[] data);
-
     byte[] compile(final String code);
 }

@@ -13,7 +13,7 @@ public class StringType implements DataType<String> {
     }
 
     @Override
-    public ByteArrayKey getDataType() {
+    public ByteArrayKey getInternalId() {
         return internalId;
     }
 

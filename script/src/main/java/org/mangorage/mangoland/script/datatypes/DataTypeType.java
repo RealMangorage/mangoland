@@ -13,7 +13,7 @@ public final class DataTypeType implements DataType<DataType<?>> {
     }
 
     @Override
-    public ByteArrayKey getDataType() {
+    public ByteArrayKey getInternalId() {
         return internalId;
     }
 

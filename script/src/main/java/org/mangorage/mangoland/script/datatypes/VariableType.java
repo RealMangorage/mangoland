@@ -12,7 +12,7 @@ public final class VariableType implements DataType<Void> {
     }
 
     @Override
-    public ByteArrayKey getDataType() {
+    public ByteArrayKey getInternalId() {
         return internalId;
     }
 

@@ -14,7 +14,7 @@ public final class IntegerType implements DataType<Integer> {
     }
 
     @Override
-    public ByteArrayKey getDataType() {
+    public ByteArrayKey getInternalId() {
         return internalId;
     }
 

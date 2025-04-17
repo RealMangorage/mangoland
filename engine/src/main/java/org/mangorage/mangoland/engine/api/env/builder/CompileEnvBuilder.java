@@ -18,7 +18,7 @@ public sealed interface CompileEnvBuilder permits CompileInvBuilderImpl {
     CompileEnvBuilder register(final String keyword, final ByteArrayKey dataTypeId, final DataType<?> dataType);
 
     default CompileEnvBuilder register(final String keyword, final DataType<?> dataType) {
-        return register(keyword, dataType.getDataType(), dataType);
+        return register(keyword, dataType.getInternalId(), dataType);
     }
 
     CompileEnv build();

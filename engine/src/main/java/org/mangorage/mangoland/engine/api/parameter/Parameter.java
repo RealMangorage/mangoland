@@ -9,10 +9,10 @@ import org.mangorage.mangoland.engine.internal.parameter.ParameterImpl;
 
     A {@link Variable} is just the DataType and Parameter Data all wrapped in a Variable Instance
 
-    This class servers the ability to use {@link Parameter#getFullData()}, so you can easily
+    This class servers the ability to use {@link Parameter#getData(int)}, so you can easily
     construct the proper Byte Array for compiling/executing the code
 
-    The {@link Variable#getFullData()} just returns a Byte Array with just the DataType and the Data associated
+    The {@link Variable#getData(int)} just returns a Byte Array with just the DataType and the Data associated
     with the object. DOES NOT include the PARAM START/END markers
  */
 public sealed interface Parameter permits ParameterImpl {
@@ -32,7 +32,5 @@ public sealed interface Parameter permits ParameterImpl {
 
     Variable getVariable();
 
-    // Useful if you need the data type & parameter
-    //   markers to be included in the array
-    byte[] getFullData();
+    byte[] getData(final int flags);
 }
