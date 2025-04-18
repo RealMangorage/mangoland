@@ -81,7 +81,7 @@ public final class Mangoland implements IScriptProvider {
                         print (string) 'Hello!',
                         add (integer) '1' + (integer) '1' (var) '1',
                         cast (var) '1' as (string) '2',
-                        print =
+                        print (var) '2'
                         """
                 ),
                 StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE
