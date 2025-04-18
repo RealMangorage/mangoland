@@ -108,11 +108,15 @@ public final class InstructionSetImpl implements InstructionSet {
             }
         }
 
+        final int numOfErrors = errors.size();
+
+
         if (!errors.isEmpty()) {
             final var finalMessage = new StringBuilder();
             finalMessage.append("\n-----------------------------------");
             finalMessage.append("\nError has occurred while compiling");
-            for (var errorInfo : errors) {
+            finalMessage.append("\nNumber of Errors: " + numOfErrors);
+            for (var errorInfo : errors.stream().limit(20).toList()) {
                 finalMessage.append("\n------------------------------------\n");
                 finalMessage.append(errorInfo.error());
 
