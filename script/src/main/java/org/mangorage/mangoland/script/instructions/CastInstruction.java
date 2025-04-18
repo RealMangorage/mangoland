@@ -4,7 +4,7 @@ import org.mangorage.mangoland.engine.api.variable.Variable;
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
 import org.mangorage.mangoland.engine.constants.CommonFlags;
-import org.mangorage.mangoland.script.exception.CompileException;
+import org.mangorage.mangoland.engine.exception.CompileException;
 import org.mangorage.mangoland.engine.api.instruction.Instruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
 import org.mangorage.mangoland.script.util.GeneralUtil;

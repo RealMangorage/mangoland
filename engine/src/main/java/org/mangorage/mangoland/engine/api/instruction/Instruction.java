@@ -2,6 +2,7 @@ package org.mangorage.mangoland.engine.api.instruction;
 
 import org.mangorage.mangoland.engine.api.env.CompileEnv;
 import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
+import org.mangorage.mangoland.engine.exception.CompileException;
 
 /**
     AAn Instruction will have 12 Bytes of data, in the simplest form.
@@ -23,5 +24,6 @@ import org.mangorage.mangoland.engine.api.env.RuntimeEnv;
  */
 public interface Instruction {
     int execute(final byte[] instruction, final RuntimeEnv env);
+
     byte[] compile(final String code, final CompileEnv env);
 }
