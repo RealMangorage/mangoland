@@ -13,6 +13,7 @@ import org.mangorage.mangoland.script.instructions.IfInstruction;
 import org.mangorage.mangoland.script.instructions.CastInstruction;
 import org.mangorage.mangoland.script.instructions.PrintInstruction;
 import org.mangorage.mangoland.engine.util.ByteUtil;
+import org.mangorage.mangoland.script.instructions.java.CreateInstruction;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -45,11 +46,13 @@ public final class Mangoland implements IScriptProvider {
             .register("add", ByteUtil.intToBytes(1), new AddInstruction())
             .register("cast", ByteUtil.intToBytes(2), new CastInstruction())
             .register("if", ByteUtil.intToBytes(3), new IfInstruction())
-            .register("call", ByteUtil.intToBytes(4), new CallInstruction(this))
+            .register("create", ByteUtil.intToBytes(4), new CreateInstruction())
+            .register("call", ByteUtil.intToBytes(5), new CallInstruction(this))
             .build();
 
     private final CompileEnv compileEnv = CompileEnvBuilder.create()
-            .register("var", ScriptDataTypes.VARIABLE)
+            .register("var", ScriptDataTypes.VARIABLE_TYPE)
+            .register("obj", ScriptDataTypes.OBJECT_VARIABLE_TYPE)
             .register("data_type", ScriptDataTypes.DATA_TYPE)
             .register("string", ScriptDataTypes.STRING_TYPE)
             .register("integer", ScriptDataTypes.INTEGER_TYPE)
@@ -92,5 +95,7 @@ public final class Mangoland implements IScriptProvider {
                         Path.of("myprogram.ml")
                 )
         );
+
+        System.out.println("Script Ran");
     }
 }

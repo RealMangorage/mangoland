@@ -16,7 +16,7 @@ public final class PrintInstruction implements Instruction {
         final var params = GeneralUtil.getParameters(instruction, env);
         final var param = params[0]; // TYPE LENGTH DATA
 
-        if (ScriptDataTypes.VARIABLE.equals(param.getDataType())) {
+        if (ScriptDataTypes.VARIABLE_TYPE.equals(param.getDataType())) {
             System.out.println(
                     env.getPersistence().getVariable(param.getVariable().getData(CommonFlags.includeData)).asObject(String.class)
             );

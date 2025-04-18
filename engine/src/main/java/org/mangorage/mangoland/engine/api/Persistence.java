@@ -15,4 +15,7 @@ public sealed interface Persistence permits org.mangorage.mangoland.engine.inter
 
     Variable getVariable(final byte[] id);
     void setVariable(final byte[] id, final Variable value);
+
+    Object getObject(final byte[] id);
+    void setObject(final byte[] id, final Object object);
 }

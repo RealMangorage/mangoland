@@ -1,13 +1,12 @@
 package org.mangorage.mangoland.script.datatypes;
 
-import org.mangorage.mangoland.engine.api.datatype.DataType;
 import org.mangorage.mangoland.engine.api.ByteArrayKey;
-import org.mangorage.mangoland.script.ScriptDataTypes;
+import org.mangorage.mangoland.engine.api.datatype.DataType;
 
-public final class VariableType implements DataType<byte[]> {
+public class ObjectVariableType implements DataType<byte[]> {
     private final ByteArrayKey internalId;
 
-    public VariableType(final ByteArrayKey internalId) {
+    public ObjectVariableType(final ByteArrayKey internalId) {
         this.internalId = internalId;
     }
 
@@ -15,7 +14,6 @@ public final class VariableType implements DataType<byte[]> {
     public ByteArrayKey getInternalId() {
         return internalId;
     }
-
 
     @Override
     public byte[] asObject(final byte[] data) {

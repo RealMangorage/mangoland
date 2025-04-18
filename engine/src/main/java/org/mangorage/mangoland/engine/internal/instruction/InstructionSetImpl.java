@@ -75,7 +75,7 @@ public final class InstructionSetImpl implements InstructionSet {
             lineNumber++;
             final int spot = line.indexOf(" ");
             final var instKey = packageToInstruction.get(spot == -1 ? line : line.substring(0, spot));
-            final var inst = instructionMap.get(instKey);
+            final var inst = instKey == null ? null : instructionMap.get(instKey);
 
             if (inst != null) {
                 try {

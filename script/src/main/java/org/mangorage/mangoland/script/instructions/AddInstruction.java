@@ -26,17 +26,17 @@ public final class AddInstruction implements Instruction {
 
             if (paramOne.is(ScriptDataTypes.INTEGER_TYPE)) {
                 a = paramOne.asObject();
-            } else if (paramOne.is(ScriptDataTypes.VARIABLE)) {
+            } else if (paramOne.is(ScriptDataTypes.VARIABLE_TYPE)) {
                 a = env.getPersistence().getVariable(paramOne.getVariable().getData(CommonFlags.includeData)).asObject();
             }
 
             if (paramTwo.is(ScriptDataTypes.INTEGER_TYPE)) {
                 b = paramTwo.asObject();
-            } else if (paramTwo.is(ScriptDataTypes.VARIABLE)) {
+            } else if (paramTwo.is(ScriptDataTypes.VARIABLE_TYPE)) {
                 b = env.getPersistence().getVariable(paramTwo.getVariable().getData(CommonFlags.includeData)).asObject();
             }
 
-            if (paramThree.is(ScriptDataTypes.VARIABLE)) {
+            if (paramThree.is(ScriptDataTypes.VARIABLE_TYPE)) {
                 env.getPersistence().setVariable(
                         paramThree.getVariable().getData(CommonFlags.includeData),
                         Variable.of(

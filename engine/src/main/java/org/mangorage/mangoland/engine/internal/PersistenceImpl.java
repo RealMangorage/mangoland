@@ -9,6 +9,7 @@ import java.util.Map;
 
 public final class PersistenceImpl implements Persistence {
     private final Map<ByteArrayKey, Variable> variables = new HashMap<>();
+    private final Map<ByteArrayKey, Object> variables_java = new HashMap<>();
 
     public PersistenceImpl() {}
 
@@ -18,10 +19,20 @@ public final class PersistenceImpl implements Persistence {
     }
 
     @Override
-    public void setVariable(byte[] id, Variable value) {
+    public void setVariable(final byte[] id, final Variable value) {
         variables.put(
                 ByteArrayKey.of(id),
                 value
         );
+    }
+
+    @Override
+    public Object getObject(final byte[] id) {
+        return variables_java.get(ByteArrayKey.of(id));
+    }
+
+    @Override
+    public void setObject(final byte[] id, final Object object) {
+        variables_java.put(ByteArrayKey.of(id), object);
     }
 }
