@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/Call.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/Call.java" />
+              <option name="originalContent" value="        vm.getCallStack().push(new VM.Frame(vm.ip, 0));&#10;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#10;import org.mangorage.mangolang.instruction.Instruction;&#10;import org.mangorage.mangolang.vm.VM;&#10;&#10;import java.util.List;&#10;&#10;public class Call implements Instruction {&#10;    public void execute(VM vm) {&#10;        int addr = vm.next();&#10;        vm.getCallStack().push(new VM.Frame(vm.ip, 256));&#10;        vm.ip = addr;&#10;    }&#10;&#10;    public int getArgCount() {&#10;        return 1;&#10;    }&#10;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#10;        out.add(ctx.getFunction((String) args[0]));&#10;    }&#10;}&#10;" />
+              <option name="updatedContent" value="package org.mangorage.mangolang.instruction.impl.control;&#13;&#10;&#13;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#13;&#10;import org.mangorage.mangolang.instruction.Instruction;&#13;&#10;import org.mangorage.mangolang.vm.VM;&#13;&#10;&#13;&#10;import java.util.List;&#13;&#10;&#13;&#10;public class Call implements Instruction {&#13;&#10;    @Override&#13;&#10;    public void execute(VM vm) {&#13;&#10;        int addr = vm.next();&#13;&#10;        vm.getCallStack().push(new VM.Frame(vm.ip, 0));&#13;&#10;        vm.ip = addr;&#13;&#10;    }&#13;&#10;&#13;&#10;    public int getArgCount() {&#13;&#10;        return 1;&#13;&#10;    }&#13;&#10;&#13;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#13;&#10;        out.add(ctx.getFunction((String) args[0]));&#13;&#10;    }&#13;&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/JumpIfTrue.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/JumpIfTrue.java" />
+              <option name="originalContent" value="    public JumpIfTrue() {&#10;        } else {&#10;            vm.ip = falseAddr;&#10;        out.add(ctx.getFunction((String) args[1]));&#10;package org.mangorage.mangolang.instruction.impl.control;&#10;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#10;import org.mangorage.mangolang.instruction.Instruction;&#10;import org.mangorage.mangolang.vm.VM;&#10;import java.util.List;&#10;&#10;public class JumpIfTrue implements Instruction {&#10;    private final int value;&#10;&#10;    public JumpIfTrue(int value) {&#10;        this.value = value;&#10;    }&#10;&#10;    @Override&#10;    public void execute(VM vm) {&#10;        final var booleanValue = vm.getStack().pop();&#10;&#10;        int addr = vm.next();&#10;&#10;        if (booleanValue == value) {&#10;            vm.ip = addr;&#10;        }&#10;    }&#10;&#10;    public int getArgCount() {&#10;        return 1;&#10;    }&#10;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#10;        out.add(ctx.getFunction((String) args[0]));&#10;    }&#10;}&#10;" />
+              <option name="updatedContent" value="package org.mangorage.mangolang.instruction.impl.control;&#10;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#10;import org.mangorage.mangolang.instruction.Instruction;&#10;import org.mangorage.mangolang.vm.VM;&#10;import java.util.List;&#10;&#10;public class JumpIfTrue implements Instruction {&#10;    public JumpIfTrue() {&#10;    }&#10;&#10;    @Override&#10;    public void execute(VM vm) {&#10;        final var booleanValue = vm.getStack().pop();&#10;&#10;        // Read the two target addresses emitted by the compiler&#10;        int trueAddr = vm.next();&#10;        int falseAddr = vm.next();&#10;&#10;        if (booleanValue == 1) {&#10;            vm.ip = trueAddr;&#10;        } else {&#10;            vm.ip = falseAddr;&#10;        }&#10;    }&#10;&#10;    public int getArgCount() {&#10;        return 2;&#10;    }&#10;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#10;        if (args.length != 2) throw new RuntimeException(&quot;jump_if_true requires two function names&quot;);&#10;&#10;        out.add(ctx.getFunction((String) args[0]));&#10;        out.add(ctx.getFunction((String) args[1]));&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

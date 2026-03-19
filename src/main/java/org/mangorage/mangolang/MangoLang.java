@@ -10,7 +10,7 @@ import org.mangorage.mangolang.instruction.impl.comparison.Equals;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
 import org.mangorage.mangolang.instruction.impl.control.Halt;
 import org.mangorage.mangolang.instruction.impl.control.Jump;
-import org.mangorage.mangolang.instruction.impl.control.JumpIfFalse;
+import org.mangorage.mangolang.instruction.impl.control.JumpIfTrue;
 import org.mangorage.mangolang.instruction.impl.memory.Let;
 import org.mangorage.mangolang.instruction.impl.memory.Load;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
@@ -20,6 +20,7 @@ import org.mangorage.mangolang.instruction.impl.stack.Push;
 import org.mangorage.mangolang.instruction.impl.control.Return;
 import org.mangorage.mangolang.instruction.impl.timing.Sleep;
 import org.mangorage.mangolang.instruction.impl.memory.Store;
+import org.mangorage.mangolang.terminal.TerminalGui;
 import org.mangorage.mangolang.vm.VM;
 
 import java.io.IOException;
@@ -62,8 +63,9 @@ public final class MangoLang {
         );
 
         set.register(
-                "jump_if_false", new JumpIfFalse()
+                "jump_if_true", new JumpIfTrue()
         );
+
         set.register(
                 "greater_than_zero", new GreaterThanZero()
         );
@@ -85,6 +87,7 @@ public final class MangoLang {
         int[] bytecode = compiler.compile(program);
 
         VM vm = new VM(bytecode, createEnv());
+        vm.setTerminal(TerminalGui.getInstance());
         vm.run();
     }
 }

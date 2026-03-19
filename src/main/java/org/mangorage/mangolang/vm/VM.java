@@ -2,8 +2,8 @@ package org.mangorage.mangolang.vm;
 
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
+import org.mangorage.mangolang.terminal.ConsoleTerminal;
 import org.mangorage.mangolang.terminal.Terminal;
-
 import java.util.Stack;
 
 public final class VM {
@@ -11,24 +11,15 @@ public final class VM {
     public int ip = 0;
 
     private final Stack<Integer> stack = new Stack<>();
-    public final Stack<Frame> callStack = new Stack<>();
-
-    private boolean running = true;
+    private final Stack<Frame> callStack = new Stack<>();
     private final InstructionSet set;
+
+    private Terminal terminal = ConsoleTerminal.getInstance();
+    private boolean running = true;
 
     public VM(int[] code, InstructionSet set) {
         this.code = code;
         this.set = set;
-    }
-
-    public static class Frame {
-        public int returnIp;
-        public int[] locals;
-
-        public Frame(int returnIp, int localSize) {
-            this.returnIp = returnIp;
-            this.locals = new int[localSize];
-        }
     }
 
     public int next() {
@@ -43,7 +34,7 @@ public final class VM {
     }
 
     public Terminal getTerminal() {
-        return Terminal.getInstance();
+        return terminal;
     }
 
     public Stack<Frame> getCallStack() {
@@ -51,15 +42,19 @@ public final class VM {
     }
 
     public void setLocal(int index, int value) {
-        callStack.peek().locals[index] = value;
+        callStack.firstElement().locals[index] = value;
     }
 
     public int getLocal(int index) {
-        return callStack.peek().locals[index];
+        return callStack.firstElement().locals[index];
     }
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public void setTerminal(Terminal terminal) {
+        this.terminal = terminal;
     }
 
     public void run() {
