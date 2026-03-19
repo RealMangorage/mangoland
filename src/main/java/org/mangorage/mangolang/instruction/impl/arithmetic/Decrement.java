@@ -1,0 +1,19 @@
+package org.mangorage.mangolang.instruction.impl.arithmetic;
+
+import org.mangorage.mangolang.compiler.CompilerContext;
+import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.vm.VM;
+
+import java.util.List;
+
+public class Decrement implements Instruction {
+    @Override
+    public void execute(VM vm) {
+        int val = vm.getStack().pop();
+        vm.getStack().push(val - 1);
+    }
+    @Override
+    public int getArgCount() { return 0; }
+    @Override
+    public void emitBytecode(List<Integer> out, CompilerContext ctx, Object... args) {}
+}
