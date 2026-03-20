@@ -1,5 +1,5 @@
 let x = 0
 
 if (x == 0) do
-    printstr "X is zero"
+    print "X is zero"
 end

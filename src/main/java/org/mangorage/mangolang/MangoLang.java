@@ -15,7 +15,6 @@ import org.mangorage.mangolang.instruction.impl.memory.Let;
 import org.mangorage.mangolang.instruction.impl.memory.Load;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
 import org.mangorage.mangolang.instruction.impl.output.Print;
-import org.mangorage.mangolang.instruction.impl.output.PrintStr;
 import org.mangorage.mangolang.instruction.impl.stack.Push;
 import org.mangorage.mangolang.instruction.impl.control.Return;
 import org.mangorage.mangolang.instruction.impl.timing.Sleep;
@@ -47,7 +46,7 @@ public final class MangoLang {
         set.register(
                 List.of(
                         Halt.class,
-                        PrintStr.class,
+                        Print.class,
                         Push.class,
                         Store.class,
                         Print.class,
