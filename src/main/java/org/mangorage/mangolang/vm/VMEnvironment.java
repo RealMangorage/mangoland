@@ -6,13 +6,15 @@ import java.util.Stack;
 
 public final class VMEnvironment {
     private final VM vm;
+    private final int[] code;
     private final Stack<Integer> stack = new Stack<>();
     private final Stack<Frame> callStack = new Stack<>();
     private int ip = 0;
     private boolean running = false;
 
-    public VMEnvironment(VM vm) {
+    public VMEnvironment(VM vm, int[] code) {
         this.vm = vm;
+        this.code = code;
     }
 
     public void start() {
@@ -23,7 +25,7 @@ public final class VMEnvironment {
         // Initial entry frame
         this.callStack.push(new Frame(-1, 256));
 
-        while (running && ip < vm.getCode().length) {
+        while (running && ip < code.length) {
             int currentIp = ip;
             int opcode = next();
 
@@ -46,7 +48,6 @@ public final class VMEnvironment {
     }
 
     public int next() {
-        int[] code = vm.getCode();
         if (ip < 0 || ip >= code.length) {
             throw new RuntimeException("VM instruction pointer out of bounds: " + ip);
         }

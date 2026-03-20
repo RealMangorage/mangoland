@@ -85,7 +85,8 @@ public final class MangoLang {
 
         int[] bytecode = compiler.compile(program);
 
-        VM vm = new VM(bytecode, createEnv());
+        VM vm = new VM(createEnv());
+
         vm.setTerminal(
                 DeferredTerminal.of(
                         List.of(
@@ -94,6 +95,7 @@ public final class MangoLang {
                         )
                 )
         );
-        vm.run();
+
+        vm.run(bytecode);
     }
 }
