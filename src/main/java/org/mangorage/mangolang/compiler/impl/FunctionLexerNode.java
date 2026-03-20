@@ -24,9 +24,9 @@ public final class FunctionLexerNode implements LexerNode {
             out.add(0); // placeholder
 
             ctx.registerFunction(funcName, out.size());
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
 
-        return new LexerOutput(null, false);
+        return new LexerOutput(false);
     }
 }

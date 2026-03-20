@@ -15,8 +15,8 @@ public final class WhileLexerNode implements LexerNode {
         if (name.equals("while")) {
             // Save the exact address where the condition evaluation begins
             blocks.push(new BlockContext(BlockContext.Type.WHILE, out.size()));
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
-        return new LexerOutput(null, false);
+        return new LexerOutput(false);
     }
 }

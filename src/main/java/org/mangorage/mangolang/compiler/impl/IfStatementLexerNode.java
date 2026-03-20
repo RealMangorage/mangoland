@@ -83,13 +83,13 @@ public final class IfStatementLexerNode implements LexerNode {
                 // If the delimiter was 'then' and there are tokens after it on the same line,
                 // we should continue processing the rest of this line as normal instructions.
                 if (!("then".equals(delim) && delimIdx + 1 < parts.length)) {
-                    return new LexerOutput(null, true);
+                    return new LexerOutput(true);
                 }
             }
 
             // Non-inline: push IF context and expect a separate 'then' token later
             blocks.push(new BlockContext(BlockContext.Type.IF, out.size()));
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
 
 
@@ -114,7 +114,7 @@ public final class IfStatementLexerNode implements LexerNode {
             out.add(set.requireOpcode("jump"));
             out.add(0); // placeholder to be patched at 'end'
             b.elseJumpAddress = out.size() - 1; // index of the placeholder value
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
 
         // ===== THEN (marks end of condition, start of then-body) =====
@@ -129,10 +129,10 @@ public final class IfStatementLexerNode implements LexerNode {
             out.add(0); // true-target placeholder
             out.add(0); // false-target placeholder
             if (!name.equals("end")) {
-                return new LexerOutput(null, true);
+                return new LexerOutput(true);
             }
         }
 
-        return new LexerOutput(null, false);
+        return new LexerOutput(false);
     }
 }

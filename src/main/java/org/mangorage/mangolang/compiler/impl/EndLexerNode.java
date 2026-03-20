@@ -51,8 +51,8 @@ public final class EndLexerNode implements LexerNode {
                     out.set(b.condJumpAddress + 2, out.size());
                 }
             }
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
-        return new LexerOutput(null, false);
+        return new LexerOutput(false);
     }
 }

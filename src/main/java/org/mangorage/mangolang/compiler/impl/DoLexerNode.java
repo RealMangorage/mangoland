@@ -21,8 +21,8 @@ public final class DoLexerNode implements LexerNode {
             out.add(set.requireOpcode("jump_if_false"));
             out.add(0); // true-target placeholder (patched at 'end' to loop exit)
             out.add(0); // false-target placeholder (points to instruction after these two placeholders)
-            return new LexerOutput(null, true);
+            return new LexerOutput(true);
         }
-        return new LexerOutput(null, false);
+        return new LexerOutput(false);
     }
 }
