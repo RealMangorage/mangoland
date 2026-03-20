@@ -1,0 +1,33 @@
+package org.mangorage.mangolang.compiler.impl;
+
+import org.mangorage.mangolang.compiler.BlockContext;
+import org.mangorage.mangolang.compiler.CompilerContext;
+import org.mangorage.mangolang.compiler.LexerNode;
+import org.mangorage.mangolang.compiler.LexerOutput;
+import org.mangorage.mangolang.instruction.InstructionSet;
+
+import java.util.List;
+import java.util.Stack;
+
+public final class BreakLexerNode implements LexerNode {
+    @Override
+    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
+        if (name.equals("break")) {
+            // Search down the stack to find the nearest loop (allows breaking out of a loop inside an if/function)
+            BlockContext loop = null;
+            for (int i = blocks.size() - 1; i >= 0; i--) {
+                if (blocks.get(i).type == BlockContext.Type.WHILE) {
+                    loop = blocks.get(i);
+                    break;
+                }
+            }
+            if (loop == null) throw new RuntimeException("Cannot 'break' outside of a loop");
+
+            loop.breaks.add(out.size());
+            out.add(set.requireOpcode("jump"));
+            out.add(0); // placeholder, patched at 'end'
+            return new LexerOutput(null, true);
+        }
+        return new LexerOutput(null, false);
+    }
+}

@@ -1,5 +1,11 @@
 package org.mangorage.mangolang.compiler;
 
+import org.mangorage.mangolang.compiler.impl.BreakLexerNode;
+import org.mangorage.mangolang.compiler.impl.DoLexerNode;
+import org.mangorage.mangolang.compiler.impl.EndLexerNode;
+import org.mangorage.mangolang.compiler.impl.FunctionLexerNode;
+import org.mangorage.mangolang.compiler.impl.IfStatementLexerNode;
+import org.mangorage.mangolang.compiler.impl.WhileLexerNode;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
 
@@ -10,35 +16,30 @@ import java.util.regex.Pattern;
 public final class Compiler {
     private final InstructionSet set;
 
-    // Helper class to track nested functions and loops
-    private static class BlockContext {
-        enum Type { FUNCTION, WHILE, IF }
-        Type type;
-        int startAddress;       // Where to jump back to (for loops) or skip to (for functions)
-        int condJumpAddress;    // The index of the jump_if_false placeholder
-        int elseJumpAddress = -1; // placeholder index for the unconditional jump over the else-body
-        List<Integer> breaks = new ArrayList<>(); // Track all breaks in this loop
-
-        BlockContext(Type type, int startAddress) {
-            this.type = type;
-            this.startAddress = startAddress;
-        }
-    }
-
     public Compiler(InstructionSet set) {
         this.set = set;
     }
 
     public int[] compile(String source) {
+        List<LexerNode> nodes = List.of(
+                new BreakLexerNode(),
+                new DoLexerNode(),
+                new EndLexerNode(),
+                new FunctionLexerNode(),
+                new IfStatementLexerNode(),
+                new WhileLexerNode()
+        );
+
         CompilerContext ctx = new CompilerContext();
         List<Integer> out = new ArrayList<>();
+
 
         // Upgrade from `boolean inFunction` to a stack to support nesting!
         Stack<BlockContext> blocks = new Stack<>();
 
         String[] lines = source.split("\\n");
 
-        for (String raw : lines) {
+        main: for (String raw : lines) {
             String line = raw.trim();
             if (line.isEmpty() || line.startsWith("#")) continue;
 
@@ -51,40 +52,22 @@ public final class Compiler {
             String[] parts = line.split("\\s+");
             String name = parts[0].toLowerCase();
 
-            // ===== FUNCTION START =====
-            if (name.equals("function")) {
-                String funcName = parts[1];
-                BlockContext b = new BlockContext(BlockContext.Type.FUNCTION, out.size());
-                blocks.push(b);
 
-                // Note: Using 'jump' instead of 'call' to skip over the function body
-                // prevents accidentally pushing a junk frame to your callStack!
-                out.add(set.requireOpcode("jump"));
-                out.add(0); // placeholder
+            for (LexerNode node : nodes) {
+                final var output = node.handle(
+                        parts,
+                        name,
+                        blocks,
+                        out,
+                        ctx,
+                        set
+                );
 
-                ctx.registerFunction(funcName, out.size());
-                continue;
+                if (output.doContinue())
+                    continue main;
             }
 
-            // ===== WHILE START =====
-            if (name.equals("while")) {
-                // Save the exact address where the condition evaluation begins
-                blocks.push(new BlockContext(BlockContext.Type.WHILE, out.size()));
-                continue;
-            }
 
-            // ===== DO (Evaluates the while condition) =====
-            if (name.equals("do")) {
-                BlockContext b = blocks.peek();
-                if (b == null || b.type != BlockContext.Type.WHILE) {
-                    throw new RuntimeException("Unexpected 'do' without 'while'");
-                }
-                b.condJumpAddress = out.size();
-                out.add(set.requireOpcode("jump_if_false"));
-                out.add(0); // true-target placeholder (patched at 'end' to loop exit)
-                out.add(0); // false-target placeholder (points to instruction after these two placeholders)
-                continue;
-            }
 
             // ===== IF START =====
             if (name.equals("if")) {
@@ -158,7 +141,6 @@ public final class Compiler {
                         // Create a pseudo-line and fall through to normal instruction handling by
                         // replacing 'parts' and 'name' for this iteration.
                         parts = remainder;
-                        name = parts[0].toLowerCase();
                         // fall through to emit this instruction below
                     } else {
                         continue;
@@ -167,107 +149,6 @@ public final class Compiler {
 
                 // Non-inline: push IF context and expect a separate 'then' token later
                 blocks.push(new BlockContext(BlockContext.Type.IF, out.size()));
-                continue;
-            }
-
-            // ===== THEN (marks end of condition, start of then-body) =====
-            if (name.equals("then") || (name.equals("end") && blocks.peek() != null && blocks.peek().type == BlockContext.Type.IF)) {
-                BlockContext b = blocks.peek();
-                if (b == null || b.type != BlockContext.Type.IF) {
-                    throw new RuntimeException("Unexpected 'then' without 'if'");
-                }
-                // Emit conditional jump placeholder; if condition is false, skip the then body
-                b.condJumpAddress = out.size();
-                out.add(set.requireOpcode("jump_if_false"));
-                out.add(0); // true-target placeholder
-                out.add(0); // false-target placeholder
-                if (!name.equals("end")) {
-                    continue;
-                }
-            }
-
-            // ===== ELSE =====
-            if (name.equals("else")) {
-                BlockContext b = blocks.peek();
-                if (b == null || b.type != BlockContext.Type.IF) {
-                    throw new RuntimeException("Unexpected 'else' without 'if'");
-                }
-
-                // We are at the boundary between then-body and else-body. We'll emit
-                // an unconditional jump here (to skip the else body) which occupies
-                // two slots (opcode + placeholder). Therefore the actual start of
-                // the else-body will be current out.size() + 2.
-                int elseStart = out.size() + 2;
-
-                // Patch the conditional jump to point to the start of the else-body
-                out.set(b.condJumpAddress + 1, elseStart);
-                // Ensure false-target jumps into the then-body (immediately after the two placeholders)
-                out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
-
-                // Emit an unconditional jump to skip the else body after then-body
-                out.add(set.requireOpcode("jump"));
-                out.add(0); // placeholder to be patched at 'end'
-                b.elseJumpAddress = out.size() - 1; // index of the placeholder value
-                continue;
-            }
-
-            // ===== BREAK =====
-            if (name.equals("break")) {
-                // Search down the stack to find the nearest loop (allows breaking out of a loop inside an if/function)
-                BlockContext loop = null;
-                for (int i = blocks.size() - 1; i >= 0; i--) {
-                    if (blocks.get(i).type == BlockContext.Type.WHILE) {
-                        loop = blocks.get(i);
-                        break;
-                    }
-                }
-                if (loop == null) throw new RuntimeException("Cannot 'break' outside of a loop");
-
-                loop.breaks.add(out.size());
-                out.add(set.requireOpcode("jump"));
-                out.add(0); // placeholder, patched at 'end'
-                continue;
-            }
-
-            // ===== END =====
-            if (name.equals("end")) {
-                if (blocks.isEmpty()) throw new RuntimeException("Unexpected 'end'");
-                BlockContext b = blocks.pop();
-
-                if (b.type == BlockContext.Type.FUNCTION) {
-                    out.add(set.requireOpcode("return"));
-                    // Patch the jump so the VM skips over the function definition
-                    out.set(b.startAddress + 1, out.size());
-                }
-                else if (b.type == BlockContext.Type.WHILE) {
-                    // Unconditional jump back to the 'while' condition
-                    out.add(set.requireOpcode("jump"));
-                    out.add(b.startAddress);
-
-                    int loopExitAddress = out.size();
-
-                    // 1. Patch the 'do' conditional jump
-                    // condJumpAddress points at opcode; +1 is true-target placeholder, +2 is false-target
-                    out.set(b.condJumpAddress + 1, loopExitAddress);
-                    out.set(b.condJumpAddress + 2, loopExitAddress);
-
-                    // 2. Patch all 'break' statements inside this loop
-                    for (int breakAddr : b.breaks) {
-                        out.set(breakAddr + 1, loopExitAddress);
-                    }
-                }
-                else if (b.type == BlockContext.Type.IF) {
-                    // If there was an ELSE branch, patch its unconditional jump placeholder
-                    if (b.elseJumpAddress != -1) {
-                        out.set(b.elseJumpAddress, out.size());
-                        // Also patch the original conditional's false-target to point to the start of the then-body
-                        out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
-                    } else {
-                        // No ELSE: patch the conditional jump to skip the then-body
-                        out.set(b.condJumpAddress + 1, out.size());
-                        out.set(b.condJumpAddress + 2, out.size());
-                    }
-                }
                 continue;
             }
 
