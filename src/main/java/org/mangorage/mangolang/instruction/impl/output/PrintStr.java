@@ -3,6 +3,7 @@ package org.mangorage.mangolang.instruction.impl.output;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,17 +11,17 @@ import java.util.List;
 public final class PrintStr implements Instruction {
 
     @Override
-    public void execute(VM vm) {
+    public void execute(VMEnvironment env) {
         // 1. Read the length of the string from the bytecode stream
-        int length = vm.next();
+        int length = env.next();
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             // 2. Read each character code and append to the builder
-            sb.append((char) vm.next());
+            sb.append((char) env.next());
         }
 
-        vm.getTerminal().println(sb.toString());
+        env.getTerminal().println(sb.toString());
     }
 
     @Override

@@ -3,20 +3,20 @@ package org.mangorage.mangolang.instruction.impl.control;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.Frame;
-import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public class Return implements Instruction {
 
     @Override
-    public void execute(VM vm) {
-        if (vm.getCallStack().size() <= 1) {
+    public void execute(VMEnvironment env) {
+        if (env.getCallStack().size() <= 1) {
             throw new RuntimeException("Return with no caller");
         }
 
-        Frame frame = vm.getCallStack().pop();
-        vm.ip = frame.returnIp;
+        Frame frame = env.getCallStack().pop();
+        env.setIp(frame.returnIp);
     }
 
     @Override

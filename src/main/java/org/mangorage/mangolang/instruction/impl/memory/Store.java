@@ -3,16 +3,17 @@ package org.mangorage.mangolang.instruction.impl.memory;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public final class Store implements Instruction {
 
     @Override
-    public void execute(VM vm) {
-        int index = vm.next();           // get the local variable index
-        int value = vm.getStack().pop(); // pop value from stack
-        vm.setLocal(index, value);       // store into local
+    public void execute(VMEnvironment env) {
+        int index = env.next();           // get the local variable index
+        int value = env.getStack().pop(); // pop value from stack
+        env.setLocal(index, value);       // store into local
     }
 
     @Override

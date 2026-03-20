@@ -3,15 +3,16 @@ package org.mangorage.mangolang.instruction.impl.arithmetic;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public class Multiply implements Instruction {
     @Override
-    public void execute(VM vm) {
-        int b = vm.getStack().pop();
-        int a = vm.getStack().pop();
-        vm.getStack().push(a * b);
+    public void execute(VMEnvironment env) {
+        int b = env.getStack().pop();
+        int a = env.getStack().pop();
+        env.getStack().push(a * b);
     }
     @Override
     public int getArgCount() { return 0; }

@@ -3,32 +3,6 @@
   <component name="CopilotDiffPersistence">
     <option name="pendingDiffs">
       <map>
-        <entry key="$PROJECT_DIR$/example.ml">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/example.ml" />
-              <option name="originalContent" value="let x 1&#10;&#10;function zero&#10;    printstr &quot;x is zero&quot;&#10;    return&#10;end&#10;&#10;function notzero&#10;    printstr &quot;x is not zero&quot;&#10;    return&#10;end&#10;&#10;function check_x&#10;    load x&#10;    push 0&#10;    equals&#10;&#10;    jump_if_true zero notzero&#10;    return&#10;end&#10;&#10;call check_x&#10;&#10;push 0&#10;store x&#10;&#10;call check_x&#10;" />
-              <option name="updatedContent" value="let x 0&#10;&#10;if (x == 0) do&#10;    printstr &quot;X is zero&quot;&#10;else&#10;    printstr &quot;X is not zero&quot;&#10;end&#10;&#10;printstr &quot;Hello, World!&quot;&#10;&#10;    jump_if_true zero notzero&#10;    return&#10;end&#10;&#10;call check_x&#10;&#10;push 0&#10;store x&#10;&#10;call check_x&#10;" />
-            </PendingDiffInfo>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/RunIfTest.java">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/RunIfTest.java" />
-              <option name="updatedContent" value="package org.mangorage.mangolang;&#10;&#10;import org.mangorage.mangolang.compiler.Compiler;&#10;import org.mangorage.mangolang.instruction.InstructionSet;&#10;import org.mangorage.mangolang.terminal.ConsoleTerminal;&#10;import org.mangorage.mangolang.terminal.DeferredTerminal;&#10;import org.mangorage.mangolang.vm.VM;&#10;&#10;import java.util.List;&#10;&#10;public class RunIfTest {&#10;    public static void main(String[] args) {&#10;        Compiler compiler = new Compiler(MangoLang.createEnv());&#10;&#10;        String program = &quot;&quot;&quot;&#10;                let x 1&#10;&#10;                if (x == 0) then&#10;                    printstr &quot;X is zero&quot;&#10;                else&#10;                    printstr &quot;X is not zero&quot;&#10;                end&#10;&#10;                printstr &quot;Hello, World!&quot;&#10;                &quot;&quot;&quot;;&#10;&#10;        int[] bytecode = compiler.compile(program);&#10;        System.out.println(&quot;Bytecode: &quot; + java.util.Arrays.toString(bytecode));&#10;        InstructionSet set = MangoLang.createEnv();&#10;        for (int i = 0; i &lt; bytecode.length; i++) {&#10;            Integer v = bytecode[i];&#10;            String name = set.getName(v);&#10;            if (name != null) System.out.printf(&quot;%04d: %d %s\n&quot;, i, v, name);&#10;            else System.out.printf(&quot;%04d: %d\n&quot;, i, v);&#10;        }&#10;&#10;        VM vm = new VM(bytecode, set);&#10;        vm.setTerminal(DeferredTerminal.of(List.of(ConsoleTerminal.getInstance())));&#10;        vm.run();&#10;    }&#10;}&#10;&#10;&#10;" />
-            </PendingDiffInfo>
-          </value>
-        </entry>
-        <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/Call.java">
-          <value>
-            <PendingDiffInfo>
-              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/Call.java" />
-              <option name="originalContent" value="        vm.getCallStack().push(new VM.Frame(vm.ip, 0));&#10;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#10;import org.mangorage.mangolang.instruction.Instruction;&#10;import org.mangorage.mangolang.vm.VM;&#10;&#10;import java.util.List;&#10;&#10;public class Call implements Instruction {&#10;    public void execute(VM vm) {&#10;        int addr = vm.next();&#10;        vm.getCallStack().push(new VM.Frame(vm.ip, 256));&#10;        vm.ip = addr;&#10;    }&#10;&#10;    public int getArgCount() {&#10;        return 1;&#10;    }&#10;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#10;        out.add(ctx.getFunction((String) args[0]));&#10;    }&#10;}&#10;" />
-              <option name="updatedContent" value="package org.mangorage.mangolang.instruction.impl.control;&#13;&#10;&#13;&#10;import org.mangorage.mangolang.compiler.CompilerContext;&#13;&#10;import org.mangorage.mangolang.instruction.Instruction;&#13;&#10;import org.mangorage.mangolang.vm.VM;&#13;&#10;&#13;&#10;import java.util.List;&#13;&#10;&#13;&#10;public class Call implements Instruction {&#13;&#10;    @Override&#13;&#10;    public void execute(VM vm) {&#13;&#10;        int addr = vm.next();&#13;&#10;        vm.getCallStack().push(new VM.Frame(vm.ip, 0));&#13;&#10;        vm.ip = addr;&#13;&#10;    }&#13;&#10;&#13;&#10;    public int getArgCount() {&#13;&#10;        return 1;&#13;&#10;    }&#13;&#10;&#13;&#10;    public void emitBytecode(List&lt;Integer&gt; out, CompilerContext ctx, Object... args) {&#13;&#10;        out.add(ctx.getFunction((String) args[0]));&#13;&#10;    }&#13;&#10;}" />
-            </PendingDiffInfo>
-          </value>
-        </entry>
         <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/JumpIfTrue.java">
           <value>
             <PendingDiffInfo>

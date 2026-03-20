@@ -3,16 +3,17 @@ package org.mangorage.mangolang.instruction.impl.memory;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public final class Load implements Instruction {
 
     @Override
-    public void execute(VM vm) {
-        int index = vm.next();       // read variable index
-        int value = vm.getLocal(index); // get value from locals
-        vm.getStack().push(value);      // push onto stack
+    public void execute(VMEnvironment env) {
+        int index = env.next();       // read variable index
+        int value = env.getLocal(index); // get value from locals
+        env.getStack().push(value);      // push onto stack
     }
 
     @Override

@@ -3,6 +3,8 @@ package org.mangorage.mangolang.instruction.impl.control;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
+
 import java.util.List;
 
 public class JumpInst implements Instruction {
@@ -13,17 +15,17 @@ public class JumpInst implements Instruction {
     }
 
     @Override
-    public void execute(VM vm) {
-        final var booleanValue = vm.getStack().pop();
+    public void execute(VMEnvironment env) {
+        final var booleanValue = env.getStack().pop();
 
         // Read the two target addresses emitted by the compiler
-        int trueAddr = vm.next();
-        int falseAddr = vm.next();
+        int trueAddr = env.next();
+        int falseAddr = env.next();
 
         if (booleanValue == value) {
-            vm.ip = trueAddr;
+            env.setIp(trueAddr);
         } else {
-            vm.ip = falseAddr;
+            env.setIp(falseAddr);
         }
     }
 

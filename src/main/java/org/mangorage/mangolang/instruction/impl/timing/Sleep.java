@@ -3,14 +3,15 @@ package org.mangorage.mangolang.instruction.impl.timing;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public final class Sleep implements Instruction {
 
     @Override
-    public void execute(VM vm) {
-        int durationMs = vm.getStack().pop(); // pop the value from the stack
+    public void execute(VMEnvironment env) {
+        int durationMs = env.getStack().pop(); // pop the value from the stack
         try {
             Thread.sleep(durationMs);
         } catch (InterruptedException e) {

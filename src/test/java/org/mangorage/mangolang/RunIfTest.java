@@ -13,7 +13,7 @@ public class RunIfTest {
         Compiler compiler = new Compiler(MangoLang.createEnv());
 
         String program = """
-                let x 1
+                let x = 0
 
                 if (x == 0) then
                     printstr "X is zero"
@@ -27,6 +27,7 @@ public class RunIfTest {
         int[] bytecode = compiler.compile(program);
         System.out.println("Bytecode: " + java.util.Arrays.toString(bytecode));
         InstructionSet set = MangoLang.createEnv();
+
         for (int i = 0; i < bytecode.length; i++) {
             Integer v = bytecode[i];
             String name = set.getName(v);

@@ -10,13 +10,14 @@ import org.mangorage.mangolang.vm.VM;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class VMTest {
 
     private final List<String> out = new ArrayList<>();
 
     @Test
-    public void testPrintStrEmits() {
+    public void testPrintStrEmits() throws InterruptedException {
         // Compile and run a small program using the Compiler and createEnv
         Compiler compiler = new Compiler(MangoLang.createEnv());
 
@@ -43,7 +44,14 @@ public class VMTest {
                         )
                 )
         );
-        vm.run();
+
+        final var executors = Executors.newCachedThreadPool();
+
+        for (int i = 0; i < 100; i++) {
+            executors.submit(() -> vm.run());
+        }
+
+        Thread.sleep(10000);
 
         // Join outputs
         String joined = String.join("", out);

@@ -3,16 +3,17 @@ package org.mangorage.mangolang.instruction.impl.memory;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public final class Let implements Instruction {
 
     @Override
-    public void execute(VM vm) {
-        int index = vm.next();  // variable index
-        int value = vm.next();  // value to store
-        vm.setLocal(index, value);
+    public void execute(VMEnvironment env) {
+        int index = env.next();  // variable index
+        int value = env.next();  // value to store
+        env.setLocal(index, value);
     }
 
     @Override

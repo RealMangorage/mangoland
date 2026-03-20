@@ -3,14 +3,15 @@ package org.mangorage.mangolang.instruction.impl.arithmetic;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
+import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
 public class Decrement implements Instruction {
     @Override
-    public void execute(VM vm) {
-        int val = vm.getStack().pop();
-        vm.getStack().push(val - 1);
+    public void execute(VMEnvironment env) {
+        int val = env.getStack().pop();
+        env.getStack().push(val - 1);
     }
     @Override
     public int getArgCount() { return 0; }
