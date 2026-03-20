@@ -16,14 +16,14 @@ public final class BreakLexerNode implements LexerNode {
             // Search down the stack to find the nearest loop (allows breaking out of a loop inside an if/function)
             BlockContext loop = null;
             for (int i = blocks.size() - 1; i >= 0; i--) {
-                if (blocks.get(i).type == BlockContext.Type.WHILE) {
+                if (blocks.get(i).getType() == BlockContext.Type.WHILE) {
                     loop = blocks.get(i);
                     break;
                 }
             }
             if (loop == null) throw new RuntimeException("Cannot 'break' outside of a loop");
 
-            loop.breaks.add(out.size());
+            loop.addBreak(out.size());
             out.add(set.requireOpcode("jump"));
             out.add(0); // placeholder, patched at 'end'
             return new LexerOutput(true);

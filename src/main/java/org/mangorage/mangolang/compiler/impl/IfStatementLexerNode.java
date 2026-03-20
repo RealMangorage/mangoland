@@ -76,7 +76,7 @@ public final class IfStatementLexerNode implements LexerNode {
                 // Now emit the conditional jump placeholder to skip the then-body when false
                 BlockContext b = new BlockContext(BlockContext.Type.IF, out.size());
                 blocks.push(b);
-                b.condJumpAddress = out.size();
+                b.setCondJumpAddress(out.size());
                 out.add(set.requireOpcode("jump_if_false"));
                 out.add(0); // true-target placeholder (patched to else/exit)
                 out.add(0); // false-target placeholder (points to instruction after these placeholders)
@@ -95,7 +95,7 @@ public final class IfStatementLexerNode implements LexerNode {
 
         if (name.equals("else")) {
             BlockContext b = blocks.peek();
-            if (b == null || b.type != BlockContext.Type.IF) {
+            if (b == null || b.getType() != BlockContext.Type.IF) {
                 throw new RuntimeException("Unexpected 'else' without 'if'");
             }
 
@@ -106,25 +106,25 @@ public final class IfStatementLexerNode implements LexerNode {
             int elseStart = out.size() + 2;
 
             // Patch the conditional jump to point to the start of the else-body
-            out.set(b.condJumpAddress + 1, elseStart);
+            out.set(b.getCondJumpAddress() + 1, elseStart);
             // Ensure false-target jumps into the then-body (immediately after the two placeholders)
-            out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
+            out.set(b.getCondJumpAddress() + 2, b.getCondJumpAddress() + 3);
 
             // Emit an unconditional jump to skip the else body after then-body
             out.add(set.requireOpcode("jump"));
             out.add(0); // placeholder to be patched at 'end'
-            b.elseJumpAddress = out.size() - 1; // index of the placeholder value
+            b.setElseJumpAddress(out.size() - 1); // index of the placeholder value
             return new LexerOutput(true);
         }
 
         // ===== THEN (marks end of condition, start of then-body) =====
-        if (name.equals("then") || (name.equals("end") && blocks.peek() != null && blocks.peek().type == BlockContext.Type.IF)) {
+        if (name.equals("then") || (name.equals("end") && blocks.peek() != null && blocks.peek().getType() == BlockContext.Type.IF)) {
             BlockContext b = blocks.peek();
-            if (b == null || b.type != BlockContext.Type.IF) {
+            if (b == null || b.getType() != BlockContext.Type.IF) {
                 throw new RuntimeException("Unexpected 'then' without 'if'");
             }
             // Emit conditional jump placeholder; if condition is false, skip the then body
-            b.condJumpAddress = out.size();
+            b.setCondJumpAddress(out.size());
             out.add(set.requireOpcode("jump_if_false"));
             out.add(0); // true-target placeholder
             out.add(0); // false-target placeholder

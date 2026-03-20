@@ -14,10 +14,10 @@ public final class DoLexerNode implements LexerNode {
     public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
         if (name.equals("do")) {
             BlockContext b = blocks.peek();
-            if (b == null || b.type != BlockContext.Type.WHILE) {
+            if (b == null || b.getType() != BlockContext.Type.WHILE) {
                 throw new RuntimeException("Unexpected 'do' without 'while'");
             }
-            b.condJumpAddress = out.size();
+            b.setCondJumpAddress(out.size());
             out.add(set.requireOpcode("jump_if_false"));
             out.add(0); // true-target placeholder (patched at 'end' to loop exit)
             out.add(0); // false-target placeholder (points to instruction after these two placeholders)

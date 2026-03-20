@@ -17,38 +17,38 @@ public final class EndLexerNode implements LexerNode {
             if (blocks.isEmpty()) throw new RuntimeException("Unexpected 'end'");
             BlockContext b = blocks.pop();
 
-            if (b.type == BlockContext.Type.FUNCTION) {
+            if (b.getType() == BlockContext.Type.FUNCTION) {
                 out.add(set.requireOpcode("return"));
                 // Patch the jump so the VM skips over the function definition
-                out.set(b.startAddress + 1, out.size());
+                out.set(b.getStartAddress() + 1, out.size());
             }
-            else if (b.type == BlockContext.Type.WHILE) {
+            else if (b.getType() == BlockContext.Type.WHILE) {
                 // Unconditional jump back to the 'while' condition
                 out.add(set.requireOpcode("jump"));
-                out.add(b.startAddress);
+                out.add(b.getStartAddress());
 
                 int loopExitAddress = out.size();
 
                 // 1. Patch the 'do' conditional jump
                 // condJumpAddress points at opcode; +1 is true-target placeholder, +2 is false-target
-                out.set(b.condJumpAddress + 1, loopExitAddress);
-                out.set(b.condJumpAddress + 2, loopExitAddress);
+                out.set(b.getCondJumpAddress() + 1, loopExitAddress);
+                out.set(b.getCondJumpAddress() + 2, loopExitAddress);
 
                 // 2. Patch all 'break' statements inside this loop
-                for (int breakAddr : b.breaks) {
+                for (int breakAddr : b.getBreaks()) {
                     out.set(breakAddr + 1, loopExitAddress);
                 }
             }
-            else if (b.type == BlockContext.Type.IF) {
+            else if (b.getType() == BlockContext.Type.IF) {
                 // If there was an ELSE branch, patch its unconditional jump placeholder
-                if (b.elseJumpAddress != -1) {
-                    out.set(b.elseJumpAddress, out.size());
+                if (b.getElseJumpAddress() != -1) {
+                    out.set(b.getElseJumpAddress(), out.size());
                     // Also patch the original conditional's false-target to point to the start of the then-body
-                    out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
+                    out.set(b.getCondJumpAddress() + 2, b.getCondJumpAddress() + 3);
                 } else {
                     // No ELSE: patch the conditional jump to skip the then-body
-                    out.set(b.condJumpAddress + 1, out.size());
-                    out.set(b.condJumpAddress + 2, out.size());
+                    out.set(b.getCondJumpAddress() + 1, out.size());
+                    out.set(b.getCondJumpAddress() + 2, out.size());
                 }
             }
             return new LexerOutput(true);
