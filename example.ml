@@ -16,6 +16,7 @@ function check_x
     equals
 
     jump_if_true zero notzero
+    return
 end
 
 call check_x

@@ -20,6 +20,8 @@ import org.mangorage.mangolang.instruction.impl.stack.Push;
 import org.mangorage.mangolang.instruction.impl.control.Return;
 import org.mangorage.mangolang.instruction.impl.timing.Sleep;
 import org.mangorage.mangolang.instruction.impl.memory.Store;
+import org.mangorage.mangolang.terminal.ConsoleTerminal;
+import org.mangorage.mangolang.terminal.DeferredTerminal;
 import org.mangorage.mangolang.terminal.TerminalGui;
 import org.mangorage.mangolang.vm.VM;
 
@@ -61,7 +63,6 @@ public final class MangoLang {
                         Multiply.class
                 )
         );
-
         set.register(
                 "jump_if_true", new JumpIfTrue()
         );
@@ -69,12 +70,6 @@ public final class MangoLang {
         set.register(
                 "greater_than_zero", new GreaterThanZero()
         );
-
-        if (System.currentTimeMillis() % 1000 == 0) {
-            set.register("lol", new Print());
-            System.out.println("LOL");
-        }
-
 
         return set;
     }
@@ -87,7 +82,14 @@ public final class MangoLang {
         int[] bytecode = compiler.compile(program);
 
         VM vm = new VM(bytecode, createEnv());
-        vm.setTerminal(TerminalGui.getInstance());
+        vm.setTerminal(
+                DeferredTerminal.of(
+                        List.of(
+                                TerminalGui.getInstance(),
+                                ConsoleTerminal.getInstance()
+                        )
+                )
+        );
         vm.run();
     }
 }
