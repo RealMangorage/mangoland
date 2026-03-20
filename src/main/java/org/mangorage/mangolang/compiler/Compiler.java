@@ -171,7 +171,7 @@ public final class Compiler {
             }
 
             // ===== THEN (marks end of condition, start of then-body) =====
-            if (name.equals("then")) {
+            if (name.equals("then") || (name.equals("end") && blocks.peek() != null && blocks.peek().type == BlockContext.Type.IF)) {
                 BlockContext b = blocks.peek();
                 if (b == null || b.type != BlockContext.Type.IF) {
                     throw new RuntimeException("Unexpected 'then' without 'if'");
@@ -181,7 +181,9 @@ public final class Compiler {
                 out.add(set.requireOpcode("jump_if_false"));
                 out.add(0); // true-target placeholder
                 out.add(0); // false-target placeholder
-                continue;
+                if (!name.equals("end")) {
+                    continue;
+                }
             }
 
             // ===== ELSE =====

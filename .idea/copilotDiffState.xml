@@ -3,6 +3,15 @@
   <component name="CopilotDiffPersistence">
     <option name="pendingDiffs">
       <map>
+        <entry key="$PROJECT_DIR$/example.ml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/example.ml" />
+              <option name="originalContent" value="let x = 0&#10;&#10;if (x == 0) do&#10;    printstr &quot;X is zero&quot;&#10;else&#10;end&#10;&#10;printstr &quot;Hello, World!&quot;&#10;" />
+              <option name="updatedContent" value="&#10;let x = 0&#10;&#10;if (x == 0) do&#10;    printstr &quot;X is zero&quot;&#10;else&#10;end&#10;&#10;printstr &quot;Hello, World!&quot;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/src/main/java/org/mangorage/mangolang/instruction/impl/control/JumpIfTrue.java">
           <value>
             <PendingDiffInfo>
