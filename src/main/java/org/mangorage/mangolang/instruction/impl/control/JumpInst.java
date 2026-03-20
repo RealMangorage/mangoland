@@ -5,8 +5,11 @@ import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.vm.VM;
 import java.util.List;
 
-public class JumpIfTrue implements Instruction {
-    public JumpIfTrue() {
+public class JumpInst implements Instruction {
+    private final int value;
+
+    public JumpInst(int value) {
+        this.value = value;
     }
 
     @Override
@@ -17,7 +20,7 @@ public class JumpIfTrue implements Instruction {
         int trueAddr = vm.next();
         int falseAddr = vm.next();
 
-        if (booleanValue == 1) {
+        if (booleanValue == value) {
             vm.ip = trueAddr;
         } else {
             vm.ip = falseAddr;

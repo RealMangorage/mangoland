@@ -1,19 +1,12 @@
-let x 1
+let x 0
 
-function zero
-    printstr "x is zero"
-    return
+if (x == 0) do
+    printstr "X is zero"
+else
+    printstr "X is not zero"
 end
 
-function notzero
-    printstr "x is not zero"
-    return
-end
-
-function check_x
-    load x
-    push 0
-    equals
+printstr "Hello, World!"
 
     jump_if_true zero notzero
     return

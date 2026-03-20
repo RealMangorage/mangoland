@@ -10,7 +10,7 @@ import org.mangorage.mangolang.instruction.impl.comparison.Equals;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
 import org.mangorage.mangolang.instruction.impl.control.Halt;
 import org.mangorage.mangolang.instruction.impl.control.Jump;
-import org.mangorage.mangolang.instruction.impl.control.JumpIfTrue;
+import org.mangorage.mangolang.instruction.impl.control.JumpInst;
 import org.mangorage.mangolang.instruction.impl.memory.Let;
 import org.mangorage.mangolang.instruction.impl.memory.Load;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
@@ -64,7 +64,11 @@ public final class MangoLang {
                 )
         );
         set.register(
-                "jump_if_true", new JumpIfTrue()
+                "jump_if_true", new JumpInst(1)
+        );
+
+        set.register(
+                "jump_if_false", new JumpInst(0)
         );
 
         set.register(
