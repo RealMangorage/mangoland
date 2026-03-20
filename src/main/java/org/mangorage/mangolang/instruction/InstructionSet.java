@@ -51,4 +51,8 @@ public final class InstructionSet {
         }
         return op;
     }
+
+    public String getDebugInfo() {
+        return "";
+    }
 }

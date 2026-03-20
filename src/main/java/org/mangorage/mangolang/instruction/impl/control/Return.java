@@ -7,7 +7,7 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
-public class Return implements Instruction {
+public final class Return implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {

@@ -1,13 +1,14 @@
 package org.mangorage.mangolang.instruction.impl.comparison;
 
 import org.mangorage.mangolang.compiler.CompilerContext;
+import org.mangorage.mangolang.instruction.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
-import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
-public class GreaterThanZero implements Instruction {
+@AutoRegisterInstruction
+public final class GreaterThanZero implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         int val = env.getStack().pop();

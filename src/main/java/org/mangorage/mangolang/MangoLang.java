@@ -10,7 +10,7 @@ import org.mangorage.mangolang.instruction.impl.comparison.Equals;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
 import org.mangorage.mangolang.instruction.impl.control.Halt;
 import org.mangorage.mangolang.instruction.impl.control.Jump;
-import org.mangorage.mangolang.instruction.impl.control.JumpInst;
+import org.mangorage.mangolang.instruction.impl.control.JumpStatement;
 import org.mangorage.mangolang.instruction.impl.memory.Let;
 import org.mangorage.mangolang.instruction.impl.memory.Load;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
@@ -28,6 +28,7 @@ import org.mangorage.mangolang.vm.VM;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 public final class MangoLang {
@@ -64,11 +65,11 @@ public final class MangoLang {
                 )
         );
         set.register(
-                "jump_if_true", new JumpInst(1)
+                "jump_if_true", new JumpStatement(1)
         );
 
         set.register(
-                "jump_if_false", new JumpInst(0)
+                "jump_if_false", new JumpStatement(0)
         );
 
         set.register(
@@ -79,13 +80,29 @@ public final class MangoLang {
     }
 
     public static void main(String[] args) {
-        Compiler compiler = new Compiler(createEnv());
+        final var env = createEnv();
+
+        Compiler compiler = new Compiler(env);
 
         String program = loadProgram("example.ml");
 
         int[] bytecode = compiler.compile(program);
 
-        VM vm = new VM(createEnv());
+        System.out.println(
+                Arrays.toString(
+                        bytecode
+                )
+        );
+
+        for (int i = 0; i < bytecode.length; i++) {
+            Integer v = bytecode[i];
+            String name = env.getName(v);
+            if (name != null) System.out.printf("%04d: %d %s\n", i, v, name);
+            else System.out.printf("%04d: %d\n", i, v);
+        }
+
+
+        VM vm = new VM(env);
 
         vm.setTerminal(
                 DeferredTerminal.of(

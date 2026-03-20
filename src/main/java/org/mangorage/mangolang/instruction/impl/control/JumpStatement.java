@@ -2,15 +2,14 @@ package org.mangorage.mangolang.instruction.impl.control;
 
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
-import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
-public class JumpInst implements Instruction {
+public final class JumpStatement implements Instruction {
     private final int value;
 
-    public JumpInst(int value) {
+    public JumpStatement(int value) {
         this.value = value;
     }
 
