@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.mangorage.mangolang.compiler.Compiler;
 import org.mangorage.mangolang.terminal.ConsoleTerminal;
 import org.mangorage.mangolang.terminal.DeferredTerminal;
-import org.mangorage.mangolang.terminal.Terminal;
 import org.mangorage.mangolang.vm.VM;
 
 import java.util.ArrayList;
@@ -22,13 +21,14 @@ public class VMTest {
         Compiler compiler = new Compiler(MangoLang.createEnv());
 
         String program = """
-                let x 0
+                let x = 0
                 
                 if (x == 0) then
                     printstr "X is zero"
                 else
                     printstr "X is not zero"
                 end
+                
                 printstr "Hello, World!"
                 """;
 

@@ -16,11 +16,13 @@ public final class Let implements Instruction {
     }
 
     @Override
-    public int getArgCount() { return 2; }
+    public int getArgCount() {
+        return 3;
+    }
 
     @Override
     public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
-        if (args.length != 2)
+        if (args.length != 3)
             throw new RuntimeException("Let instruction requires variable name and value");
 
         String name = args[0].toString();
@@ -32,10 +34,10 @@ public final class Let implements Instruction {
         // Value can be integer literal or another variable name
         int value;
         try {
-            value = Integer.parseInt(args[1].toString());
+            value = Integer.parseInt(args[2].toString());
         } catch (NumberFormatException e) {
             // Treat it as variable reference
-            value = ctx.getVariableIndex(args[1].toString());
+            value = ctx.getVariableIndex(args[2].toString());
         }
 
         output.add(index);

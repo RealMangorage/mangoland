@@ -62,6 +62,10 @@ public final class VM {
 
         while (running && ip < code.length) {
             int opcode = next();
+            if (System.getProperty("mangolang.vmdebug") != null) {
+                String name = set.getName(opcode);
+                System.out.println("[VM] ip=" + (ip-1) + " opcode=" + opcode + (name==null?"":" ("+name+")") + " stack=" + stack);
+            }
             Instruction inst = set.get(opcode);
             if (inst == null) throw new RuntimeException("Unknown opcode " + opcode);
             inst.execute(this);

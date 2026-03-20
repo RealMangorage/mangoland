@@ -81,19 +81,27 @@ public final class Compiler {
                 }
                 b.condJumpAddress = out.size();
                 out.add(set.requireOpcode("jump_if_false"));
-                out.add(0); // placeholder to skip the loop body, patched at 'end'
+                out.add(0); // true-target placeholder (patched at 'end' to loop exit)
+                out.add(0); // false-target placeholder (points to instruction after these two placeholders)
                 continue;
             }
 
             // ===== IF START =====
             if (name.equals("if")) {
                 // If the 'if' is inline and contains 'do' on the same line, try to parse a simple condition
-                int doIdx = -1;
-                for (int i = 1; i < parts.length; i++) if (parts[i].equalsIgnoreCase("do")) { doIdx = i; break; }
+                int delimIdx = -1;
+                String delim = null;
+                for (int i = 1; i < parts.length; i++) {
+                    if (parts[i].equalsIgnoreCase("do") || parts[i].equalsIgnoreCase("then")) {
+                        delimIdx = i;
+                        delim = parts[i].toLowerCase();
+                        break;
+                    }
+                }
 
-                if (doIdx != -1) {
-                    // Join the condition tokens between 'if' and 'do'
-                    String condStr = String.join(" ", Arrays.copyOfRange(parts, 1, doIdx));
+                if (delimIdx != -1) {
+                    // Join the condition tokens between 'if' and the delimiter (do/then)
+                    String condStr = String.join(" ", Arrays.copyOfRange(parts, 1, delimIdx));
 
                     // Simple pattern: (var == value) allowing optional surrounding parens
                     Pattern p = Pattern.compile("\\(?\\s*([a-zA-Z_]\\w*)\\s*(==|!=)\\s*([0-9]+)\\s*\\)?");
@@ -140,8 +148,21 @@ public final class Compiler {
                     blocks.push(b);
                     b.condJumpAddress = out.size();
                     out.add(set.requireOpcode("jump_if_false"));
-                    out.add(0); // placeholder
-                    continue;
+                    out.add(0); // true-target placeholder (patched to else/exit)
+                    out.add(0); // false-target placeholder (points to instruction after these placeholders)
+                    // If the delimiter was 'then' and there are tokens after it on the same line,
+                    // we should continue processing the rest of this line as normal instructions.
+                    if ("then".equals(delim) && delimIdx + 1 < parts.length) {
+                        // Rebuild the remainder of the line and process it immediately
+                        String[] remainder = Arrays.copyOfRange(parts, delimIdx + 1, parts.length);
+                        // Create a pseudo-line and fall through to normal instruction handling by
+                        // replacing 'parts' and 'name' for this iteration.
+                        parts = remainder;
+                        name = parts[0].toLowerCase();
+                        // fall through to emit this instruction below
+                    } else {
+                        continue;
+                    }
                 }
 
                 // Non-inline: push IF context and expect a separate 'then' token later
@@ -158,7 +179,8 @@ public final class Compiler {
                 // Emit conditional jump placeholder; if condition is false, skip the then body
                 b.condJumpAddress = out.size();
                 out.add(set.requireOpcode("jump_if_false"));
-                out.add(0); // placeholder
+                out.add(0); // true-target placeholder
+                out.add(0); // false-target placeholder
                 continue;
             }
 
@@ -169,8 +191,16 @@ public final class Compiler {
                     throw new RuntimeException("Unexpected 'else' without 'if'");
                 }
 
+                // We are at the boundary between then-body and else-body. We'll emit
+                // an unconditional jump here (to skip the else body) which occupies
+                // two slots (opcode + placeholder). Therefore the actual start of
+                // the else-body will be current out.size() + 2.
+                int elseStart = out.size() + 2;
+
                 // Patch the conditional jump to point to the start of the else-body
-                out.set(b.condJumpAddress + 1, out.size());
+                out.set(b.condJumpAddress + 1, elseStart);
+                // Ensure false-target jumps into the then-body (immediately after the two placeholders)
+                out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
 
                 // Emit an unconditional jump to skip the else body after then-body
                 out.add(set.requireOpcode("jump"));
@@ -215,7 +245,9 @@ public final class Compiler {
                     int loopExitAddress = out.size();
 
                     // 1. Patch the 'do' conditional jump
+                    // condJumpAddress points at opcode; +1 is true-target placeholder, +2 is false-target
                     out.set(b.condJumpAddress + 1, loopExitAddress);
+                    out.set(b.condJumpAddress + 2, loopExitAddress);
 
                     // 2. Patch all 'break' statements inside this loop
                     for (int breakAddr : b.breaks) {
@@ -226,9 +258,12 @@ public final class Compiler {
                     // If there was an ELSE branch, patch its unconditional jump placeholder
                     if (b.elseJumpAddress != -1) {
                         out.set(b.elseJumpAddress, out.size());
+                        // Also patch the original conditional's false-target to point to the start of the then-body
+                        out.set(b.condJumpAddress + 2, b.condJumpAddress + 3);
                     } else {
                         // No ELSE: patch the conditional jump to skip the then-body
                         out.set(b.condJumpAddress + 1, out.size());
+                        out.set(b.condJumpAddress + 2, out.size());
                     }
                 }
                 continue;
