@@ -82,14 +82,7 @@ public final class IfStatementLexerNode implements LexerNode {
                 out.add(0); // false-target placeholder (points to instruction after these placeholders)
                 // If the delimiter was 'then' and there are tokens after it on the same line,
                 // we should continue processing the rest of this line as normal instructions.
-                if ("then".equals(delim) && delimIdx + 1 < parts.length) {
-                    // Rebuild the remainder of the line and process it immediately
-                    String[] remainder = Arrays.copyOfRange(parts, delimIdx + 1, parts.length);
-                    // Create a pseudo-line and fall through to normal instruction handling by
-                    // replacing 'parts' and 'name' for this iteration.
-                    parts = remainder;
-                    // fall through to emit this instruction below
-                } else {
+                if (!("then".equals(delim) && delimIdx + 1 < parts.length)) {
                     return new LexerOutput(null, true);
                 }
             }
