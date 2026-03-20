@@ -16,13 +16,27 @@ public class VMTest {
 
     private final List<String> out = new ArrayList<>();
 
+    public static void main(String[] args) throws InterruptedException {
+        new VMTest().testPrintStrEmits();
+    }
+
     @Test
     public void testPrintStrEmits() throws InterruptedException {
         // Compile and run a small program using the Compiler and createEnv
         Compiler compiler = new Compiler(MangoLang.createEnv());
 
         String program = """
+                # Testing stuff!
                 let x = 0
+                
+                function testFunc()  # Simple function here!
+                    printstr "Func called"
+                end
+                
+                call testFunc()
+                
+                
+                printstr "Hello, World!"
                 
                 if (x == 0) then
                     printstr "X is zero"
@@ -30,12 +44,33 @@ public class VMTest {
                     printstr "X is not zero"
                 end
                 
-                printstr "Hello, World!"
+                if (x != 1) then
+                    printstr "X is not one"
+                end
+                
+                # Testing stuff!
+                let y = 50
+                
+                while do
+                    
+                    if (y == 0) then
+                        break
+                    end
+                    
+                    call testFunc()
+                    
+                    load y
+                    decrement
+                    store y
+               
+                end
+                
+                printstr "Ended"
                 """;
 
         int[] bytecode = compiler.compile(program);
 
-        VM vm = new VM(bytecode, MangoLang.createEnv());
+        VM vm = new VM(MangoLang.createEnv());
         vm.setTerminal(
                 DeferredTerminal.of(
                         List.of(
@@ -45,17 +80,12 @@ public class VMTest {
                 )
         );
 
-        final var executors = Executors.newCachedThreadPool();
-
-        for (int i = 0; i < 100; i++) {
-            executors.submit(() -> vm.run());
-        }
-
-        Thread.sleep(10000);
+        vm.run(bytecode);
 
         // Join outputs
-        String joined = String.join("", out);
+        String joined = String.join("\n", out);
         Assertions.assertTrue(joined.contains("Hello, World!"), "Expected 'Hello, World!' in terminal output: " + joined);
+        Assertions.assertTrue(joined.contains("X is zero"), "Expected 'X is zero' in terminal output: " + joined);
     }
 }
 

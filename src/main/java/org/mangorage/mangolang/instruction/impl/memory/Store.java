@@ -18,9 +18,6 @@ public final class Store implements Instruction {
     }
 
     @Override
-    public int getArgCount() { return 1; }
-
-    @Override
     public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
         if (args.length != 1)
             throw new RuntimeException("Store requires 1 argument (variable name)");

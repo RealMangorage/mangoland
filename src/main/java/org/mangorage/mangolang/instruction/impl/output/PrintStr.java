@@ -25,15 +25,6 @@ public final class PrintStr implements Instruction {
         env.getTerminal().println(sb.toString());
     }
 
-    @Override
-    public int getArgCount() {
-        /** * Change: In a fixed-length system, this is tricky.
-         * However, for the compiler's sake, "1" usually refers to the
-         * high-level argument (the String object).
-         */
-        return 1;
-    }
-
     public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
         if (args.length < 1) return;
 

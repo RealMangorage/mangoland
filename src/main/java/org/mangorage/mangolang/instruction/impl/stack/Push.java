@@ -13,10 +13,6 @@ public final class Push implements Instruction {
         env.getStack().push(env.next());
     }
 
-    public int getArgCount() {
-        return 1;
-    }
-
     @Override
     public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
         if (args.length != 1) {

@@ -46,9 +46,11 @@ public final class EndLexerNode implements LexerNode {
                     // Also patch the original conditional's false-target to point to the start of the then-body
                     out.set(b.getCondJumpAddress() + 2, b.getCondJumpAddress() + 3);
                 } else {
-                    // No ELSE: patch the conditional jump to skip the then-body
+                    // No ELSE: patch the conditional jump so that
+                    // - the first placeholder (trueAddr) points to the instruction after the then-body (skip)
+                    // - the second placeholder (falseAddr) points to the start of the then-body (immediately after the placeholders)
                     out.set(b.getCondJumpAddress() + 1, out.size());
-                    out.set(b.getCondJumpAddress() + 2, out.size());
+                    out.set(b.getCondJumpAddress() + 2, b.getCondJumpAddress() + 3);
                 }
             }
             return new LexerOutput(true);

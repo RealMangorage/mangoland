@@ -1,7 +1,6 @@
 package org.mangorage.mangolang.compiler;
 
 import org.mangorage.mangolang.compiler.impl.BreakLexerNode;
-import org.mangorage.mangolang.compiler.impl.DoLexerNode;
 import org.mangorage.mangolang.compiler.impl.EndLexerNode;
 import org.mangorage.mangolang.compiler.impl.FunctionLexerNode;
 import org.mangorage.mangolang.compiler.impl.IfStatementLexerNode;
@@ -10,8 +9,6 @@ import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class Compiler {
     private final InstructionSet set;
@@ -23,7 +20,6 @@ public final class Compiler {
     public int[] compile(String source) {
         List<LexerNode> nodes = List.of(
                 new BreakLexerNode(),
-                new DoLexerNode(),
                 new EndLexerNode(),
                 new FunctionLexerNode(),
                 new IfStatementLexerNode(),

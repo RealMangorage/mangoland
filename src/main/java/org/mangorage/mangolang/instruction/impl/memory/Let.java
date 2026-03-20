@@ -18,11 +18,6 @@ public final class Let implements Instruction {
     }
 
     @Override
-    public int getArgCount() {
-        return 3;
-    }
-
-    @Override
     public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
         if (args.length != 3)
             throw new RuntimeException("Let instruction requires variable name and value");

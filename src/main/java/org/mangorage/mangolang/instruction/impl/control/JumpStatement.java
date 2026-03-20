@@ -28,10 +28,6 @@ public final class JumpStatement implements Instruction {
         }
     }
 
-    public int getArgCount() {
-        return 2;
-    }
-
     public void emitBytecode(List<Integer> out, CompilerContext ctx, Object... args) {
         if (args.length != 2) throw new RuntimeException("jump_if_true requires two function names");
 

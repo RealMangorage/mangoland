@@ -17,10 +17,6 @@ public final class Call implements Instruction {
         env.setIp(addr);
     }
 
-    public int getArgCount() {
-        return 1;
-    }
-
     public void emitBytecode(List<Integer> out, CompilerContext ctx, Object... args) {
         out.add(ctx.getFunction((String) args[0]));
     }

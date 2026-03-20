@@ -88,13 +88,15 @@ public final class IfStatementLexerNode implements LexerNode {
             }
 
             // Non-inline: push IF context and expect a separate 'then' token later
+            // Only push when there was no inline delimiter parsed above.
+            // (The inline branch already pushed a BlockContext when needed.)
             blocks.push(new BlockContext(BlockContext.Type.IF, out.size()));
             return new LexerOutput(true);
         }
 
 
         if (name.equals("else")) {
-            BlockContext b = blocks.peek();
+            BlockContext b = blocks.isEmpty() ? null : blocks.peek();
             if (b == null || b.getType() != BlockContext.Type.IF) {
                 throw new RuntimeException("Unexpected 'else' without 'if'");
             }
@@ -118,8 +120,8 @@ public final class IfStatementLexerNode implements LexerNode {
         }
 
         // ===== THEN (marks end of condition, start of then-body) =====
-        if (name.equals("then") || (name.equals("end") && blocks.peek() != null && blocks.peek().getType() == BlockContext.Type.IF)) {
-            BlockContext b = blocks.peek();
+        if (name.equals("then") || (name.equals("end") && !blocks.isEmpty() && blocks.peek().getType() == BlockContext.Type.IF)) {
+            BlockContext b = blocks.isEmpty() ? null : blocks.peek();
             if (b == null || b.getType() != BlockContext.Type.IF) {
                 throw new RuntimeException("Unexpected 'then' without 'if'");
             }
