@@ -11,8 +11,8 @@ import java.util.List;
 public final class Multiply implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
-        int b = env.getStack().pop();
-        int a = env.getStack().pop();
+        int b = (int) env.getStack().pop();
+        int a = (int) env.getStack().pop();
         env.getStack().push(a * b);
     }
 }

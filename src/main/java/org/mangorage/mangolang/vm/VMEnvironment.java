@@ -7,7 +7,7 @@ import java.util.Stack;
 public final class VMEnvironment {
     private final VM vm;
     private final int[] code;
-    private final Stack<Integer> stack = new Stack<>();
+    private final Stack<Object> stack = new Stack<>();
     private final Stack<Frame> callStack = new Stack<>();
     private int ip = 0;
     private boolean running = false;
@@ -55,13 +55,34 @@ public final class VMEnvironment {
     }
 
     // Accessors for Instructions to use
-    public Stack<Integer> getStack() { return stack; }
-    public Stack<Frame> getCallStack() { return callStack; }
-    public Terminal getTerminal() { return vm.getTerminal(); }
-    public int getIp() { return ip; }
-    public void setIp(int ip) { this.ip = ip; }
-    public void setRunning(boolean running) { this.running = running; }
-    public boolean isRunning() { return running; }
+    public Stack<Object> getStack() {
+        return stack;
+    }
+
+    public Stack<Frame> getCallStack() {
+        return callStack;
+    }
+
+    public Terminal getTerminal() {
+        return vm.getTerminal();
+    }
+
+    public int getIp() {
+        return ip;
+
+    }
+
+    public void setIp(int ip) {
+        this.ip = ip;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
 
     public void setLocal(int index, int value) {
         if (callStack.isEmpty()) throw new RuntimeException("No active frame");

@@ -15,7 +15,7 @@ public final class JumpStatement implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        final var booleanValue = env.getStack().pop();
+        final var booleanValue = (int) env.getStack().pop();
 
         // Read the two target addresses emitted by the compiler
         int trueAddr = env.next();

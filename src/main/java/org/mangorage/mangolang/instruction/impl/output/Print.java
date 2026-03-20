@@ -9,7 +9,7 @@ public final class Print implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int value = env.getStack().pop(); // pop dynamically
+        int value = (int) env.getStack().pop(); // pop dynamically
         env.getTerminal().println(value + "");
     }
 }

@@ -30,16 +30,16 @@ public class VMTest {
         String program = """
                 # Testing stuff!
                 let x = 0
+                                printstr "Hello, World!"
                 
-                function testFunc()  # Simple function here!
+                function testFunc()  #Simple function here!
                     printstr "Func called"
                     return
                 end
                 
                 call testFunc()
                 
-                
-                printstr "Hello, World!"
+               
                 
                 if (x == 0) then
                     printstr "X is zero"

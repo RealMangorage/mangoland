@@ -13,7 +13,7 @@ public final class Dup implements Instruction {
         }
 
         // Peek at the top value without removing it, then push a copy
-        int topValue = env.getStack().peek();
+        int topValue = (int) env.getStack().peek();
         env.getStack().push(topValue);
     }
 }

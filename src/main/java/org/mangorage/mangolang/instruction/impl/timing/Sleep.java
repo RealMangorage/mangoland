@@ -9,7 +9,7 @@ public final class Sleep implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int durationMs = env.getStack().pop(); // pop the value from the stack
+        int durationMs = (int) env.getStack().pop(); // pop the value from the stack
         try {
             Thread.sleep(durationMs);
         } catch (InterruptedException e) {

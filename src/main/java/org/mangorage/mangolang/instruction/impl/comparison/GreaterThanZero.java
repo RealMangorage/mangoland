@@ -8,7 +8,7 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 public final class GreaterThanZero implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
-        int val = env.getStack().pop();
+        int val = (int) env.getStack().pop();
         env.getStack().push(val > 0 ? 1 : 0);
     }
 }
