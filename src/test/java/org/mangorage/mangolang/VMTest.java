@@ -9,6 +9,7 @@ import org.mangorage.mangolang.terminal.DeferredTerminal;
 import org.mangorage.mangolang.vm.VM;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -23,7 +24,8 @@ public class VMTest {
     @Test
     public void testPrintStrEmits() throws InterruptedException {
         // Compile and run a small program using the Compiler and createEnv
-        Compiler compiler = new Compiler(MangoLang.createEnv());
+        final var env = MangoLang.createEnv();
+        Compiler compiler = new Compiler(env);
 
         String program = """
                 # Testing stuff!
@@ -31,6 +33,7 @@ public class VMTest {
                 
                 function testFunc()  # Simple function here!
                     printstr "Func called"
+                    return
                 end
                 
                 call testFunc()
@@ -69,6 +72,25 @@ public class VMTest {
                 """;
 
         int[] bytecode = compiler.compile(program);
+
+
+        Util.saveProgram("VMTest.ml.class", bytecode);
+
+        bytecode = Util.loadProgram("VMTest.ml.class");
+
+        System.out.println(
+                Arrays.toString(
+                        bytecode
+                )
+        );
+
+        for (int i = 0; i < bytecode.length; i++) {
+            Integer v = bytecode[i];
+            String name = env.getName(v);
+            if (name != null) System.out.printf("%04d: %d %s\n", i, v, name);
+            else System.out.printf("%04d: %d\n", i, v);
+        }
+
 
         VM vm = new VM(MangoLang.createEnv());
         vm.setTerminal(

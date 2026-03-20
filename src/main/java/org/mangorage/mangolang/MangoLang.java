@@ -88,6 +88,11 @@ public final class MangoLang {
 
         int[] bytecode = compiler.compile(program);
 
+        Util.saveProgram("example.ml.class", bytecode);
+
+        bytecode = Util.loadProgram("example.ml.class");
+
+
         System.out.println(
                 Arrays.toString(
                         bytecode
