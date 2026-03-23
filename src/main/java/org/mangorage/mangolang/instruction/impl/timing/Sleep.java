@@ -9,7 +9,8 @@ public final class Sleep implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int durationMs = (int) env.getStack().pop(); // pop the value from the stack
+        var obj = env.getStack().pop();
+        int durationMs = ((org.mangorage.mangolang.object.impl.IntegerMLObject) obj).getValue(); // pop the value from the stack
         try {
             Thread.sleep(durationMs);
         } catch (InterruptedException e) {

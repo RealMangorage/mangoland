@@ -1,13 +1,15 @@
 package org.mangorage.mangolang.vm;
 
 import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.terminal.Terminal;
 import java.util.Stack;
 
 public final class VMEnvironment {
     private final VM vm;
     private final int[] code;
-    private final Stack<Object> stack = new Stack<>();
+    // Stack stores MangolangObject values (wrappers for ints, strings, etc.)
+    private final Stack<MangolangObject> stack = new Stack<>();
     private final Stack<Frame> callStack = new Stack<>();
     private int ip = 0;
     private boolean running = false;
@@ -55,7 +57,7 @@ public final class VMEnvironment {
     }
 
     // Accessors for Instructions to use
-    public Stack<Object> getStack() {
+    public Stack<MangolangObject> getStack() {
         return stack;
     }
 
@@ -84,12 +86,12 @@ public final class VMEnvironment {
         return running;
     }
 
-    public void setLocal(int index, int value) {
+    public void setLocal(int index, MangolangObject value) {
         if (callStack.isEmpty()) throw new RuntimeException("No active frame");
         callStack.peek().locals[index] = value;
     }
 
-    public int getLocal(int index) {
+    public MangolangObject getLocal(int index) {
         if (callStack.isEmpty()) throw new RuntimeException("No active frame");
         return callStack.peek().locals[index];
     }

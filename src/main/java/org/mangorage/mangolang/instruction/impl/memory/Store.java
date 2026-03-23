@@ -13,7 +13,7 @@ public final class Store implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         int index = env.next();           // get the local variable index
-        int value = (int) env.getStack().pop(); // pop value from stack
+        org.mangorage.mangolang.object.MangolangObject value = env.getStack().pop(); // pop value from stack
         env.setLocal(index, value);       // store into local
     }
 

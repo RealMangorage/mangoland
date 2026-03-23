@@ -7,8 +7,10 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 @AutoRegisterInstruction
 public final class Add implements Instruction {
     public void execute(VMEnvironment env) {
-        int b = (int) env.getStack().pop();
-        int a = (int) env.getStack().pop();
-        env.getStack().push(a + b);
+        var bObj = env.getStack().pop();
+        var aObj = env.getStack().pop();
+        int b = ((org.mangorage.mangolang.object.impl.IntegerMLObject) bObj).getValue();
+        int a = ((org.mangorage.mangolang.object.impl.IntegerMLObject) aObj).getValue();
+        env.getStack().push(new org.mangorage.mangolang.object.impl.IntegerMLObject(a + b));
     }
 }

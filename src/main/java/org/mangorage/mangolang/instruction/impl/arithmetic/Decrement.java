@@ -8,7 +8,8 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 public final class Decrement implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
-        int val = (int) env.getStack().pop();
-        env.getStack().push(val - 1);
+        var obj = env.getStack().pop();
+        int val = ((org.mangorage.mangolang.object.impl.IntegerMLObject) obj).getValue();
+        env.getStack().push(new org.mangorage.mangolang.object.impl.IntegerMLObject(val - 1));
     }
 }

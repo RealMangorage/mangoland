@@ -12,8 +12,8 @@ public final class Dup implements Instruction {
             throw new RuntimeException("Stack underflow: Cannot dup an empty stack");
         }
 
-        // Peek at the top value without removing it, then push a copy
-        int topValue = (int) env.getStack().peek();
-        env.getStack().push(topValue);
+        // Shallow duplicate: peek the top MangolangObject and push the same reference
+        org.mangorage.mangolang.object.MangolangObject top = env.getStack().peek();
+        env.getStack().push(top);
     }
 }

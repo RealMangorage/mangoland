@@ -13,8 +13,8 @@ public final class Let implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         int index = env.next();  // variable index
-        int value = env.next();  // value to store
-        env.setLocal(index, value);
+        int value = env.next();  // value to store (literal)
+        env.setLocal(index, new org.mangorage.mangolang.object.impl.IntegerMLObject(value));
     }
 
     @Override

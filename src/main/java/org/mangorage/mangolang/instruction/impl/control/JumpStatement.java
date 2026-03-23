@@ -15,7 +15,8 @@ public final class JumpStatement implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        final var booleanValue = (int) env.getStack().pop();
+        final var booleanObj = env.getStack().pop();
+        final int booleanValue = ((org.mangorage.mangolang.object.impl.IntegerMLObject) booleanObj).getValue();
 
         // Read the two target addresses emitted by the compiler
         int trueAddr = env.next();

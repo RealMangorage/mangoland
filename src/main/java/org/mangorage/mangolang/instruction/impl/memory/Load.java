@@ -13,7 +13,7 @@ public final class Load implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         int index = env.next();       // read variable index
-        int value = env.getLocal(index); // get value from locals
+        org.mangorage.mangolang.object.MangolangObject value = env.getLocal(index); // get value from locals
         env.getStack().push(value);      // push onto stack
     }
 

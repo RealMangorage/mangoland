@@ -2,23 +2,23 @@ package org.mangorage.mangolang;
 
 import org.mangorage.mangolang.compiler.Compiler;
 import org.mangorage.mangolang.instruction.InstructionSet;
-import org.mangorage.mangolang.instruction.impl.arithmetic.Add;
-import org.mangorage.mangolang.instruction.impl.control.Call;
-import org.mangorage.mangolang.instruction.impl.arithmetic.Decrement;
-import org.mangorage.mangolang.instruction.impl.stack.Dup;
-import org.mangorage.mangolang.instruction.impl.comparison.Equals;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
+import org.mangorage.mangolang.instruction.impl.comparison.Equals;
 import org.mangorage.mangolang.instruction.impl.control.Halt;
 import org.mangorage.mangolang.instruction.impl.control.Jump;
 import org.mangorage.mangolang.instruction.impl.control.JumpStatement;
+import org.mangorage.mangolang.instruction.impl.control.Call;
+import org.mangorage.mangolang.instruction.impl.control.Return;
 import org.mangorage.mangolang.instruction.impl.memory.Let;
 import org.mangorage.mangolang.instruction.impl.memory.Load;
-import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
+import org.mangorage.mangolang.instruction.impl.memory.Store;
 import org.mangorage.mangolang.instruction.impl.output.Print;
 import org.mangorage.mangolang.instruction.impl.stack.Push;
-import org.mangorage.mangolang.instruction.impl.control.Return;
+import org.mangorage.mangolang.instruction.impl.stack.Dup;
+import org.mangorage.mangolang.instruction.impl.arithmetic.Add;
+import org.mangorage.mangolang.instruction.impl.arithmetic.Decrement;
+import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
 import org.mangorage.mangolang.instruction.impl.timing.Sleep;
-import org.mangorage.mangolang.instruction.impl.memory.Store;
 import org.mangorage.mangolang.terminal.ConsoleTerminal;
 import org.mangorage.mangolang.terminal.DeferredTerminal;
 import org.mangorage.mangolang.terminal.TerminalGui;
@@ -45,24 +45,25 @@ public final class MangoLang {
 
         set.register(
                 List.of(
-                        Halt.class,
-                        Print.class,
+                        Let.class,
                         Push.class,
+                        Load.class,
                         Store.class,
+                        Call.class,
+                        Return.class,
+                        Jump.class,
                         Print.class,
                         Add.class,
-                        Load.class,
-                        Let.class,
-                        Return.class,
-                        Call.class,
-                        Sleep.class,
-                        Jump.class,
-                        Dup.class,
                         Decrement.class,
+                        Multiply.class,
                         Equals.class,
-                        Multiply.class
+                        Dup.class,
+                        Sleep.class,
+                        Halt.class
                 )
         );
+        // Alias for legacy/compiler token "printstr" -> use Print instruction
+        set.register("printstr", new Print());
         set.register(
                 "jump_if_true", new JumpStatement(1)
         );
