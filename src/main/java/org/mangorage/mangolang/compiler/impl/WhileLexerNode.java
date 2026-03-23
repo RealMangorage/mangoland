@@ -11,7 +11,7 @@ import java.util.Stack;
 
 public final class WhileLexerNode implements LexerNode {
     @Override
-    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
+    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         if (name.equals("while")) {
             // Save the exact address where the condition evaluation begins
             blocks.push(new BlockContext(BlockContext.Type.WHILE, out.size()));

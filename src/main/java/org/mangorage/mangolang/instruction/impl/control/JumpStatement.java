@@ -29,10 +29,15 @@ public final class JumpStatement implements Instruction {
         }
     }
 
-    public void emitBytecode(List<Integer> out, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> out, CompilerContext ctx, Object... args) {
         if (args.length != 2) throw new RuntimeException("jump_if_true requires two function names");
 
-        out.add(ctx.getFunction((String) args[0]));
-        out.add(ctx.getFunction((String) args[1]));
+        int a = ctx.getFunction((String) args[0]);
+        int b = ctx.getFunction((String) args[1]);
+
+        out.add((byte) (a & 0xFF));
+        out.add((byte) ((a >> 8) & 0xFF));
+        out.add((byte) (b & 0xFF));
+        out.add((byte) ((b >> 8) & 0xFF));
     }
 }

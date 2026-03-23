@@ -18,7 +18,7 @@ public final class Let implements Instruction {
     }
 
     @Override
-    public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {
         if (args.length != 3)
             throw new RuntimeException("Let instruction requires variable name and value");
 
@@ -37,7 +37,7 @@ public final class Let implements Instruction {
             value = ctx.getVariableIndex(args[2].toString());
         }
 
-        output.add(index);
-        output.add(value);
+        output.add((byte) index);
+        output.add((byte) value);
     }
 }

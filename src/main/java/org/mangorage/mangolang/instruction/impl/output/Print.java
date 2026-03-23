@@ -18,35 +18,23 @@ public final class Print implements Instruction {
         }
 
         // No value on stack => expect an immediate string encoded in the bytecode
-        int flag = env.next();
-        if (flag == 1) {
-            int len = env.next();
-            StringBuilder sb = new StringBuilder(len);
-            for (int i = 0; i < len; i++) {
-                sb.append((char) env.next());
-            }
-            env.getTerminal().println(sb.toString());
-            return;
-        }
-
-        // Fallback: treat flag as length
-        int len = flag;
-        StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append((char) env.next());
-        }
-        env.getTerminal().println(sb.toString());
+        // Read an encoded object from bytecode
+        var obj = env.readObject();
+        env.getTerminal().println("" + obj);
     }
 
-    public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {
         if (args.length >= 1) {
-            // If the argument looks like a quoted string, emit it inline as: [flag=1][len][chars...]
-            String raw = args[0].toString();
+            // Reconstruct raw argument (preserve spaces between tokens)
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < args.length; i++) {
+                if (i > 0) sb.append(' ');
+                sb.append(args[i].toString());
+            }
+            String raw = sb.toString();
             if (raw.length() >= 2 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
                 String str = raw.substring(1, raw.length() - 1);
-                output.add(1); // string flag
-                output.add(str.length());
-                for (char c : str.toCharArray()) output.add((int) c);
+                new org.mangorage.mangolang.object.impl.StringMLObject(str).emitBytes(output);
             }
         }
     }

@@ -11,7 +11,7 @@ import java.util.Stack;
 
 public final class BreakLexerNode implements LexerNode {
     @Override
-    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
+    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         if (name.equals("break")) {
             // Search down the stack to find the nearest loop (allows breaking out of a loop inside an if/function)
             BlockContext loop = null;
@@ -24,8 +24,8 @@ public final class BreakLexerNode implements LexerNode {
             if (loop == null) throw new RuntimeException("Cannot 'break' outside of a loop");
 
             loop.addBreak(out.size());
-            out.add(set.requireOpcode("jump"));
-            out.add(0); // placeholder, patched at 'end'
+            out.add((byte) set.requireOpcode("jump"));
+            out.add((byte) 0); // placeholder, patched at 'end'
             return new LexerOutput(true);
         }
         return new LexerOutput(false);

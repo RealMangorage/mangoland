@@ -18,7 +18,7 @@ public final class Load implements Instruction {
     }
 
     @Override
-    public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {
         if (args.length != 1) throw new RuntimeException("Load requires 1 argument (variable name or index)");
 
         String nameOrValue = args[0].toString();
@@ -32,6 +32,6 @@ public final class Load implements Instruction {
             index = Integer.parseInt(nameOrValue);
         }
 
-        output.add(index);
+        output.add((byte) index);
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 public interface Instruction {
     void execute(VMEnvironment env);
 
-    default void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {};
+    default void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {};
 }

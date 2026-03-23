@@ -17,7 +17,9 @@ public final class Call implements Instruction {
         env.setIp(addr);
     }
 
-    public void emitBytecode(List<Integer> out, CompilerContext ctx, Object... args) {
-        out.add(ctx.getFunction((String) args[0]));
+    public void emitBytecode(List<Byte> out, CompilerContext ctx, Object... args) {
+        int addr = ctx.getFunction((String) args[0]);
+        out.add((byte) (addr & 0xFF));
+        out.add((byte) ((addr >> 8) & 0xFF));
     }
 }

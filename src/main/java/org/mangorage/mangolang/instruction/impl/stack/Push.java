@@ -19,15 +19,15 @@ public final class Push implements Instruction {
     }
 
     @Override
-    public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {
         if (args.length != 1) {
             throw new RuntimeException("Push requires exactly 1 argument");
         }
 
-        // Push expects a numeric value
+        // Push expects a numeric value (we encode as a single byte)
         try {
             int value = Integer.parseInt(args[0].toString());
-            output.add(value);
+            output.add((byte) value);
         } catch (NumberFormatException e) {
             throw new RuntimeException("Push argument must be an integer: " + args[0]);
         }

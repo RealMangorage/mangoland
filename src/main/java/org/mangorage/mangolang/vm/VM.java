@@ -16,7 +16,7 @@ public final class VM {
      * Creates a new environment and runs the code.
      * This makes the VM perfectly re-runnable.
      */
-    public void run(int[] code) {
+    public void run(byte[] code) {
         VMEnvironment env = new VMEnvironment(this, code);
         env.start();
     }

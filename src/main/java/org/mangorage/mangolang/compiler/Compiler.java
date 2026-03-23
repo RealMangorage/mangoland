@@ -17,7 +17,7 @@ public final class Compiler {
         this.set = set;
     }
 
-    public int[] compile(String source) {
+    public byte[] compile(String source) {
         List<LexerNode> nodes = List.of(
                 new BreakLexerNode(),
                 new EndLexerNode(),
@@ -27,7 +27,7 @@ public final class Compiler {
         );
 
         CompilerContext ctx = new CompilerContext();
-        List<Integer> out = new ArrayList<>();
+        List<Byte> out = new ArrayList<>();
 
 
         // Upgrade from `boolean inFunction` to a stack to support nesting!
@@ -68,7 +68,7 @@ public final class Compiler {
                 System.out.println("[Compiler] line='" + line + "' name='" + name + "' args='" + Arrays.toString(Arrays.copyOfRange(parts, 1, parts.length)) + "'");
             }
             int opcode = set.requireOpcode(name);
-            out.add(opcode);
+            out.add((byte) opcode);
 
             Instruction inst = set.get(opcode);
             Object[] args = Arrays.copyOfRange(parts, 1, parts.length);
@@ -77,7 +77,7 @@ public final class Compiler {
 
         if (!blocks.isEmpty()) throw new RuntimeException("Missing 'end' for block");
 
-        out.add(set.requireOpcode("halt"));
+        out.add((byte) set.requireOpcode("halt"));
 
         // ===== SANITY CHECK =====
         for (int i = 0; i < out.size(); i++) {
@@ -91,6 +91,8 @@ public final class Compiler {
             System.out.println("[Compiler] raw bytecode: " + out);
         }
 
-        return out.stream().mapToInt(i -> i).toArray();
+        byte[] arr = new byte[out.size()];
+        for (int i = 0; i < out.size(); i++) arr[i] = out.get(i);
+        return arr;
     }
 }

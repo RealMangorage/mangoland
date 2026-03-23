@@ -1,3 +1,4 @@
-let x = 9989
+let x = 100
 load x
 print
+printstr "Hello, World!"

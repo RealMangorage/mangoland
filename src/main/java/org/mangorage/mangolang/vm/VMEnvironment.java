@@ -7,14 +7,14 @@ import java.util.Stack;
 
 public final class VMEnvironment {
     private final VM vm;
-    private final int[] code;
+    private final byte[] code;
     // Stack stores MangolangObject values (wrappers for ints, strings, etc.)
     private final Stack<MangolangObject> stack = new Stack<>();
     private final Stack<Frame> callStack = new Stack<>();
     private int ip = 0;
     private boolean running = false;
 
-    public VMEnvironment(VM vm, int[] code) {
+    public VMEnvironment(VM vm, byte[] code) {
         this.vm = vm;
         this.code = code;
     }
@@ -53,7 +53,34 @@ public final class VMEnvironment {
         if (ip < 0 || ip >= code.length) {
             throw new RuntimeException("VM instruction pointer out of bounds: " + ip);
         }
-        return code[ip++];
+        // return unsigned value of the byte
+        return code[ip++] & 0xFF;
+    }
+
+    /**
+     * Read a MangolangObject previously emitted into the bytecode.
+     * Encoding:
+     *  - tag 1: integer -> [tag=1][len=4][4 bytes big-endian]
+     *  - tag 2: string  -> [tag=2][len<=64][len bytes]
+     */
+    public org.mangorage.mangolang.object.MangolangObject readObject() {
+        int tag = next();
+        if (tag == 1) {
+            int len = next(); // expected 4
+            int b1 = next();
+            int b2 = next();
+            int b3 = next();
+            int b4 = next();
+            int val = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+            return new org.mangorage.mangolang.object.impl.IntegerMLObject(val);
+        } else if (tag == 2) {
+            int len = next();
+            byte[] bytes = new byte[len];
+            for (int i = 0; i < len; i++) bytes[i] = (byte) next();
+            return new org.mangorage.mangolang.object.impl.StringMLObject(new String(bytes));
+        } else {
+            throw new RuntimeException("Unknown object tag: " + tag + " at ip=" + (ip - 1));
+        }
     }
 
     // Accessors for Instructions to use

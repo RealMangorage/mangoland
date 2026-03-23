@@ -12,7 +12,7 @@ import java.util.Stack;
 public final class FunctionLexerNode implements LexerNode {
 
     @Override
-    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
+    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         if (name.equals("function")) {
             String funcName = parts[1];
             BlockContext b = new BlockContext(BlockContext.Type.FUNCTION, out.size());
@@ -20,8 +20,9 @@ public final class FunctionLexerNode implements LexerNode {
 
             // Note: Using 'jump' instead of 'call' to skip over the function body
             // prevents accidentally pushing a junk frame to your callStack!
-            out.add(set.requireOpcode("jump"));
-            out.add(0); // placeholder
+            out.add((byte) set.requireOpcode("jump"));
+            out.add((byte) 0); // placeholder low
+            out.add((byte) 0); // placeholder high
 
             ctx.registerFunction(funcName, out.size());
             return new LexerOutput(true);

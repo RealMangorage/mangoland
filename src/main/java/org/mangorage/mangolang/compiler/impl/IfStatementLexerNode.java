@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public final class IfStatementLexerNode implements LexerNode {
     @Override
-    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Integer> out, CompilerContext ctx, InstructionSet set) {
+    public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         // ===== IF START =====
         if (name.equals("if")) {
             // If the 'if' is inline and contains 'do' on the same line, try to parse a simple condition
@@ -47,39 +47,42 @@ public final class IfStatementLexerNode implements LexerNode {
                 // Emit the equivalent instructions for the simple condition
                 // load var
                 int opLoad = set.requireOpcode("load");
-                out.add(opLoad);
+                out.add((byte) opLoad);
                 Instruction instLoad = set.get(opLoad);
                 instLoad.emitBytecode(out, ctx, new Object[]{var});
 
                 // push value
                 int opPush = set.requireOpcode("push");
-                out.add(opPush);
+                out.add((byte) opPush);
                 set.get(opPush).emitBytecode(out, ctx, new Object[]{val});
 
                 // equals (we only support '==' for now; '!=' handled by comparing result to 0 later)
                 int opEq = set.requireOpcode("equals");
-                out.add(opEq);
+                out.add((byte) opEq);
                 set.get(opEq).emitBytecode(out, ctx, new Object[]{});
 
                 if (op.equals("!=")) {
                     // Invert the boolean: equals produced 1 when equal; we want 1 when not equal.
                     // We'll emit: push 0 ; equals  -> compares (equalsResult == 0)
                     int opPush0 = set.requireOpcode("push");
-                    out.add(opPush0);
+                    out.add((byte) opPush0);
                     set.get(opPush0).emitBytecode(out, ctx, new Object[]{"0"});
 
                     int opEq2 = set.requireOpcode("equals");
-                    out.add(opEq2);
+                    out.add((byte) opEq2);
                     set.get(opEq2).emitBytecode(out, ctx, new Object[]{});
                 }
 
                 // Now emit the conditional jump placeholder to skip the then-body when false
+                // Encoding: [opcode][trueAddrLo][trueAddrHi][falseAddrLo][falseAddrHi]
                 BlockContext b = new BlockContext(BlockContext.Type.IF, out.size());
                 blocks.push(b);
                 b.setCondJumpAddress(out.size());
-                out.add(set.requireOpcode("jump_if_false"));
-                out.add(0); // true-target placeholder (patched to else/exit)
-                out.add(0); // false-target placeholder (points to instruction after these placeholders)
+                out.add((byte) set.requireOpcode("jump_if_false"));
+                out.add((byte) 0); // trueAddr low
+                out.add((byte) 0); // trueAddr high
+                out.add((byte) 0); // falseAddr low
+                out.add((byte) 0); // falseAddr high
                 // If the delimiter was 'then' and there are tokens after it on the same line,
                 // we should continue processing the rest of this line as normal instructions.
                 if (!("then".equals(delim) && delimIdx + 1 < parts.length)) {
@@ -103,19 +106,24 @@ public final class IfStatementLexerNode implements LexerNode {
 
             // We are at the boundary between then-body and else-body. We'll emit
             // an unconditional jump here (to skip the else body) which occupies
-            // two slots (opcode + placeholder). Therefore the actual start of
-            // the else-body will be current out.size() + 2.
-            int elseStart = out.size() + 2;
+            // three slots (opcode + 2-byte placeholder). Therefore the actual start of
+            // the else-body will be current out.size() + 3.
+            int elseStart = out.size() + 3;
 
             // Patch the conditional jump to point to the start of the else-body
-            out.set(b.getCondJumpAddress() + 1, elseStart);
-            // Ensure false-target jumps into the then-body (immediately after the two placeholders)
-            out.set(b.getCondJumpAddress() + 2, b.getCondJumpAddress() + 3);
+            int p = b.getCondJumpAddress();
+            out.set(p + 1, (byte) (elseStart & 0xFF));
+            out.set(p + 2, (byte) ((elseStart >> 8) & 0xFF));
+            // Ensure false-target jumps into the then-body (immediately after the placeholders)
+            int thenStart = p + 5; // opcode + 4 bytes of placeholders
+            out.set(p + 3, (byte) (thenStart & 0xFF));
+            out.set(p + 4, (byte) ((thenStart >> 8) & 0xFF));
 
             // Emit an unconditional jump to skip the else body after then-body
-            out.add(set.requireOpcode("jump"));
-            out.add(0); // placeholder to be patched at 'end'
-            b.setElseJumpAddress(out.size() - 1); // index of the placeholder value
+            out.add((byte) set.requireOpcode("jump"));
+            out.add((byte) 0); // placeholder low
+            out.add((byte) 0); // placeholder high
+            b.setElseJumpAddress(out.size() - 2); // index of placeholder low byte
             return new LexerOutput(true);
         }
 
@@ -127,9 +135,11 @@ public final class IfStatementLexerNode implements LexerNode {
             }
             // Emit conditional jump placeholder; if condition is false, skip the then body
             b.setCondJumpAddress(out.size());
-            out.add(set.requireOpcode("jump_if_false"));
-            out.add(0); // true-target placeholder
-            out.add(0); // false-target placeholder
+            out.add((byte) set.requireOpcode("jump_if_false"));
+            out.add((byte) 0);
+            out.add((byte) 0);
+            out.add((byte) 0);
+            out.add((byte) 0);
             if (!name.equals("end")) {
                 return new LexerOutput(true);
             }

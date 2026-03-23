@@ -18,7 +18,7 @@ public final class Store implements Instruction {
     }
 
     @Override
-    public void emitBytecode(List<Integer> output, CompilerContext ctx, Object... args) {
+    public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {
         if (args.length != 1)
             throw new RuntimeException("Store requires 1 argument (variable name)");
 
@@ -27,6 +27,6 @@ public final class Store implements Instruction {
         // AUTO-DECLARE if it doesn’t exist
         int index = ctx.hasVariable(varName) ? ctx.getVariableIndex(varName) : ctx.declareVariable(varName);
 
-        output.add(index);
+        output.add((byte) index);
     }
 }

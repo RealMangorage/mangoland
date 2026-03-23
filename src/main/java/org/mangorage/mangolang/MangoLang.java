@@ -86,21 +86,20 @@ public final class MangoLang {
 
         String program = loadProgram("example.ml");
 
-        int[] bytecode = compiler.compile(program);
+        byte[] bytecode = compiler.compile(program);
 
         Util.saveProgram("example.ml.class", bytecode);
 
         bytecode = Util.loadProgram("example.ml.class");
 
+        // Print as unsigned ints for readability
+        int[] asInts = new int[bytecode.length];
+        for (int i = 0; i < bytecode.length; i++) asInts[i] = bytecode[i] & 0xFF;
 
-        System.out.println(
-                Arrays.toString(
-                        bytecode
-                )
-        );
+        System.out.println(Arrays.toString(asInts));
 
-        for (int i = 0; i < bytecode.length; i++) {
-            Integer v = bytecode[i];
+        for (int i = 0; i < asInts.length; i++) {
+            Integer v = asInts[i];
             String name = env.getName(v);
             if (name != null) System.out.printf("%04d: %d %s\n", i, v, name);
             else System.out.printf("%04d: %d\n", i, v);
