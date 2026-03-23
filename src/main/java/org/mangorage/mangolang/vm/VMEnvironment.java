@@ -48,12 +48,12 @@ public final class VMEnvironment {
         this.running = false;
     }
 
-    public int next() {
+    public byte next() {
         if (ip < 0 || ip >= code.length) {
             throw new RuntimeException("VM instruction pointer out of bounds: " + ip);
         }
         // return unsigned value of the byte
-        return code[ip++] & 0xFF;
+        return code[ip++];
     }
 
     /**

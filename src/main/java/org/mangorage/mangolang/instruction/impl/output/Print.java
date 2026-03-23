@@ -13,14 +13,14 @@ public final class Print implements Instruction {
     public void execute(VMEnvironment env) {
         if (!env.getStack().isEmpty()) {
             var obj = env.getStack().pop();
-            env.getTerminal().println("" + obj);
+            env.getTerminal().println("" + obj.asString());
             return;
         }
 
         // No value on stack => expect an immediate string encoded in the bytecode
         // Read an encoded object from bytecode
         var obj = env.readObject();
-        env.getTerminal().println("" + obj);
+        env.getTerminal().println("" + obj.asString());
     }
 
     public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {

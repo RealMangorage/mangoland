@@ -10,8 +10,8 @@ public final class Equals implements Instruction {
     public void execute(VMEnvironment env) {
         var bObj = env.getStack().pop();
         var aObj = env.getStack().pop();
-        int b = ((org.mangorage.mangolang.object.impl.IntegerMLObject) bObj).getValue();
-        int a = ((org.mangorage.mangolang.object.impl.IntegerMLObject) aObj).getValue();
-        env.getStack().push(new org.mangorage.mangolang.object.impl.IntegerMLObject(a == b ? 1 : 0));
+        env.getStack().push(
+                aObj.equals(bObj)
+        );
     }
 }

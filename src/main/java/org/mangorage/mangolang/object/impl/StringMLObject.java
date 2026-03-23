@@ -23,6 +23,11 @@ public final class StringMLObject implements MangolangObject {
     }
 
     @Override
+    public MangolangObject asString() {
+        return this;
+    }
+
+    @Override
     public String toString() {
         return value;
     }

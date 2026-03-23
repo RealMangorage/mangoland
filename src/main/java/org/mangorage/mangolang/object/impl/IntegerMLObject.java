@@ -17,14 +17,14 @@ public final class IntegerMLObject implements MangolangObject {
     @Override
     public MangolangObject equals(MangolangObject mangolangObject) {
         if (mangolangObject instanceof IntegerMLObject other) {
-            return new IntegerMLObject(this.value == other.value ? 1 : 0);
+            return this.value == other.value ? BooleanMLObject.TRUE : BooleanMLObject.FALSE;
         }
-        return new IntegerMLObject(0);
+        return BooleanMLObject.FALSE;
     }
 
     @Override
-    public String toString() {
-        return Integer.toString(value);
+    public MangolangObject asString() {
+        return new StringMLObject(Integer.toString(value));
     }
 
     @Override

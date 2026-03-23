@@ -6,5 +6,7 @@ import java.util.List;
 public interface MangolangObject {
     MangolangObject equals(MangolangObject mangolangObject);
 
+    MangolangObject asString();
+
     void emitBytes(List<Byte> out);
 }
