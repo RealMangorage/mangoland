@@ -18,9 +18,14 @@ public final class JumpStatement implements Instruction {
         final var booleanObj = env.getStack().pop();
         final int booleanValue = ((org.mangorage.mangolang.object.impl.IntegerMLObject) booleanObj).getValue();
 
-        // Read the two target addresses emitted by the compiler
-        int trueAddr = env.next();
-        int falseAddr = env.next();
+        // Read the two target addresses emitted by the compiler (each address is two bytes: low, high)
+        int trueLo = env.next();
+        int trueHi = env.next();
+        int falseLo = env.next();
+        int falseHi = env.next();
+
+        int trueAddr = (trueHi << 8) | (trueLo & 0xFF);
+        int falseAddr = (falseHi << 8) | (falseLo & 0xFF);
 
         if (booleanValue == value) {
             env.setIp(trueAddr);

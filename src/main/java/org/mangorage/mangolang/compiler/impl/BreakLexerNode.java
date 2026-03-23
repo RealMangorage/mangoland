@@ -25,7 +25,8 @@ public final class BreakLexerNode implements LexerNode {
 
             loop.addBreak(out.size());
             out.add((byte) set.requireOpcode("jump"));
-            out.add((byte) 0); // placeholder, patched at 'end'
+            out.add((byte) 0); // placeholder low
+            out.add((byte) 0); // placeholder high
             return new LexerOutput(true);
         }
         return new LexerOutput(false);

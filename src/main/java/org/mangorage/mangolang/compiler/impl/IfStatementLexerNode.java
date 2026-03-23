@@ -78,6 +78,7 @@ public final class IfStatementLexerNode implements LexerNode {
                 BlockContext b = new BlockContext(BlockContext.Type.IF, out.size());
                 blocks.push(b);
                 b.setCondJumpAddress(out.size());
+                System.out.println("[If] condJumpAddr=" + b.getCondJumpAddress() + " out.size(before)=" + out.size());
                 out.add((byte) set.requireOpcode("jump_if_false"));
                 out.add((byte) 0); // trueAddr low
                 out.add((byte) 0); // trueAddr high
@@ -94,6 +95,7 @@ public final class IfStatementLexerNode implements LexerNode {
             // Only push when there was no inline delimiter parsed above.
             // (The inline branch already pushed a BlockContext when needed.)
             blocks.push(new BlockContext(BlockContext.Type.IF, out.size()));
+            System.out.println("[If] pushed non-inline IF at out.size=" + out.size());
             return new LexerOutput(true);
         }
 

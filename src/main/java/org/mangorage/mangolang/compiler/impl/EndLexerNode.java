@@ -27,6 +27,7 @@ public final class EndLexerNode implements LexerNode {
             }
             else if (b.getType() == BlockContext.Type.WHILE) {
                 // Unconditional jump back to the 'while' condition
+                System.out.println("[End] WHILE end: startAddr=" + b.getStartAddress() + " out.size(before)=" + out.size());
                 out.add((byte) set.requireOpcode("jump"));
                 int target = b.getStartAddress();
                 out.add((byte) (target & 0xFF));

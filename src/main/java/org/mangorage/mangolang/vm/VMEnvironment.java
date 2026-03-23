@@ -33,8 +33,7 @@ public final class VMEnvironment {
 
             if (System.getProperty("mangolang.vmdebug") != null) {
                 String name = vm.getInstructionSet().getName(opcode);
-                System.out.printf("[VM] ip=%d opcode=%d %s stack=%s%n",
-                        currentIp, opcode, (name == null ? "" : "(" + name + ")"), stack);
+                System.out.printf("[VM] ip=%d opcode=%d %s stack=%s%n", currentIp, opcode, (name == null ? "" : "(" + name + ")"), stack);
             }
 
             Instruction inst = vm.getInstructionSet().get(opcode);

@@ -37,6 +37,7 @@ public final class Let implements Instruction {
             value = ctx.getVariableIndex(args[2].toString());
         }
 
+        System.out.println("[Let.emit] var='" + name + "' index=" + index + " value=" + value);
         output.add((byte) index);
         output.add((byte) value);
     }

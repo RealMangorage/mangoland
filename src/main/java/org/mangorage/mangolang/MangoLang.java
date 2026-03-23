@@ -105,6 +105,12 @@ public final class MangoLang {
             else System.out.printf("%04d: %d\n", i, v);
         }
 
+        System.out.println("--- Instruction set mapping ---");
+        for (int i = 1; i <= 40; i++) {
+            String n = env.getName(i);
+            if (n != null) System.out.printf("%02d: %s\n", i, n);
+        }
+
 
         VM vm = new VM(env);
 
