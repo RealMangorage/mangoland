@@ -2,10 +2,13 @@ package org.mangorage.mangolang.instruction.register;
 
 import org.mangorage.mangolang.instruction.Instruction;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
+import java.util.Map;
 
 public final class RegisterHandler {
 
@@ -16,31 +19,150 @@ public final class RegisterHandler {
 
         Class<? extends Instruction> instructionClass = clazz.asSubclass(Instruction.class);
 
-        try {
-            Instruction instruction = instructionClass.getDeclaredConstructor().newInstance();
-            Set<String> ids = new LinkedHashSet<>();
-            ids.add(normalizeId(instructionClass.getSimpleName()));
+        AutoRegisterInstruction[] annotations = instructionClass.getAnnotationsByType(AutoRegisterInstruction.class);
 
-            for (AutoRegisterInstruction annotation : instructionClass.getAnnotationsByType(AutoRegisterInstruction.class)) {
+        try {
+            List<BakedInstruction> bakedInstructions = new ArrayList<>();
+            Map<InstantiationKey, Instruction> instructionCache = new LinkedHashMap<>();
+
+            if (annotations.length == 0) {
+                bakedInstructions.add(new BakedInstruction(
+                        normalizeId(instructionClass.getSimpleName()),
+                        instantiate(instructionClass, instructionCache, new Object[0])
+                ));
+                return bakedInstructions;
+            }
+
+            for (AutoRegisterInstruction annotation : annotations) {
                 String id = annotation.id();
-                if (id != null && !id.isBlank()) {
-                    ids.add(normalizeId(id));
+                String bakedId = (id == null || id.isBlank())
+                        ? normalizeId(instructionClass.getSimpleName())
+                        : normalizeId(id);
+
+                Object[] args = parseParams(annotation.params());
+                Instruction instruction = instantiate(instructionClass, instructionCache, args);
+                BakedInstruction bakedInstruction = new BakedInstruction(bakedId, instruction);
+
+                if (!containsEquivalentEntry(bakedInstructions, bakedInstruction)) {
+                    bakedInstructions.add(bakedInstruction);
                 }
             }
 
-            List<BakedInstruction> bakedInstructions = new ArrayList<>(ids.size());
-            for (String id : ids) {
-                bakedInstructions.add(new BakedInstruction(id, instruction));
-            }
-
             return bakedInstructions;
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new RuntimeException("Failed to bake instruction: " + clazz.getName(), e);
         }
     }
 
     private String normalizeId(String id) {
-        return id.toLowerCase();
+        return id.toLowerCase(Locale.ROOT);
+    }
+
+    private Object[] parseParams(Parameter[] params) {
+        Object[] args = new Object[params.length];
+        for (int i = 0; i < params.length; i++) {
+            args[i] = params[i].type().parse(params[i].value());
+        }
+        return args;
+    }
+
+    private Instruction instantiate(
+            Class<? extends Instruction> instructionClass,
+            Map<InstantiationKey, Instruction> instructionCache,
+            Object[] args
+    ) throws ReflectiveOperationException {
+        Constructor<? extends Instruction> constructor = findConstructor(instructionClass, args);
+        InstantiationKey key = new InstantiationKey(constructor, List.of(args.clone()));
+
+        Instruction cachedInstruction = instructionCache.get(key);
+        if (cachedInstruction != null) {
+            return cachedInstruction;
+        }
+
+        constructor.setAccessible(true);
+        Instruction instruction = constructor.newInstance(args);
+        instructionCache.put(key, instruction);
+        return instruction;
+    }
+
+    private Constructor<? extends Instruction> findConstructor(Class<? extends Instruction> instructionClass, Object[] args) {
+        List<Constructor<? extends Instruction>> matches = new ArrayList<>();
+
+        for (Constructor<?> constructor : instructionClass.getDeclaredConstructors()) {
+            if (isCompatible(constructor.getParameterTypes(), args)) {
+                @SuppressWarnings("unchecked")
+                Constructor<? extends Instruction> typedConstructor = (Constructor<? extends Instruction>) constructor;
+                matches.add(typedConstructor);
+            }
+        }
+
+        if (matches.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "No matching constructor for " + instructionClass.getName() + " with args " + Arrays.toString(args)
+            );
+        }
+
+        if (matches.size() > 1) {
+            throw new IllegalArgumentException(
+                    "Multiple matching constructors for " + instructionClass.getName() + " with args " + Arrays.toString(args)
+            );
+        }
+
+        return matches.get(0);
+    }
+
+    private boolean isCompatible(Class<?>[] parameterTypes, Object[] args) {
+        if (parameterTypes.length != args.length) {
+            return false;
+        }
+
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> parameterType = wrap(parameterTypes[i]);
+            Object arg = args[i];
+
+            if (arg == null) {
+                if (parameterTypes[i].isPrimitive()) {
+                    return false;
+                }
+                continue;
+            }
+
+            if (!parameterType.isInstance(arg)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Class<?> wrap(Class<?> type) {
+        if (!type.isPrimitive()) {
+            return type;
+        }
+
+        if (type == boolean.class) return Boolean.class;
+        if (type == int.class) return Integer.class;
+        if (type == long.class) return Long.class;
+        if (type == double.class) return Double.class;
+        if (type == float.class) return Float.class;
+        if (type == char.class) return Character.class;
+        if (type == byte.class) return Byte.class;
+        if (type == short.class) return Short.class;
+
+        return type;
+    }
+
+    private boolean containsEquivalentEntry(List<BakedInstruction> bakedInstructions, BakedInstruction candidate) {
+        for (BakedInstruction bakedInstruction : bakedInstructions) {
+            if (bakedInstruction.id().equals(candidate.id()) && bakedInstruction.instruction() == candidate.instruction()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private record InstantiationKey(Constructor<? extends Instruction> constructor, List<Object> args) {
     }
 }
 

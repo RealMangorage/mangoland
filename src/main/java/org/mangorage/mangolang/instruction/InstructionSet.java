@@ -4,6 +4,7 @@ import org.mangorage.mangolang.instruction.register.BakedInstruction;
 import org.mangorage.mangolang.instruction.register.RegisterHandler;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +19,13 @@ public final class InstructionSet {
     public void register(List<Class<? extends Instruction>> classList) {
         for (Class<? extends Instruction> aClass : classList) {
             List<BakedInstruction> bakedInstructions = registerHandler.bake(aClass);
+            Map<Instruction, Integer> opcodeByInstruction = new IdentityHashMap<>();
 
-            Integer opcode = null;
             for (BakedInstruction bakedInstruction : bakedInstructions) {
+                Integer opcode = opcodeByInstruction.get(bakedInstruction.instruction());
                 if (opcode == null) {
                     opcode = register(bakedInstruction.id(), bakedInstruction.instruction());
+                    opcodeByInstruction.put(bakedInstruction.instruction(), opcode);
                 } else {
                     registerAlias(bakedInstruction.id(), opcode);
                 }

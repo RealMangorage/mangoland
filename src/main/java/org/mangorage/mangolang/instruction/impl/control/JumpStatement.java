@@ -20,7 +20,7 @@ import java.util.List;
         }
 )
 @AutoRegisterInstruction(
-        id = "jump_if_true",
+        id = "jump_if_false",
         params = {
                 @Parameter(
                         type = ParamType.BOOLEAN,
