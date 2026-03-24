@@ -12,11 +12,17 @@ import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjectCompiler;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.codec.impl.BooleanMLCodec;
+import org.mangorage.mangolang.object.codec.impl.DoubleMLCodec;
+import org.mangorage.mangolang.object.codec.impl.FloatMLCodec;
 import org.mangorage.mangolang.object.codec.impl.IntegerMLCodec;
+import org.mangorage.mangolang.object.codec.impl.LongMLCodec;
 import org.mangorage.mangolang.object.codec.impl.StringMLCodec;
 import org.mangorage.mangolang.object.OperationType;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
+import org.mangorage.mangolang.object.impl.DoubleMLObject;
+import org.mangorage.mangolang.object.impl.FloatMLObject;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
+import org.mangorage.mangolang.object.impl.LongMLObject;
 import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
@@ -63,14 +69,27 @@ public class VMTest {
         assertRoundTrip(new IntegerMLObject(1337), IntegerMLObject.class, "1337");
         assertRoundTrip(new StringMLObject("hello world"), StringMLObject.class, "hello world");
         assertRoundTrip(BooleanMLObject.TRUE, BooleanMLObject.class, "true");
+        assertRoundTrip(new LongMLObject(1234567890123L), LongMLObject.class, "1234567890123");
+        assertRoundTrip(new FloatMLObject(12.5f), FloatMLObject.class, "12.5");
+        assertRoundTrip(new DoubleMLObject(123.125d), DoubleMLObject.class, "123.125");
     }
 
     @Test
     public void codecTagsAreUniqueAndFitInObjectHeaders() {
-        Assertions.assertEquals(3, java.util.Set.of(IntegerMLCodec.TAG, StringMLCodec.TAG, BooleanMLCodec.TAG).size());
+        Assertions.assertEquals(6, java.util.Set.of(
+                IntegerMLCodec.TAG,
+                StringMLCodec.TAG,
+                BooleanMLCodec.TAG,
+                LongMLCodec.TAG,
+                FloatMLCodec.TAG,
+                DoubleMLCodec.TAG
+        ).size());
         Assertions.assertTrue(IntegerMLCodec.TAG >= 0 && IntegerMLCodec.TAG <= 0xFF);
         Assertions.assertTrue(StringMLCodec.TAG >= 0 && StringMLCodec.TAG <= 0xFF);
         Assertions.assertTrue(BooleanMLCodec.TAG >= 0 && BooleanMLCodec.TAG <= 0xFF);
+        Assertions.assertTrue(LongMLCodec.TAG >= 0 && LongMLCodec.TAG <= 0xFF);
+        Assertions.assertTrue(FloatMLCodec.TAG >= 0 && FloatMLCodec.TAG <= 0xFF);
+        Assertions.assertTrue(DoubleMLCodec.TAG >= 0 && DoubleMLCodec.TAG <= 0xFF);
     }
 
     @Test
@@ -153,6 +172,9 @@ public class VMTest {
                 let integerValue = 42
                 let stringValue = "mango"
                 let booleanValue = true
+                let longValue = 42l
+                let floatValue = 42.5f
+                let doubleValue = 42.75d
 
                 type integerValue
                 print
@@ -160,9 +182,67 @@ public class VMTest {
                 print
                 type booleanValue
                 print
+                type longValue
+                print
+                type floatValue
+                print
+                type doubleValue
+                print
                 """);
 
-        Assertions.assertEquals(List.of("integer", "string", "boolean"), out);
+        Assertions.assertEquals(List.of("integer", "string", "boolean", "long", "float", "double"), out);
+    }
+
+    @Test
+    public void suffixedNumericLiteralsCompileStoreAndPrint() {
+        List<String> out = runProgram("""
+                let x = 100f
+                let y = 100d
+                let z = 100l
+                print "Float: " .. x
+                print "Double: " .. y
+                print "Long: " .. z
+                """);
+
+        Assertions.assertEquals(List.of("Float: 100.0", "Double: 100.0", "Long: 100"), out);
+    }
+
+    @Test
+    public void mixedNumericArithmeticPromotesAcrossNewTypes() {
+        List<String> out = runProgram("""
+                let longSum = 5 + 10l
+                let floatSum = 5 + 2.5f
+                let doubleProduct = 2.0d * 4l
+                let doubleQuotient = 5l / 2.0d
+                print "Long sum: " .. longSum
+                print "Float sum: " .. floatSum
+                print "Double product: " .. doubleProduct
+                print "Double quotient: " .. doubleQuotient
+                """);
+
+        Assertions.assertEquals(List.of(
+                "Long sum: 15",
+                "Float sum: 7.5",
+                "Double product: 8.0",
+                "Double quotient: 2.5"
+        ), out);
+    }
+
+    @Test
+    public void suffixedNumericLiteralsWorkInInlineConditions() {
+        List<String> out = runProgram("""
+                if (2l == 2) then
+                    print "long equals integer"
+                end
+                if (2.5f != 1.5f) then
+                    print "float inequality"
+                end
+                if (4.0d == 4l) then
+                    print "double equals long"
+                end
+                """);
+
+        Assertions.assertEquals(List.of("long equals integer", "float inequality", "double equals long"), out);
     }
 
     @Test

@@ -19,10 +19,16 @@ print "=== MangoLang Showcase Start ==="
 let baseNumber = 10
 let baseText = "mango"
 let baseTruth = true
+let baseLong = 100l
+let baseFloat = 100.5f
+let baseDouble = 100.25d
 
 print "Base number: " .. baseNumber
 print "Base text: " .. baseText
 print "Base truth: " .. baseTruth
+print "Base long: " .. baseLong
+print "Base float: " .. baseFloat
+print "Base double: " .. baseDouble
 
 type baseNumber
 store baseNumberType
@@ -35,6 +41,18 @@ print "Type of baseText: " .. baseTextType
 type baseTruth
 store baseTruthType
 print "Type of baseTruth: " .. baseTruthType
+
+type baseLong
+store baseLongType
+print "Type of baseLong: " .. baseLongType
+
+type baseFloat
+store baseFloatType
+print "Type of baseFloat: " .. baseFloatType
+
+type baseDouble
+store baseDoubleType
+print "Type of baseDouble: " .. baseDoubleType
 
 load baseNumber
 print
@@ -295,4 +313,6 @@ else
 end
 
 print "=== MangoLang Showcase Complete ==="
-halt
+push 5000
+sleep
+exit

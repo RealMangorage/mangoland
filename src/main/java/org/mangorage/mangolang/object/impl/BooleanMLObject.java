@@ -18,6 +18,18 @@ public record BooleanMLObject(boolean value) implements MangolangObject {
             return IntegerMLObject.coerceBooleanValue(integerObject);
         }
 
+        if (value instanceof LongMLObject longObject) {
+            return longObject.getValue() != 0L;
+        }
+
+        if (value instanceof FloatMLObject floatObject) {
+            return Float.compare(floatObject.getValue(), 0.0f) != 0;
+        }
+
+        if (value instanceof DoubleMLObject doubleObject) {
+            return Double.compare(doubleObject.getValue(), 0.0d) != 0;
+        }
+
         throw new RuntimeException(context + " requires a boolean-compatible value, got " + (value == null ? "null" : value.describe()));
     }
 

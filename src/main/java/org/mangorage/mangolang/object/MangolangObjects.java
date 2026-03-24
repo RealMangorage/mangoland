@@ -2,7 +2,10 @@ package org.mangorage.mangolang.object;
 
 import org.mangorage.mangolang.object.codec.MangolangObjectCodec;
 import org.mangorage.mangolang.object.codec.impl.BooleanMLCodec;
+import org.mangorage.mangolang.object.codec.impl.DoubleMLCodec;
+import org.mangorage.mangolang.object.codec.impl.FloatMLCodec;
 import org.mangorage.mangolang.object.codec.impl.IntegerMLCodec;
+import org.mangorage.mangolang.object.codec.impl.LongMLCodec;
 import org.mangorage.mangolang.object.codec.impl.StringMLCodec;
 
 import java.util.HashMap;
@@ -19,6 +22,9 @@ public final class MangolangObjects {
         registerCodec(new IntegerMLCodec());
         registerCodec(new StringMLCodec());
         registerCodec(new BooleanMLCodec());
+        registerCodec(new LongMLCodec());
+        registerCodec(new FloatMLCodec());
+        registerCodec(new DoubleMLCodec());
     }
 
     private MangolangObjects() {

@@ -9,8 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class CompilerEmitUtil {
+    private static final String INLINE_LITERAL_PATTERN = "(?:true|false|-?(?:\\d+[lL]|(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?[fFdD]?|\\d+)|\"[^\"]*\")";
     private static final Pattern INLINE_CONDITION_PATTERN = Pattern.compile(
-            "\\(?\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*(==|!=)\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*\\)?"
+            "\\(?\\s*([a-zA-Z_]\\w*|" + INLINE_LITERAL_PATTERN + ")\\s*(==|!=)\\s*([a-zA-Z_]\\w*|" + INLINE_LITERAL_PATTERN + ")\\s*\\)?"
     );
 
     private CompilerEmitUtil() {
