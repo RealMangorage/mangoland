@@ -11,9 +11,7 @@ import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class VMTest {
@@ -174,6 +172,63 @@ public class VMTest {
                 """));
 
         Assertions.assertTrue(exception.getMessage().contains("expects 2 arguments but got 1"));
+    }
+
+    @Test
+    public void letCanCaptureSingleFunctionReturnValue() {
+        List<String> out = runProgram("""
+                function check(x, y, z)
+                    print "x: " .. x
+                    print "y: " .. y
+                    print "z: " .. z
+                    return z
+                end
+
+                let result = call check(1, 2, 3)
+                result = result + 10
+                print "Result: " .. result
+                """);
+
+        Assertions.assertEquals(List.of("x: 1", "y: 2", "z: 3", "Result: 13"), out);
+    }
+
+    @Test
+    public void functionsCanReturnLiteralValues() {
+        List<String> out = runProgram("""
+                function answer()
+                    return 42
+                end
+
+                let result = call answer()
+                print "Answer: " .. result
+                """);
+
+        Assertions.assertEquals(List.of("Answer: 42"), out);
+    }
+
+    @Test
+    public void uncapturedReturnValueRemainsOnStack() {
+        List<String> out = runProgram("""
+                function answer()
+                    return 99
+                end
+
+                call answer()
+                print
+                """);
+
+        Assertions.assertEquals(List.of("99"), out);
+    }
+
+    @Test
+    public void reassignmentCanUseInfixAdditionExpressions() {
+        List<String> out = runProgram("""
+                let total = 5
+                total = total + 10
+                print "Total: " .. total
+                """);
+
+        Assertions.assertEquals(List.of("Total: 15"), out);
     }
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {

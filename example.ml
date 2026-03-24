@@ -1,25 +1,10 @@
-let x = 12
-while do
-    print "Hello, world!"
-    load x
-    print
-    if (x == 0) then
-        break
-    end
-    load x
-    decrement
-    store x
+function check(x, y, z)
+    print "x: " .. x
+    print "y: " .. y
+    print "z: " .. z
+    return z
 end
 
-print "Goodbye, world!"
-
-function test()
-    print "This is a test function."
-    load x
-    print
-    return
-end
-
-call test()
-
-print "End of program."
+let result = call check(1, 2, 3)
+result = result + 10
+print "Result: " .. result
