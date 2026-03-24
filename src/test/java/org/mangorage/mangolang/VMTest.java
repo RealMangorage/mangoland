@@ -21,6 +21,8 @@ import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,6 +163,22 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("integer", "string", "boolean"), out);
+    }
+
+    @Test
+    public void exampleProgramCompilesAndRunsAsShowcase() throws Exception {
+        String program = Files.readString(Path.of("example.ml"));
+
+        List<String> out = runProgram(program);
+
+        Assertions.assertFalse(out.isEmpty());
+        Assertions.assertEquals("=== MangoLang Showcase Start ===", out.get(0));
+        Assertions.assertTrue(out.contains("Type of baseNumber: integer"));
+        Assertions.assertTrue(out.contains("Type of baseText: string"));
+        Assertions.assertTrue(out.contains("Type of baseTruth: boolean"));
+        Assertions.assertTrue(out.contains("Inside banner()"));
+        Assertions.assertTrue(out.contains("Late function demo reached"));
+        Assertions.assertEquals("=== MangoLang Showcase Complete ===", out.get(out.size() - 1));
     }
 
     @Test
@@ -376,6 +394,33 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("Diff: 15", "Product: 42", "Quotient: 5"), out);
+    }
+
+    @Test
+    public void longProgramsStillSupportLateFunctionsAndLoops() {
+        StringBuilder program = new StringBuilder();
+        for (int i = 0; i < 40; i++) {
+            program.append("let filler").append(i).append(" = ").append(i).append('\n');
+        }
+
+        program.append("""
+                function lateDemo()
+                    print "late function ok"
+                end
+
+                let loopCounter = 2
+                while loopCounter != 0 do
+                    print "loop: " .. loopCounter
+                    loopCounter = loopCounter - 1
+                end
+
+                call lateDemo()
+                print "after long prefix"
+                """);
+
+        List<String> out = runProgram(program.toString());
+
+        Assertions.assertEquals(List.of("loop: 2", "loop: 1", "late function ok", "after long prefix"), out);
     }
 
     @Test

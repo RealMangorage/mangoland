@@ -8,7 +8,8 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 public final class Jump implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
-        // Update the instruction pointer to the argument provided
-        env.setIp(env.next());
+        int low = env.next() & 0xFF;
+        int high = env.next() & 0xFF;
+        env.setIp((high << 8) | low);
     }
 }
