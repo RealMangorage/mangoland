@@ -1,7 +1,12 @@
-# Simple arithmetic test program
-let x = 0
-let y = 0
-load x
-load y
-equals
-print
+let x = 12
+while do
+    print "Hello, world!"
+    load x
+    print
+    if (x == 0) then
+        break
+    end
+    load x
+    decrement
+    store x
+end

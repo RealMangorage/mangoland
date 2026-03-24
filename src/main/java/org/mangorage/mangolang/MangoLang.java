@@ -65,11 +65,11 @@ public final class MangoLang {
         // Alias for legacy/compiler token "printstr" -> use Print instruction
         set.register("printstr", new Print());
         set.register(
-                "jump_if_true", new JumpStatement(1)
+                "jump_if_true", new JumpStatement(true)
         );
 
         set.register(
-                "jump_if_false", new JumpStatement(0)
+                "jump_if_false", new JumpStatement(false)
         );
 
         set.register(

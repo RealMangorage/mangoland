@@ -35,14 +35,16 @@ public final class EndLexerNode implements LexerNode {
 
                 int loopExitAddress = out.size();
 
-                // 1. Patch the 'do' conditional jump
+                // 1. Patch the 'do' conditional jump if the compiler emitted one
                 // condJumpAddress points at opcode; +1 is true-target placeholder, +2 is false-target
-                int la = loopExitAddress;
                 int p = b.getCondJumpAddress(); // opcode index
-                out.set(p + 1, (byte) (la & 0xFF));
-                out.set(p + 2, (byte) ((la >> 8) & 0xFF));
-                out.set(p + 3, (byte) (la & 0xFF));
-                out.set(p + 4, (byte) ((la >> 8) & 0xFF));
+                if (p != -1) {
+                    int la = loopExitAddress;
+                    out.set(p + 1, (byte) (la & 0xFF));
+                    out.set(p + 2, (byte) ((la >> 8) & 0xFF));
+                    out.set(p + 3, (byte) (la & 0xFF));
+                    out.set(p + 4, (byte) ((la >> 8) & 0xFF));
+                }
 
                 // 2. Patch all 'break' statements inside this loop
                 for (int breakAddr : b.getBreaks()) {

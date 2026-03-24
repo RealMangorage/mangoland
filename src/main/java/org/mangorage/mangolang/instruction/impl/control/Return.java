@@ -9,7 +9,9 @@ public final class Return implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         if (env.getCallStack().size() <= 1) {
-            throw new RuntimeException("Return with no caller");
+            // No caller frame: treat this as a top-level return and stop the VM
+            env.setRunning(false);
+            return;
         }
 
         Frame frame = env.getCallStack().pop();

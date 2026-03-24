@@ -18,3 +18,12 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+// Make the produced JAR executable by setting the main class in the manifest
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.mangorage.mangolang.MangoLang'
+        )
+    }
+}

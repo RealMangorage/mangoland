@@ -30,7 +30,7 @@ public class VMTest {
                 # Testing stuff!
                 let x = 0
                 push 999
-                print
+                print "Hello!"
                 """;
 
         byte[] bytecode = compiler.compile(program);

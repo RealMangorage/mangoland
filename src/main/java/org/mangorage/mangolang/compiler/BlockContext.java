@@ -13,7 +13,7 @@ public final class BlockContext {
 
     private Type type;
     private int startAddress;       // Where to jump back to (for loops) or skip to (for functions)
-    private int condJumpAddress;    // The index of the jump_if_false placeholder
+    private int condJumpAddress = -1;    // The index of the jump_if_false placeholder (-1 when not set)
     private int elseJumpAddress = -1; // placeholder index for the unconditional jump over the else-body
     private final List<Integer> breaks = new ArrayList<>(); // Track all breaks in this loop
 

@@ -66,16 +66,18 @@ public final class VMEnvironment {
         int tag = next();
         if (tag == 1) {
             int len = next(); // expected 4
-            int b1 = next();
-            int b2 = next();
-            int b3 = next();
-            int b4 = next();
+            int b1 = next() & 0xFF;
+            int b2 = next() & 0xFF;
+            int b3 = next() & 0xFF;
+            int b4 = next() & 0xFF;
             int val = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
             return new org.mangorage.mangolang.object.impl.IntegerMLObject(val);
         } else if (tag == 2) {
             int len = next();
             byte[] bytes = new byte[len];
-            for (int i = 0; i < len; i++) bytes[i] = (byte) next();
+            for (int i = 0; i < len; i++) {
+                bytes[i] = next();
+            }
             return new org.mangorage.mangolang.object.impl.StringMLObject(new String(bytes));
         } else {
             throw new RuntimeException("Unknown object tag: " + tag + " at ip=" + (ip - 1));
