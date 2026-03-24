@@ -1,44 +1,31 @@
 package org.mangorage.mangolang.instruction;
 
-import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
+import org.mangorage.mangolang.instruction.register.BakedInstruction;
+import org.mangorage.mangolang.instruction.register.RegisterHandler;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class InstructionSet {
     private final Map<Integer, Instruction> opcodeMap = new HashMap<>();
     private final Map<String, Integer> nameMap = new HashMap<>();
     private final Map<Integer, String> opcodeToNameMap = new HashMap<>();
+    private final RegisterHandler registerHandler = new RegisterHandler();
 
     private int nextOpcode = 1;
 
     public void register(List<Class<? extends Instruction>> classList) {
         for (Class<? extends Instruction> aClass : classList) {
-            try {
-                Instruction instruction = aClass.getDeclaredConstructor().newInstance();
-                Set<String> names = new LinkedHashSet<>();
-                names.add(normalizeName(aClass.getSimpleName()));
+            List<BakedInstruction> bakedInstructions = registerHandler.bake(aClass);
 
-                for (AutoRegisterInstruction annotation : aClass.getAnnotationsByType(AutoRegisterInstruction.class)) {
-                    String id = annotation.id();
-                    if (id != null && !id.isBlank()) {
-                        names.add(normalizeName(id));
-                    }
+            Integer opcode = null;
+            for (BakedInstruction bakedInstruction : bakedInstructions) {
+                if (opcode == null) {
+                    opcode = register(bakedInstruction.id(), bakedInstruction.instruction());
+                } else {
+                    registerAlias(bakedInstruction.id(), opcode);
                 }
-
-                Integer opcode = null;
-                for (String name : names) {
-                    if (opcode == null) {
-                        opcode = register(name, instruction);
-                    } else {
-                        registerAlias(name, opcode);
-                    }
-                }
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
             }
         }
     }

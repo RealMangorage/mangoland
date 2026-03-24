@@ -55,6 +55,8 @@ public final class MangoLang {
                         Call.class,
                         Return.class,
                         Jump.class,
+                        JumpStatement.class,
+                        GreaterThanZero.class,
                         Print.class,
                         Add.class,
                         Subtract.class,
@@ -67,20 +69,6 @@ public final class MangoLang {
                         Halt.class,
                         Exit.class
                 )
-        );
-
-        // Alias for legacy/compiler token "printstr" -> use Print instruction
-
-        set.register(
-                "jump_if_true", new JumpStatement(true)
-        );
-
-        set.register(
-                "jump_if_false", new JumpStatement(false)
-        );
-
-        set.register(
-                "greater_than_zero", new GreaterThanZero()
         );
 
         return set;
