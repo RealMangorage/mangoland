@@ -65,17 +65,17 @@ public final class MangolangObjects {
     }
 
     public static BooleanMLObject booleanObject(boolean value) {
-        return BooleanMLObject.of(value);
+        return BooleanMLCodec.objectValue(value);
     }
 
     public static StringMLObject concatenateAsStrings(MangolangObject left, MangolangObject right) {
-        return new StringMLObject(toDisplayString(left) + toDisplayString(right));
+        return StringMLCodec.concatenate(left, right);
     }
 
 
     public static int requireIntegerValue(MangolangObject value, String context) {
         if (value instanceof IntegerMLObject integerObject) {
-            return integerObject.getValue();
+            return IntegerMLCodec.requireIntegerValue(integerObject);
         }
 
         throw new RuntimeException(context + " requires an integer, got " + describe(value));
@@ -83,11 +83,11 @@ public final class MangolangObjects {
 
     public static boolean coerceBooleanValue(MangolangObject value, String context) {
         if (value instanceof BooleanMLObject booleanObject) {
-            return booleanObject.value();
+            return BooleanMLCodec.coerceBooleanValue(booleanObject);
         }
 
         if (value instanceof IntegerMLObject integerObject) {
-            return integerObject.getValue() != 0;
+            return IntegerMLCodec.coerceBooleanValue(integerObject);
         }
 
         throw new RuntimeException(context + " requires a boolean-compatible value, got " + describe(value));
@@ -96,6 +96,18 @@ public final class MangolangObjects {
     public static String toDisplayString(MangolangObject value) {
         if (value == null) {
             return "null";
+        }
+
+        if (value instanceof StringMLObject stringObject) {
+            return StringMLCodec.toDisplayString(stringObject);
+        }
+
+        if (value instanceof IntegerMLObject integerObject) {
+            return IntegerMLCodec.toDisplayString(integerObject);
+        }
+
+        if (value instanceof BooleanMLObject booleanObject) {
+            return BooleanMLCodec.toDisplayString(booleanObject);
         }
 
         MangolangObject stringValue = value.asString();
