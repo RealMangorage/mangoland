@@ -7,7 +7,6 @@ import org.mangorage.mangolang.compiler.impl.IfStatementLexerNode;
 import org.mangorage.mangolang.compiler.impl.WhileLexerNode;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
-import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
 
 import java.util.*;
@@ -275,26 +274,7 @@ public final class Compiler {
     }
 
     private void emitValuePush(String rawValue, List<Byte> out, CompilerContext ctx) {
-        String value = rawValue.trim();
-        if (value.isEmpty()) {
-            throw new RuntimeException("Missing value expression");
-        }
-
-        MangolangObject literal = MangolangObjects.literalFromToken(value);
-        if (literal != null) {
-            out.add((byte) set.requireOpcode("push"));
-            MangolangObjects.emitObject(out, literal);
-            return;
-        }
-
-        if (ctx.hasVariable(value)) {
-            int opcode = set.requireOpcode("load");
-            out.add((byte) opcode);
-            set.get(opcode).emitBytecode(out, ctx, value);
-            return;
-        }
-
-        throw new RuntimeException("Unsupported value expression: " + value);
+        CompilerEmitUtil.emitValuePush(rawValue, out, ctx, set);
     }
 
     private String joinArgs(String[] parts, int startIndex) {

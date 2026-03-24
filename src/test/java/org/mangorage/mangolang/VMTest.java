@@ -139,6 +139,22 @@ public class VMTest {
     }
 
     @Test
+    public void inlineIfSupportsVariableToVariableEquality() {
+        List<String> out = runProgram("""
+                let x = 5
+                let y = 5
+                if (x == y) then
+                    print "matched"
+                end
+                if (x != y) then
+                    print "missed"
+                end
+                """);
+
+        Assertions.assertEquals(List.of("matched"), out);
+    }
+
+    @Test
     public void parameterizedFunctionsReceiveArgumentsAndShadowGlobals() {
         List<String> out = runProgram("""
                 let x = 10
@@ -195,6 +211,9 @@ public class VMTest {
                     print "x: " .. x
                     print "y: " .. y
                     print "z: " .. z
+                    if (3 == z) then
+                        z = z + 1
+                    end
                     return z
                 end
 
@@ -203,7 +222,7 @@ public class VMTest {
                 print "Result: " .. result
                 """);
 
-        Assertions.assertEquals(List.of("x: 1", "y: 2", "z: 3", "Result: 13"), out);
+        Assertions.assertEquals(List.of("x: 1", "y: 2", "z: 3", "Result: 14"), out);
     }
 
     @Test

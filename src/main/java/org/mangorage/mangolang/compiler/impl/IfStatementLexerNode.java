@@ -2,9 +2,9 @@ package org.mangorage.mangolang.compiler.impl;
 
 import org.mangorage.mangolang.compiler.BlockContext;
 import org.mangorage.mangolang.compiler.CompilerContext;
+import org.mangorage.mangolang.compiler.CompilerEmitUtil;
 import org.mangorage.mangolang.compiler.LexerNode;
 import org.mangorage.mangolang.compiler.LexerOutput;
-import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
 
 import java.util.Arrays;
@@ -14,6 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class IfStatementLexerNode implements LexerNode {
+    private static final Pattern INLINE_CONDITION_PATTERN = Pattern.compile(
+            "\\(?\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*(==|!=)\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*\\)?"
+    );
+
     @Override
     public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         // ===== IF START =====
@@ -33,28 +37,17 @@ public final class IfStatementLexerNode implements LexerNode {
                 // Join the condition tokens between 'if' and the delimiter (do/then)
                 String condStr = String.join(" ", Arrays.copyOfRange(parts, 1, delimIdx));
 
-                // Simple pattern: (var == value) allowing optional surrounding parens
-                Pattern p = Pattern.compile("\\(?\\s*([a-zA-Z_]\\w*)\\s*(==|!=)\\s*([0-9]+)\\s*\\)?");
-                Matcher m = p.matcher(condStr);
+                Matcher m = INLINE_CONDITION_PATTERN.matcher(condStr);
                 if (!m.matches()) {
                     throw new RuntimeException("Unsupported inline if condition: " + condStr);
                 }
 
-                String var = m.group(1);
+                String left = m.group(1);
                 String op = m.group(2);
-                String val = m.group(3);
+                String right = m.group(3);
 
-                // Emit the equivalent instructions for the simple condition
-                // load var
-                int opLoad = set.requireOpcode("load");
-                out.add((byte) opLoad);
-                Instruction instLoad = set.get(opLoad);
-                instLoad.emitBytecode(out, ctx, var);
-
-                // push value
-                int opPush = set.requireOpcode("push");
-                out.add((byte) opPush);
-                set.get(opPush).emitBytecode(out, ctx, val);
+                CompilerEmitUtil.emitValuePush(left, out, ctx, set);
+                CompilerEmitUtil.emitValuePush(right, out, ctx, set);
 
                 // equals compares two runtime objects and leaves a boolean on the stack.
                 int opEq = set.requireOpcode("equals");
