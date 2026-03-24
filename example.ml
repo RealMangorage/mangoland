@@ -11,3 +11,7 @@ mainloop: while x != 5 do
 end
 
 print "Done! " .. x
+print "Exiting in 5 seconds..."
+push 5000
+sleep
+exit

@@ -4,6 +4,7 @@ import org.mangorage.mangolang.compiler.Compiler;
 import org.mangorage.mangolang.instruction.InstructionSet;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
 import org.mangorage.mangolang.instruction.impl.comparison.Equals;
+import org.mangorage.mangolang.instruction.impl.control.Exit;
 import org.mangorage.mangolang.instruction.impl.control.Halt;
 import org.mangorage.mangolang.instruction.impl.control.Jump;
 import org.mangorage.mangolang.instruction.impl.control.JumpStatement;
@@ -63,7 +64,8 @@ public final class MangoLang {
                         Equals.class,
                         Dup.class,
                         Sleep.class,
-                        Halt.class
+                        Halt.class,
+                        Exit.class
                 )
         );
         // Alias for legacy/compiler token "printstr" -> use Print instruction
