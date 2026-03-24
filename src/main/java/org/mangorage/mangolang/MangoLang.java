@@ -27,6 +27,10 @@ import org.mangorage.mangolang.terminal.ConsoleTerminal;
 import org.mangorage.mangolang.terminal.DeferredTerminal;
 import org.mangorage.mangolang.terminal.TerminalGui;
 import org.mangorage.mangolang.vm.VM;
+import org.reflections.Configuration;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,34 +51,12 @@ public final class MangoLang {
     public static InstructionSet createEnv() {
         InstructionSet set = new InstructionSet();
 
-        for (Class<?> aClass : Instruction.class.getClasses()) {
-            System.out.println(aClass);
-        }
-
+        Reflections reflections = new Reflections(
+                "org.mangorage"
+        );
 
         set.register(
-                List.of(
-                        Let.class,
-                        Push.class,
-                        Load.class,
-                        Store.class,
-                        Call.class,
-                        Return.class,
-                        Jump.class,
-                        JumpStatement.class,
-                        GreaterThanZero.class,
-                        Print.class,
-                        Add.class,
-                        Subtract.class,
-                        Decrement.class,
-                        Divide.class,
-                        Multiply.class,
-                        Equals.class,
-                        Dup.class,
-                        Sleep.class,
-                        Halt.class,
-                        Exit.class
-                )
+                reflections.getSubTypesOf(Instruction.class).stream().toList()
         );
 
         return set;
