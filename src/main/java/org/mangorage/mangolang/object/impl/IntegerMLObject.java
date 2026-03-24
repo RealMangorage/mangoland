@@ -7,6 +7,18 @@ import org.mangorage.mangolang.object.OperationType;
 public final class IntegerMLObject implements MangolangObject {
     private final int value;
 
+    public static int requireIntegerValue(MangolangObject value, String context) {
+        if (value instanceof IntegerMLObject integerObject) {
+            return integerObject.getValue();
+        }
+
+        throw new RuntimeException(context + " requires an integer, got " + (value == null ? "null" : value.describe()));
+    }
+
+    public static boolean coerceBooleanValue(IntegerMLObject value) {
+        return value.getValue() != 0;
+    }
+
     public IntegerMLObject(int value) {
         this.value = value;
     }
@@ -22,7 +34,7 @@ public final class IntegerMLObject implements MangolangObject {
                 if (mangolangObject instanceof IntegerMLObject other) {
                     yield new IntegerMLObject(this.value + other.value);
                 }
-                yield MangolangObjects.concatenateAsStrings(this, mangolangObject);
+                yield StringMLObject.concatenate(this, mangolangObject);
             }
             case SUBTRACT -> {
                 if (mangolangObject instanceof IntegerMLObject other) {
@@ -60,6 +72,11 @@ public final class IntegerMLObject implements MangolangObject {
     @Override
     public MangolangObject asString() {
         return new StringMLObject(Integer.toString(value));
+    }
+
+    @Override
+    public String toDisplayString() {
+        return Integer.toString(value);
     }
 
     @Override

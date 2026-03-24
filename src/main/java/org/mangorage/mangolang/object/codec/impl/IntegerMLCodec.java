@@ -7,17 +7,6 @@ import org.mangorage.mangolang.object.impl.IntegerMLObject;
 public final class IntegerMLCodec implements MangolangObjectCodec<IntegerMLObject> {
     public static final int TAG = MangolangObjects.generateTag();
 
-    public static String toDisplayString(IntegerMLObject value) {
-        return Integer.toString(value.getValue());
-    }
-
-    public static int requireIntegerValue(IntegerMLObject value) {
-        return value.getValue();
-    }
-
-    public static boolean coerceBooleanValue(IntegerMLObject value) {
-        return value.getValue() != 0;
-    }
 
     @Override
     public int tag() {

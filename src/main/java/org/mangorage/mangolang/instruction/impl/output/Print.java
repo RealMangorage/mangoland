@@ -18,14 +18,14 @@ public final class Print implements Instruction {
         int next = env.peek();
         if (next == MangolangObjects.OBJECT_PREFIX) {
             var obj = env.readObject();
-            env.getTerminal().println(MangolangObjects.toDisplayString(obj));
+            env.getTerminal().println(obj.toDisplayString());
             return;
         }
 
         // Otherwise, pop from the stack and print
         if (!env.getStack().isEmpty()) {
             var obj = env.getStack().pop();
-            env.getTerminal().println(MangolangObjects.toDisplayString(obj));
+            env.getTerminal().println(obj.toDisplayString());
         }
     }
 

@@ -1,6 +1,5 @@
 package org.mangorage.mangolang.object.codec.impl;
 
-import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.codec.MangolangObjectCodec;
 import org.mangorage.mangolang.object.impl.StringMLObject;
@@ -10,13 +9,6 @@ import java.nio.charset.StandardCharsets;
 public final class StringMLCodec implements MangolangObjectCodec<StringMLObject> {
     public static final int TAG = MangolangObjects.generateTag();
 
-    public static String toDisplayString(StringMLObject value) {
-        return value.getValue();
-    }
-
-    public static StringMLObject concatenate(MangolangObject left, MangolangObject right) {
-        return new StringMLObject(MangolangObjects.toDisplayString(left) + MangolangObjects.toDisplayString(right));
-    }
 
     @Override
     public int tag() {
