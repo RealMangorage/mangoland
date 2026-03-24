@@ -10,6 +10,13 @@ mainloop: while x != 5 do
     end
 end
 
+
+let y = 0
+type y
+store typeresult
+
+print "Type of y: " .. typeresult
+
 print "Done! " .. x
 print "Exiting in 5 seconds..."
 push 5000
