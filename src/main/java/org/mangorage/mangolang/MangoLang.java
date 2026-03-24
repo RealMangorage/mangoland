@@ -1,6 +1,7 @@
 package org.mangorage.mangolang;
 
 import org.mangorage.mangolang.compiler.Compiler;
+import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
 import org.mangorage.mangolang.instruction.impl.comparison.GreaterThanZero;
 import org.mangorage.mangolang.instruction.impl.comparison.Equals;
@@ -45,6 +46,11 @@ public final class MangoLang {
 
     public static InstructionSet createEnv() {
         InstructionSet set = new InstructionSet();
+
+        for (Class<?> aClass : Instruction.class.getClasses()) {
+            System.out.println(aClass);
+        }
+
 
         set.register(
                 List.of(
