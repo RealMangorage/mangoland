@@ -126,7 +126,7 @@ public class VMTest {
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {
         List<Byte> bytes = new ArrayList<>();
-        original.emitBytes(bytes);
+        MangolangObjects.emitObject(bytes, original);
 
         byte[] code = new byte[bytes.size()];
         for (int i = 0; i < bytes.size(); i++) {

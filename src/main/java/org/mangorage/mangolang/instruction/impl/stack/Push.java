@@ -27,6 +27,6 @@ public final class Push implements Instruction {
             throw new RuntimeException("Push argument must be a literal value: " + args[0]);
         }
 
-        literal.emitBytes(output);
+        MangolangObjects.emitObject(output, literal);
     }
 }

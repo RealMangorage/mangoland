@@ -39,7 +39,7 @@ public final class Print implements Instruction {
             String raw = sb.toString();
             if (raw.length() >= 2 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
                 String str = raw.substring(1, raw.length() - 1);
-                new org.mangorage.mangolang.object.impl.StringMLObject(str).emitBytes(output);
+                MangolangObjects.emitObject(output, new org.mangorage.mangolang.object.impl.StringMLObject(str));
             }
         }
     }

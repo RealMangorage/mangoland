@@ -1,9 +1,6 @@
 package org.mangorage.mangolang.object.impl;
 
 import org.mangorage.mangolang.object.MangolangObject;
-import org.mangorage.mangolang.object.MangolangObjects;
-
-import java.util.List;
 
 public final class IntegerMLObject implements MangolangObject {
     private final int value;
@@ -32,10 +29,5 @@ public final class IntegerMLObject implements MangolangObject {
     @Override
     public String toString() {
         return Integer.toString(value);
-    }
-
-    @Override
-    public void emitBytes(List<Byte> out) {
-        MangolangObjects.emitObject(out, this);
     }
 }

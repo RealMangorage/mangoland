@@ -42,7 +42,7 @@ public final class Let implements Instruction {
 
         MangolangObject literal = MangolangObjects.literalFromToken(args[2].toString());
         if (literal != null) {
-            literal.emitBytes(output);
+            MangolangObjects.emitObject(output, literal);
         } else {
             output.add((byte) ctx.getVariableIndex(args[2].toString()));
         }
