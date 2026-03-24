@@ -4,7 +4,7 @@ import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObject;
-import org.mangorage.mangolang.object.impl.IntegerMLObject;
+import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
@@ -12,9 +12,7 @@ import java.util.List;
 @AutoRegisterInstruction
 public final class Push implements Instruction {
     public void execute(VMEnvironment env) {
-        // Next int is an immediate literal; wrap it as an IntegerMLObject
-        int literal = env.next();
-        MangolangObject obj = new IntegerMLObject(literal);
+        MangolangObject obj = env.readObject();
         env.getStack().push(obj);
     }
 
@@ -24,12 +22,11 @@ public final class Push implements Instruction {
             throw new RuntimeException("Push requires exactly 1 argument");
         }
 
-        // Push expects a numeric value (we encode as a single byte)
-        try {
-            int value = Integer.parseInt(args[0].toString());
-            output.add((byte) value);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Push argument must be an integer: " + args[0]);
+        MangolangObject literal = MangolangObjects.literalFromToken(args[0].toString());
+        if (literal == null) {
+            throw new RuntimeException("Push argument must be a literal value: " + args[0]);
         }
+
+        literal.emitBytes(output);
     }
 }

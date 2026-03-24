@@ -3,7 +3,9 @@ package org.mangorage.mangolang.instruction.impl.output;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
+
 import java.util.List;
 
 @AutoRegisterInstruction
@@ -11,19 +13,18 @@ public final class Print implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        // If the next byte is an encoded object tag (1=int, 2=string), read it directly
+        // Inline literals are encoded as serialized Mangolang objects directly after the opcode.
         int next = env.peek();
-        if (next == 1 || next == 2) {
+        if (next == MangolangObjects.OBJECT_PREFIX) {
             var obj = env.readObject();
-            env.getTerminal().println("" + obj.asString());
+            env.getTerminal().println(MangolangObjects.toDisplayString(obj));
             return;
         }
 
         // Otherwise, pop from the stack and print
         if (!env.getStack().isEmpty()) {
             var obj = env.getStack().pop();
-            env.getTerminal().println("" + obj.asString());
-            return;
+            env.getTerminal().println(MangolangObjects.toDisplayString(obj));
         }
     }
 

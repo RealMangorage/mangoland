@@ -2,7 +2,13 @@ package org.mangorage.mangolang.vm;
 
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.impl.BooleanMLObject;
+import org.mangorage.mangolang.object.impl.IntegerMLObject;
+import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.terminal.Terminal;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Stack;
 
 public final class VMEnvironment {
@@ -65,26 +71,43 @@ public final class VMEnvironment {
     /**
      * Read a MangolangObject previously emitted into the bytecode.
      * Encoding:
-     *  - tag 1: integer -> [tag=1][len=4][4 bytes big-endian]
-     *  - tag 2: string  -> [tag=2][len<=64][len bytes]
+     *  - [0xFF][tag][lenLo][lenHi][payload...]
+     *  - tag 1: integer -> 4 byte big-endian payload
+     *  - tag 2: string  -> UTF-8 payload
+     *  - tag 3: boolean -> 1 byte payload (0 or 1)
      */
-    public org.mangorage.mangolang.object.MangolangObject readObject() {
-        int tag = next();
-        if (tag == 1) {
-            int len = next(); // expected 4
+    public MangolangObject readObject() {
+        int prefix = next() & 0xFF;
+        if (prefix != MangolangObjects.OBJECT_PREFIX) {
+            throw new RuntimeException("Expected object prefix " + MangolangObjects.OBJECT_PREFIX + " but found " + prefix + " at ip=" + (ip - 1));
+        }
+
+        int tag = next() & 0xFF;
+        int len = (next() & 0xFF) | ((next() & 0xFF) << 8);
+
+        if (tag == MangolangObjects.TAG_INTEGER) {
+            if (len != 4) {
+                throw new RuntimeException("Invalid integer payload size: " + len);
+            }
+
             int b1 = next() & 0xFF;
             int b2 = next() & 0xFF;
             int b3 = next() & 0xFF;
             int b4 = next() & 0xFF;
             int val = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-            return new org.mangorage.mangolang.object.impl.IntegerMLObject(val);
-        } else if (tag == 2) {
-            int len = next();
+            return new IntegerMLObject(val);
+        } else if (tag == MangolangObjects.TAG_STRING) {
             byte[] bytes = new byte[len];
             for (int i = 0; i < len; i++) {
                 bytes[i] = next();
             }
-            return new org.mangorage.mangolang.object.impl.StringMLObject(new String(bytes));
+            return new StringMLObject(new String(bytes, StandardCharsets.UTF_8));
+        } else if (tag == MangolangObjects.TAG_BOOLEAN) {
+            if (len != 1) {
+                throw new RuntimeException("Invalid boolean payload size: " + len);
+            }
+
+            return BooleanMLObject.of((next() & 0xFF) != 0);
         } else {
             throw new RuntimeException("Unknown object tag: " + tag + " at ip=" + (ip - 1));
         }

@@ -68,17 +68,21 @@ public final class Compiler {
                 System.out.println("[Compiler] line='" + line + "' name='" + name + "' args='" + Arrays.toString(Arrays.copyOfRange(parts, 1, parts.length)) + "'");
             }
             int opcode = set.requireOpcode(name);
-            System.out.println("[Compiler] emitting opcode " + opcode + " for '" + name + "' at out.size=" + out.size());
+            boolean debug = System.getProperty("mangolang.debug") != null;
+            if (debug) {
+                System.out.println("[Compiler] emitting opcode " + opcode + " for '" + name + "' at out.size=" + out.size());
+            }
             out.add((byte) opcode);
 
             Instruction inst = set.get(opcode);
             Object[] args = Arrays.copyOfRange(parts, 1, parts.length);
             inst.emitBytecode(out, ctx, args);
-            System.out.println("[Compiler] after emit out.size=" + out.size());
-            // Dump current byte stream for debugging
-            System.out.print("[Compiler] bytes=");
-            for (int i = 0; i < out.size(); i++) System.out.print((out.get(i) & 0xFF) + (i + 1 < out.size() ? "," : ""));
-            System.out.println();
+            if (debug) {
+                System.out.println("[Compiler] after emit out.size=" + out.size());
+                System.out.print("[Compiler] bytes=");
+                for (int i = 0; i < out.size(); i++) System.out.print((out.get(i) & 0xFF) + (i + 1 < out.size() ? "," : ""));
+                System.out.println();
+            }
         }
 
         if (!blocks.isEmpty()) throw new RuntimeException("Missing 'end' for block");

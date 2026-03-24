@@ -3,6 +3,8 @@ package org.mangorage.mangolang.instruction.impl.memory;
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
@@ -13,8 +15,16 @@ public final class Let implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         int index = env.next();  // variable index
-        int value = env.next();  // value to store (literal)
-        env.setLocal(index, new org.mangorage.mangolang.object.impl.IntegerMLObject(value));
+        MangolangObject value;
+
+        if (env.peek() == MangolangObjects.OBJECT_PREFIX) {
+            value = env.readObject();
+        } else {
+            int sourceIndex = env.next() & 0xFF;
+            value = env.getLocal(sourceIndex);
+        }
+
+        env.setLocal(index, value);
     }
 
     @Override
@@ -28,17 +38,13 @@ public final class Let implements Instruction {
 
         int index = ctx.hasVariable(name) ? ctx.getVariableIndex(name) : ctx.declareVariable(name);
 
-        // Value can be integer literal or another variable name
-        int value;
-        try {
-            value = Integer.parseInt(args[2].toString());
-        } catch (NumberFormatException e) {
-            // Treat it as variable reference
-            value = ctx.getVariableIndex(args[2].toString());
-        }
-
-        System.out.println("[Let.emit] var='" + name + "' index=" + index + " value=" + value);
         output.add((byte) index);
-        output.add((byte) value);
+
+        MangolangObject literal = MangolangObjects.literalFromToken(args[2].toString());
+        if (literal != null) {
+            literal.emitBytes(output);
+        } else {
+            output.add((byte) ctx.getVariableIndex(args[2].toString()));
+        }
     }
 }

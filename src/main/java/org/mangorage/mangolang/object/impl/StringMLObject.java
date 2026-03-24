@@ -1,6 +1,9 @@
 package org.mangorage.mangolang.object.impl;
 
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class StringMLObject implements MangolangObject {
@@ -17,9 +20,9 @@ public final class StringMLObject implements MangolangObject {
     @Override
     public MangolangObject equals(MangolangObject mangolangObject) {
         if (mangolangObject instanceof StringMLObject other) {
-            return new org.mangorage.mangolang.object.impl.IntegerMLObject(this.value.equals(other.value) ? 1 : 0);
+            return BooleanMLObject.of(this.value.equals(other.value));
         }
-        return new org.mangorage.mangolang.object.impl.IntegerMLObject(0);
+        return BooleanMLObject.FALSE;
     }
 
     @Override
@@ -34,12 +37,11 @@ public final class StringMLObject implements MangolangObject {
 
     @Override
     public void emitBytes(List<Byte> out) {
-        // Tag 2 = string
-        out.add((byte) 2);
-        byte[] bytes = value.getBytes();
-        int len = Math.min(bytes.length, 64);
-        out.add((byte) len);
-        for (int i = 0; i < len; i++) out.add(bytes[i]);
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        MangolangObjects.emitHeader(out, MangolangObjects.TAG_STRING, bytes.length);
+        for (byte aByte : bytes) {
+            out.add(aByte);
+        }
     }
 }
 

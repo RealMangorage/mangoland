@@ -2,7 +2,7 @@ package org.mangorage.mangolang.instruction.impl.control;
 
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
-import org.mangorage.mangolang.object.impl.BooleanMLObject;
+import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public final class JumpStatement implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
         final var booleanObj = env.getStack().pop();
-        final boolean booleanValue = ((BooleanMLObject) booleanObj).value();
+        final boolean booleanValue = MangolangObjects.coerceBooleanValue(booleanObj, "jump condition");
 
         // Read the two target addresses emitted by the compiler (each address is two bytes: low, high)
         int trueLo = env.next();

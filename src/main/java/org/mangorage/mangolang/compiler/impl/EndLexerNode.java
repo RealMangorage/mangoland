@@ -27,7 +27,6 @@ public final class EndLexerNode implements LexerNode {
             }
             else if (b.getType() == BlockContext.Type.WHILE) {
                 // Unconditional jump back to the 'while' condition
-                System.out.println("[End] WHILE end: startAddr=" + b.getStartAddress() + " out.size(before)=" + out.size());
                 out.add((byte) set.requireOpcode("jump"));
                 int target = b.getStartAddress();
                 out.add((byte) (target & 0xFF));
@@ -39,18 +38,16 @@ public final class EndLexerNode implements LexerNode {
                 // condJumpAddress points at opcode; +1 is true-target placeholder, +2 is false-target
                 int p = b.getCondJumpAddress(); // opcode index
                 if (p != -1) {
-                    int la = loopExitAddress;
-                    out.set(p + 1, (byte) (la & 0xFF));
-                    out.set(p + 2, (byte) ((la >> 8) & 0xFF));
-                    out.set(p + 3, (byte) (la & 0xFF));
-                    out.set(p + 4, (byte) ((la >> 8) & 0xFF));
+                    out.set(p + 1, (byte) (loopExitAddress & 0xFF));
+                    out.set(p + 2, (byte) ((loopExitAddress >> 8) & 0xFF));
+                    out.set(p + 3, (byte) (loopExitAddress & 0xFF));
+                    out.set(p + 4, (byte) ((loopExitAddress >> 8) & 0xFF));
                 }
 
                 // 2. Patch all 'break' statements inside this loop
                 for (int breakAddr : b.getBreaks()) {
-                    int idx = breakAddr;
-                    out.set(idx + 1, (byte) (loopExitAddress & 0xFF));
-                    out.set(idx + 2, (byte) ((loopExitAddress >> 8) & 0xFF));
+                    out.set(breakAddr + 1, (byte) (loopExitAddress & 0xFF));
+                    out.set(breakAddr + 2, (byte) ((loopExitAddress >> 8) & 0xFF));
                 }
             }
             else if (b.getType() == BlockContext.Type.IF) {

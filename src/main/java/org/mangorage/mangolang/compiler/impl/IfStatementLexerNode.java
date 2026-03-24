@@ -49,28 +49,27 @@ public final class IfStatementLexerNode implements LexerNode {
                 int opLoad = set.requireOpcode("load");
                 out.add((byte) opLoad);
                 Instruction instLoad = set.get(opLoad);
-                instLoad.emitBytecode(out, ctx, new Object[]{var});
+                instLoad.emitBytecode(out, ctx, var);
 
                 // push value
                 int opPush = set.requireOpcode("push");
                 out.add((byte) opPush);
-                set.get(opPush).emitBytecode(out, ctx, new Object[]{val});
+                set.get(opPush).emitBytecode(out, ctx, val);
 
-                // equals (we only support '==' for now; '!=' handled by comparing result to 0 later)
+                // equals compares two runtime objects and leaves a boolean on the stack.
                 int opEq = set.requireOpcode("equals");
                 out.add((byte) opEq);
-                set.get(opEq).emitBytecode(out, ctx, new Object[]{});
+                set.get(opEq).emitBytecode(out, ctx);
 
                 if (op.equals("!=")) {
-                    // Invert the boolean: equals produced 1 when equal; we want 1 when not equal.
-                    // We'll emit: push 0 ; equals  -> compares (equalsResult == 0)
+                    // Invert the boolean by comparing the equality result with `false`.
                     int opPush0 = set.requireOpcode("push");
                     out.add((byte) opPush0);
-                    set.get(opPush0).emitBytecode(out, ctx, new Object[]{"0"});
+                    set.get(opPush0).emitBytecode(out, ctx, "false");
 
                     int opEq2 = set.requireOpcode("equals");
                     out.add((byte) opEq2);
-                    set.get(opEq2).emitBytecode(out, ctx, new Object[]{});
+                    set.get(opEq2).emitBytecode(out, ctx);
                 }
 
                 // Now emit the conditional jump placeholder to skip the then-body when false
@@ -78,7 +77,6 @@ public final class IfStatementLexerNode implements LexerNode {
                 BlockContext b = new BlockContext(BlockContext.Type.IF, out.size());
                 blocks.push(b);
                 b.setCondJumpAddress(out.size());
-                System.out.println("[If] condJumpAddr=" + b.getCondJumpAddress() + " out.size(before)=" + out.size());
                 out.add((byte) set.requireOpcode("jump_if_false"));
                 out.add((byte) 0); // trueAddr low
                 out.add((byte) 0); // trueAddr high
@@ -95,7 +93,6 @@ public final class IfStatementLexerNode implements LexerNode {
             // Only push when there was no inline delimiter parsed above.
             // (The inline branch already pushed a BlockContext when needed.)
             blocks.push(new BlockContext(BlockContext.Type.IF, out.size()));
-            System.out.println("[If] pushed non-inline IF at out.size=" + out.size());
             return new LexerOutput(true);
         }
 

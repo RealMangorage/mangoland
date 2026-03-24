@@ -1,6 +1,8 @@
 package org.mangorage.mangolang.object.impl;
 
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
+
 import java.util.List;
 
 public final class IntegerMLObject implements MangolangObject {
@@ -17,7 +19,7 @@ public final class IntegerMLObject implements MangolangObject {
     @Override
     public MangolangObject equals(MangolangObject mangolangObject) {
         if (mangolangObject instanceof IntegerMLObject other) {
-            return this.value == other.value ? BooleanMLObject.TRUE : BooleanMLObject.FALSE;
+            return BooleanMLObject.of(this.value == other.value);
         }
         return BooleanMLObject.FALSE;
     }
@@ -28,12 +30,13 @@ public final class IntegerMLObject implements MangolangObject {
     }
 
     @Override
+    public String toString() {
+        return Integer.toString(value);
+    }
+
+    @Override
     public void emitBytes(List<Byte> out) {
-        // Tag 1 = integer
-        out.add((byte) 1);
-        // Length (4 bytes)
-        out.add((byte) 4);
-        // Big-endian 4-byte integer
+        MangolangObjects.emitHeader(out, MangolangObjects.TAG_INTEGER, 4);
         out.add((byte) ((value >> 24) & 0xFF));
         out.add((byte) ((value >> 16) & 0xFF));
         out.add((byte) ((value >> 8) & 0xFF));
