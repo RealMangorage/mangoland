@@ -155,6 +155,32 @@ public class VMTest {
     }
 
     @Test
+    public void whileSupportsInlineHeaderConditions() {
+        List<String> out = runProgram("""
+                let x = 10
+                while x != 5 do
+                    print "Doing! " .. x
+                    x = x - 1
+                end
+                """);
+
+        Assertions.assertEquals(List.of("Doing! 10", "Doing! 9", "Doing! 8", "Doing! 7", "Doing! 6"), out);
+    }
+
+    @Test
+    public void labeledWhileHeadersCompileAndRun() {
+        List<String> out = runProgram("""
+                let x = 3
+                mainloop: while x != 0 do
+                    print "Loop " .. x
+                    x = x - 1
+                end
+                """);
+
+        Assertions.assertEquals(List.of("Loop 3", "Loop 2", "Loop 1"), out);
+    }
+
+    @Test
     public void parameterizedFunctionsReceiveArgumentsAndShadowGlobals() {
         List<String> out = runProgram("""
                 let x = 10

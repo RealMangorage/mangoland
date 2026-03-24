@@ -5,8 +5,14 @@ import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class CompilerEmitUtil {
+    private static final Pattern INLINE_CONDITION_PATTERN = Pattern.compile(
+            "\\(?\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*(==|!=)\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*\\)?"
+    );
+
     private CompilerEmitUtil() {
     }
 
@@ -31,5 +37,32 @@ public final class CompilerEmitUtil {
         }
 
         throw new RuntimeException("Unsupported value expression: " + value);
+    }
+
+    public static void emitSimpleCondition(String condition, List<Byte> out, CompilerContext ctx, InstructionSet set) {
+        Matcher matcher = INLINE_CONDITION_PATTERN.matcher(condition.trim());
+        if (!matcher.matches()) {
+            throw new RuntimeException("Unsupported inline condition: " + condition);
+        }
+
+        String left = matcher.group(1);
+        String operator = matcher.group(2);
+        String right = matcher.group(3);
+
+        emitValuePush(left, out, ctx, set);
+        emitValuePush(right, out, ctx, set);
+
+        int equalsOpcode = set.requireOpcode("equals");
+        out.add((byte) equalsOpcode);
+        set.get(equalsOpcode).emitBytecode(out, ctx);
+
+        if ("!=".equals(operator)) {
+            int pushOpcode = set.requireOpcode("push");
+            out.add((byte) pushOpcode);
+            set.get(pushOpcode).emitBytecode(out, ctx, "false");
+
+            out.add((byte) equalsOpcode);
+            set.get(equalsOpcode).emitBytecode(out, ctx);
+        }
     }
 }

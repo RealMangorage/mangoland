@@ -12,6 +12,7 @@ public final class BlockContext {
     }
 
     private Type type;
+    private String label;
     private int startAddress;       // Where to jump back to (for loops) or skip to (for functions)
     private int condJumpAddress = -1;    // The index of the jump_if_false placeholder (-1 when not set)
     private int elseJumpAddress = -1; // placeholder index for the unconditional jump over the else-body
@@ -22,12 +23,26 @@ public final class BlockContext {
         this.startAddress = startAddress;
     }
 
+    public BlockContext(Type type, int startAddress, String label) {
+        this.type = type;
+        this.startAddress = startAddress;
+        this.label = label;
+    }
+
     public Type getType() {
         return type;
     }
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public int getStartAddress() {

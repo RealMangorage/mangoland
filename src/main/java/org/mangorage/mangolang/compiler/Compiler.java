@@ -55,6 +55,19 @@ public final class Compiler {
 
             if (line.isEmpty()) continue;
 
+            int colonIndex = line.indexOf(':');
+            if (colonIndex > 0) {
+                String possibleLabel = line.substring(0, colonIndex).trim();
+                String remainder = line.substring(colonIndex + 1).trim();
+                if (!remainder.isEmpty() && remainder.startsWith("while ")) {
+                    if (!possibleLabel.matches("[a-zA-Z_]\\w*")) {
+                        throw new RuntimeException("Invalid loop label: " + possibleLabel);
+                    }
+                    ctx.setPendingLoopLabel(possibleLabel);
+                    line = remainder;
+                }
+            }
+
             String[] parts = line.split("\\s+");
             String name = parts[0].toLowerCase();
 

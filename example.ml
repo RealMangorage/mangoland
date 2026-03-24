@@ -1,14 +1,13 @@
-function check(x, y, z)
-    print "x: " .. x
-    print "y: " .. y
-    print "z: " .. z
-    if (z != x) then
-        print "z is 3, incrementing z"
-        z = z + 1
+let x = 10
+mainloop: while x != 5 do
+    print "Doing! " .. x
+    while do
+        print "Inner loop! " .. x
+        x = x - 1
+        if x == 7 then
+            break mainloop
+        end
     end
-    return z
 end
 
-let result = call check(1, 2, 3)
-result = result * 100 / 2 * 10000
-print "Result: " .. result
+print "Done! " .. x

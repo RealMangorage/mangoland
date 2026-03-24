@@ -55,6 +55,7 @@ public final class CompilerContext {
     private final Stack<FunctionScope> functionScopes = new Stack<>();
 
     private int nextGlobalVar = 0;
+    private String pendingLoopLabel;
 
     public int declareVariable(String name) {
         if (!functionScopes.isEmpty()) {
@@ -120,5 +121,15 @@ public final class CompilerContext {
         }
 
         functionScopes.pop();
+    }
+
+    public void setPendingLoopLabel(String pendingLoopLabel) {
+        this.pendingLoopLabel = pendingLoopLabel;
+    }
+
+    public String consumePendingLoopLabel() {
+        String label = pendingLoopLabel;
+        pendingLoopLabel = null;
+        return label;
     }
 }

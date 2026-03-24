@@ -11,13 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class IfStatementLexerNode implements LexerNode {
-    private static final Pattern INLINE_CONDITION_PATTERN = Pattern.compile(
-            "\\(?\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*(==|!=)\\s*([a-zA-Z_]\\w*|true|false|-?\\d+|\"[^\"]*\")\\s*\\)?"
-    );
-
     @Override
     public LexerOutput handle(String[] parts, String name, Stack<BlockContext> blocks, List<Byte> out, CompilerContext ctx, InstructionSet set) {
         // ===== IF START =====
@@ -36,34 +31,7 @@ public final class IfStatementLexerNode implements LexerNode {
             if (delimIdx != -1) {
                 // Join the condition tokens between 'if' and the delimiter (do/then)
                 String condStr = String.join(" ", Arrays.copyOfRange(parts, 1, delimIdx));
-
-                Matcher m = INLINE_CONDITION_PATTERN.matcher(condStr);
-                if (!m.matches()) {
-                    throw new RuntimeException("Unsupported inline if condition: " + condStr);
-                }
-
-                String left = m.group(1);
-                String op = m.group(2);
-                String right = m.group(3);
-
-                CompilerEmitUtil.emitValuePush(left, out, ctx, set);
-                CompilerEmitUtil.emitValuePush(right, out, ctx, set);
-
-                // equals compares two runtime objects and leaves a boolean on the stack.
-                int opEq = set.requireOpcode("equals");
-                out.add((byte) opEq);
-                set.get(opEq).emitBytecode(out, ctx);
-
-                if (op.equals("!=")) {
-                    // Invert the boolean by comparing the equality result with `false`.
-                    int opPush0 = set.requireOpcode("push");
-                    out.add((byte) opPush0);
-                    set.get(opPush0).emitBytecode(out, ctx, "false");
-
-                    int opEq2 = set.requireOpcode("equals");
-                    out.add((byte) opEq2);
-                    set.get(opEq2).emitBytecode(out, ctx);
-                }
+                CompilerEmitUtil.emitSimpleCondition(condStr, out, ctx, set);
 
                 // Now emit the conditional jump placeholder to skip the then-body when false
                 // Encoding: [opcode][trueAddrLo][trueAddrHi][falseAddrLo][falseAddrHi]
