@@ -3,3 +3,6 @@ function test(x)
 end
 
 test(1)
+
+let y = 54
+print y

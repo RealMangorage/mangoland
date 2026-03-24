@@ -155,10 +155,8 @@ public class VMTest {
         List<String> out = runProgram("""
                 let x = 999
                 print "Hello!"
-                load x
-                print
-                push true
-                print
+                print x
+                print true
                 """);
 
         Assertions.assertEquals(List.of("Hello!", "999", "true"), out);
@@ -170,8 +168,7 @@ public class VMTest {
                 let x = 999
                 println("Hello, world!")
                 println("Value: " .. x)
-                load x
-                println()
+                println(x)
                 """);
 
         Assertions.assertEquals(List.of("Hello, world!", "Value: 999", "999"), out);
@@ -181,8 +178,7 @@ public class VMTest {
     public void typeInstructionCanStoreAndPrintVariableTypes() {
         List<String> out = runProgram("""
                 let x = 999
-                type x
-                store typeresult
+                let typeresult = type(x)
                 print "Type: " .. typeresult
                 """);
 
@@ -199,18 +195,12 @@ public class VMTest {
                 let floatValue = 42.5f
                 let doubleValue = 42.75d
 
-                type integerValue
-                print
-                type stringValue
-                print
-                type booleanValue
-                print
-                type longValue
-                print
-                type floatValue
-                print
-                type doubleValue
-                print
+                print type(integerValue)
+                print typeof(stringValue)
+                print type(booleanValue)
+                print type(longValue)
+                print type(floatValue)
+                print type(doubleValue)
                 """);
 
         Assertions.assertEquals(List.of("integer", "string", "boolean", "long", "float", "double"), out);
@@ -274,7 +264,7 @@ public class VMTest {
 
         List<String> out = runProgram(program);
 
-        Assertions.assertEquals(List.of("Hello, world!"), out);
+        Assertions.assertEquals(List.of("Hello, world! X: 1", "54"), out);
     }
 
     @Test
@@ -282,17 +272,14 @@ public class VMTest {
         List<String> out = runProgram("""
                 let x = 2
                 while do
-                    load x
-                    print
+                    print x
                     if (x == 0) then
                         break
                     end
                     if (x != 1) then
                         print "tick"
                     end
-                    load x
-                    decrement
-                    store x
+                    x = x - 1
                 end
                 """);
 
@@ -380,8 +367,7 @@ public class VMTest {
                 end
 
                 call test x 543 290
-                load x
-                print
+                print x
                 """);
 
         Assertions.assertEquals(List.of("X: 10", "Y: 543", "Z: 290", "10"), out);
@@ -393,8 +379,7 @@ public class VMTest {
                 let x = 7
 
                 function test()
-                    load x
-                    print
+                    print x
                 end
 
                 call test()
@@ -433,6 +418,25 @@ public class VMTest {
                 """));
 
         Assertions.assertTrue(exception.getMessage().contains("expects 2 arguments but got 1"));
+    }
+
+    @Test
+    public void rawSourceInstructionsAreRejectedInFavorOfLanguageSyntax() {
+        Compiler compiler = new Compiler(MangoLang.createEnv());
+
+        RuntimeException loadException = Assertions.assertThrows(RuntimeException.class, () -> compiler.compile("""
+                let x = 1
+                load x
+                print
+                """));
+        Assertions.assertTrue(loadException.getMessage().contains("Raw source instruction 'load'"));
+
+        RuntimeException typeException = Assertions.assertThrows(RuntimeException.class, () -> compiler.compile("""
+                let x = 1
+                type x
+                print
+                """));
+        Assertions.assertTrue(typeException.getMessage().contains("Raw source instruction 'type'"));
     }
 
     @Test

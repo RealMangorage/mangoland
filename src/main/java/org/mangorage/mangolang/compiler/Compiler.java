@@ -5,7 +5,6 @@ import org.mangorage.mangolang.compiler.impl.EndLexerNode;
 import org.mangorage.mangolang.compiler.impl.FunctionLexerNode;
 import org.mangorage.mangolang.compiler.impl.IfStatementLexerNode;
 import org.mangorage.mangolang.compiler.impl.WhileLexerNode;
-import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
 
 import java.util.*;
@@ -17,6 +16,7 @@ public final class Compiler {
     private static final Pattern LET_ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)");
     private static final Set<String> PRINT_INSTRUCTION_NAMES = Set.of("print", "println");
+    private static final Set<String> TYPE_EXPRESSION_NAMES = Set.of("type", "typeof");
 
     private record BinaryOperator(int index, int width, String token) {
     }
@@ -62,7 +62,7 @@ public final class Compiler {
             if (colonIndex > 0) {
                 String possibleLabel = line.substring(0, colonIndex).trim();
                 String remainder = line.substring(colonIndex + 1).trim();
-                if (!remainder.isEmpty() && remainder.startsWith("while ")) {
+                if (remainder.startsWith("while ")) {
                     if (!possibleLabel.matches("[a-zA-Z_]\\w*")) {
                         throw new RuntimeException("Invalid loop label: " + possibleLabel);
                     }
@@ -98,22 +98,7 @@ public final class Compiler {
                 System.out.println("[Compiler] line='" + line + "' name='" + name + "' args='" + Arrays.toString(Arrays.copyOfRange(parts, 1, parts.length)) + "'");
             }
 
-            int opcode = set.requireOpcode(name);
-            boolean debug = System.getProperty("mangolang.debug") != null;
-            if (debug) {
-                System.out.println("[Compiler] emitting opcode " + opcode + " for '" + name + "' at out.size=" + out.size());
-            }
-            out.add((byte) opcode);
-
-            Instruction inst = set.get(opcode);
-            Object[] args = Arrays.copyOfRange(parts, 1, parts.length);
-            inst.emitBytecode(out, ctx, args);
-            if (debug) {
-                System.out.println("[Compiler] after emit out.size=" + out.size());
-                System.out.print("[Compiler] bytes=");
-                for (int i = 0; i < out.size(); i++) System.out.print((out.get(i) & 0xFF) + (i + 1 < out.size() ? "," : ""));
-                System.out.println();
-            }
+            throw unsupportedSourceSyntax(line, name);
 
         }
 
@@ -298,6 +283,10 @@ public final class Compiler {
         if (expression.regionMatches(true, 0, "call", 0, "call".length())
                 && (expression.length() == 4 || Character.isWhitespace(expression.charAt(4)))) {
             emitCallInstruction(expression, out, ctx);
+            return;
+        }
+
+        if (emitTypeExpression(expression, out, ctx)) {
             return;
         }
 
@@ -529,6 +518,28 @@ public final class Compiler {
         return trimmed;
     }
 
+    private boolean emitTypeExpression(String rawExpression, List<Byte> out, CompilerContext ctx) {
+        Matcher matcher = PAREN_CALL_PATTERN.matcher(rawExpression.trim());
+        if (!matcher.matches() || !TYPE_EXPRESSION_NAMES.contains(matcher.group(1).toLowerCase(Locale.ROOT))) {
+            return false;
+        }
+
+        List<String> arguments = splitCommaSeparatedRespectingQuotes(matcher.group(2));
+        if (arguments.size() != 1) {
+            throw new RuntimeException("type(...) expects exactly 1 variable argument but got " + arguments.size());
+        }
+
+        String variableName = arguments.get(0).trim();
+        if (!ctx.hasVariable(variableName)) {
+            throw new RuntimeException("type(...) requires a declared variable, got: " + variableName);
+        }
+
+        int opcode = set.requireOpcode("type");
+        out.add((byte) opcode);
+        set.get(opcode).emitBytecode(out, ctx, variableName);
+        return true;
+    }
+
     private FunctionCall parseFunctionCall(String line) {
         String rawCall = line.trim();
         if (rawCall.regionMatches(true, 0, "call", 0, "call".length())
@@ -626,5 +637,15 @@ public final class Compiler {
         }
 
         return true;
+    }
+
+    private RuntimeException unsupportedSourceSyntax(String line, String name) {
+        if (set.getOpcode(name) != null) {
+            return new RuntimeException(
+                    "Raw source instruction '" + name + "' is not allowed here. Use MangoLang syntax like let/assignment/print/println/type(...)/function calls instead."
+            );
+        }
+
+        return new RuntimeException("Unsupported source syntax: " + line);
     }
 }
