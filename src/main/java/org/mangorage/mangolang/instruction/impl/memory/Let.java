@@ -4,6 +4,7 @@ import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjectCompiler;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
@@ -45,9 +46,9 @@ public final class Let implements Instruction {
         output.add((byte) (index & 0xFF));
         output.add((byte) ((index >> 8) & 0xFF));
 
-        MangolangObject literal = MangolangObjects.literalFromToken(args[2].toString());
+        MangolangObject literal = MangolangObjectCompiler.literalFromToken(args[2].toString());
         if (literal != null) {
-            MangolangObjects.emitObject(output, literal);
+            MangolangObjectCompiler.emitObject(output, literal);
         } else {
             int sourceIndex = ctx.getVariableIndex(args[2].toString());
             output.add((byte) (sourceIndex & 0xFF));

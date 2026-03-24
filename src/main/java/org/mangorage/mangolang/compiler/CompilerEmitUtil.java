@@ -2,7 +2,7 @@ package org.mangorage.mangolang.compiler;
 
 import org.mangorage.mangolang.instruction.InstructionSet;
 import org.mangorage.mangolang.object.MangolangObject;
-import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.MangolangObjectCompiler;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,10 +22,10 @@ public final class CompilerEmitUtil {
             throw new RuntimeException("Missing value expression");
         }
 
-        MangolangObject literal = MangolangObjects.literalFromToken(value);
+        MangolangObject literal = MangolangObjectCompiler.literalFromToken(value);
         if (literal != null) {
             out.add((byte) set.requireOpcode("push"));
-            MangolangObjects.emitObject(out, literal);
+            MangolangObjectCompiler.emitObject(out, literal);
             return;
         }
 

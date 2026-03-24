@@ -9,6 +9,7 @@ import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.register.ParamType;
 import org.mangorage.mangolang.instruction.register.Parameter;
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjectCompiler;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.codec.impl.BooleanMLCodec;
 import org.mangorage.mangolang.object.codec.impl.IntegerMLCodec;
@@ -419,7 +420,7 @@ public class VMTest {
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {
         List<Byte> bytes = new ArrayList<>();
-        MangolangObjects.emitObject(bytes, original);
+        MangolangObjectCompiler.emitObject(bytes, original);
 
         byte[] code = new byte[bytes.size()];
         for (int i = 0; i < bytes.size(); i++) {

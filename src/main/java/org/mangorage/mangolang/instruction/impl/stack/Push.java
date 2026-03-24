@@ -4,7 +4,7 @@ import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObject;
-import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.MangolangObjectCompiler;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
@@ -22,11 +22,11 @@ public final class Push implements Instruction {
             throw new RuntimeException("Push requires exactly 1 argument");
         }
 
-        MangolangObject literal = MangolangObjects.literalFromToken(args[0].toString());
+        MangolangObject literal = MangolangObjectCompiler.literalFromToken(args[0].toString());
         if (literal == null) {
             throw new RuntimeException("Push argument must be a literal value: " + args[0]);
         }
 
-        MangolangObjects.emitObject(output, literal);
+        MangolangObjectCompiler.emitObject(output, literal);
     }
 }

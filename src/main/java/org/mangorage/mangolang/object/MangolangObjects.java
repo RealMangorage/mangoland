@@ -9,7 +9,6 @@ import org.mangorage.mangolang.object.impl.IntegerMLObject;
 import org.mangorage.mangolang.object.impl.StringMLObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class MangolangObjects {
@@ -57,19 +56,6 @@ public final class MangolangObjects {
         return codec.decodePayload(payload);
     }
 
-    public static void emitObject(List<Byte> out, MangolangObject value) {
-        if (value == null) {
-            throw new RuntimeException("Cannot emit null MangolangObject");
-        }
-
-        MangolangObjectCodec<? extends MangolangObject> codec = findCodec(value);
-        if (codec == null) {
-            throw new RuntimeException("No object codec registered for type: " + value.getClass().getName());
-        }
-
-        emitObject(out, codec, value);
-    }
-
     public static MangolangObject applyOperation(MangolangObject left, MangolangObject right, OperationType type) {
         if (left == null) {
             throw new RuntimeException("Cannot apply operation " + type + " to null left operand");
@@ -86,40 +72,6 @@ public final class MangolangObjects {
         return new StringMLObject(toDisplayString(left) + toDisplayString(right));
     }
 
-    public static MangolangObject literalFromToken(String token) {
-        if (token == null) {
-            return null;
-        }
-
-        if ("true".equalsIgnoreCase(token)) {
-            return BooleanMLObject.TRUE;
-        }
-
-        if ("false".equalsIgnoreCase(token)) {
-            return BooleanMLObject.FALSE;
-        }
-
-        if (token.length() >= 2 && token.charAt(0) == '"' && token.charAt(token.length() - 1) == '"') {
-            return new StringMLObject(token.substring(1, token.length() - 1));
-        }
-
-        try {
-            return new IntegerMLObject(Integer.parseInt(token));
-        } catch (NumberFormatException ignored) {
-            return null;
-        }
-    }
-
-    public static void emitHeader(List<Byte> out, int tag, int payloadLength) {
-        if (payloadLength < 0 || payloadLength > 0xFFFF) {
-            throw new RuntimeException("Object payload is too large: " + payloadLength + " bytes");
-        }
-
-        out.add((byte) OBJECT_PREFIX);
-        out.add((byte) tag);
-        out.add((byte) (payloadLength & 0xFF));
-        out.add((byte) ((payloadLength >> 8) & 0xFF));
-    }
 
     public static int requireIntegerValue(MangolangObject value, String context) {
         if (value instanceof IntegerMLObject integerObject) {
@@ -167,7 +119,7 @@ public final class MangolangObjects {
                 + (right == null ? "" : " and " + describe(right)));
     }
 
-    private static MangolangObjectCodec<? extends MangolangObject> findCodec(MangolangObject value) {
+    static MangolangObjectCodec<? extends MangolangObject> findCodec(MangolangObject value) {
         MangolangObjectCodec<? extends MangolangObject> directCodec = CODECS_BY_TYPE.get(value.getClass());
         if (directCodec != null) {
             return directCodec;
@@ -182,15 +134,6 @@ public final class MangolangObjects {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T extends MangolangObject> void emitObject(List<Byte> out, MangolangObjectCodec<? extends MangolangObject> codec, MangolangObject value) {
-        MangolangObjectCodec<T> typedCodec = (MangolangObjectCodec<T>) codec;
-        byte[] payload = typedCodec.encodePayload(typedCodec.type().cast(value));
-        emitHeader(out, typedCodec.tag(), payload.length);
-        for (byte payloadByte : payload) {
-            out.add(payloadByte);
-        }
-    }
 
     public static void requirePayloadSize(int tag, byte[] payload, int expectedLength) {
         if (payload.length != expectedLength) {
