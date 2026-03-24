@@ -12,4 +12,14 @@ while do
 end
 
 print "Goodbye, world!"
-halt
+
+function test()
+    print "This is a test function."
+    load x
+    print
+    return
+end
+
+call test()
+
+print "End of program."

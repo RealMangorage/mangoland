@@ -12,8 +12,17 @@ import java.util.List;
 public final class Call implements Instruction {
     @Override
     public void execute(VMEnvironment env) {
-        int addr = env.next();
-        env.getCallStack().push(new Frame(env.getIp(), 0));
+        // Addresses are emitted as two bytes: low, high
+        int low = env.next() & 0xFF;
+        int high = env.next() & 0xFF;
+        int addr = (high << 8) | low;
+        // Push a new frame that inherits the caller's locals so the function can access outer variables
+        Frame caller = env.getCallStack().peek();
+        int localSize = caller.locals.length;
+        Frame newFrame = new Frame(env.getIp(), localSize);
+        // Share caller locals with callee so functions can access / modify global variables
+        newFrame.locals = caller.locals;
+        env.getCallStack().push(newFrame);
         env.setIp(addr);
     }
 
