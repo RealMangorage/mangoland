@@ -19,6 +19,7 @@ public final class EndLexerNode implements LexerNode {
 
             if (b.getType() == BlockContext.Type.FUNCTION) {
                 out.add((byte) set.requireOpcode("return"));
+                ctx.endFunction();
                 // Patch the jump so the VM skips over the function definition
                 int target = out.size();
                 int placeholderIndex = b.getStartAddress() + 1; // low byte position

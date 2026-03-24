@@ -27,7 +27,7 @@ public final class VMEnvironment {
         this.stack.clear();
         this.callStack.clear();
         // Initial entry frame
-        this.callStack.push(new Frame(-1, 256));
+        this.callStack.push(new Frame(-1, Frame.LOCAL_INDEX_BASE));
 
         while (running && ip < code.length) {
             int currentIp = ip;
@@ -125,11 +125,32 @@ public final class VMEnvironment {
 
     public void setLocal(int index, MangolangObject value) {
         if (callStack.isEmpty()) throw new RuntimeException("No active frame");
-        callStack.peek().locals[index] = value;
+        Frame frame = callStack.peek();
+        if (index < Frame.LOCAL_INDEX_BASE) {
+            frame.globals[index] = value;
+            return;
+        }
+
+        int localIndex = index - Frame.LOCAL_INDEX_BASE;
+        if (localIndex < 0 || localIndex >= frame.locals.length) {
+            throw new RuntimeException("Local variable index out of bounds: " + index);
+        }
+
+        frame.locals[localIndex] = value;
     }
 
     public MangolangObject getLocal(int index) {
         if (callStack.isEmpty()) throw new RuntimeException("No active frame");
-        return callStack.peek().locals[index];
+        Frame frame = callStack.peek();
+        if (index < Frame.LOCAL_INDEX_BASE) {
+            return frame.globals[index];
+        }
+
+        int localIndex = index - Frame.LOCAL_INDEX_BASE;
+        if (localIndex < 0 || localIndex >= frame.locals.length) {
+            throw new RuntimeException("Local variable index out of bounds: " + index);
+        }
+
+        return frame.locals[localIndex];
     }
 }

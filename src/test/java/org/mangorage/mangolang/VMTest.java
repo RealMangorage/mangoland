@@ -11,7 +11,9 @@ import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.vm.VM;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class VMTest {
@@ -122,6 +124,56 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("2", "tick", "1", "0"), out);
+    }
+
+    @Test
+    public void parameterizedFunctionsReceiveArgumentsAndShadowGlobals() {
+        List<String> out = runProgram("""
+                let x = 10
+
+                function test(x, y, z)
+                    print "X: " .. x
+                    print "Y: " .. y
+                    print "Z: " .. z
+                end
+
+                call test x 543 290
+                load x
+                print
+                """);
+
+        Assertions.assertEquals(List.of("X: 10", "Y: 543", "Z: 290", "10"), out);
+    }
+
+    @Test
+    public void zeroArgumentFunctionsStillWorkWithParenthesesSyntax() {
+        List<String> out = runProgram("""
+                let x = 7
+
+                function test()
+                    load x
+                    print
+                end
+
+                call test()
+                """);
+
+        Assertions.assertEquals(List.of("7"), out);
+    }
+
+    @Test
+    public void callFailsWhenFunctionArityDoesNotMatch() {
+        Compiler compiler = new Compiler(MangoLang.createEnv());
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> compiler.compile("""
+                function test(x, y)
+                    print x
+                end
+
+                call test 1
+                """));
+
+        Assertions.assertTrue(exception.getMessage().contains("expects 2 arguments but got 1"));
     }
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {

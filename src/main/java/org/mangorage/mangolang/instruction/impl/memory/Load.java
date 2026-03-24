@@ -12,7 +12,9 @@ public final class Load implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int index = env.next();       // read variable index
+        int low = env.next() & 0xFF;
+        int high = env.next() & 0xFF;
+        int index = (high << 8) | low;
         org.mangorage.mangolang.object.MangolangObject value = env.getLocal(index); // get value from locals
         env.getStack().push(value);      // push onto stack
     }
@@ -32,6 +34,7 @@ public final class Load implements Instruction {
             index = Integer.parseInt(nameOrValue);
         }
 
-        output.add((byte) index);
+        output.add((byte) (index & 0xFF));
+        output.add((byte) ((index >> 8) & 0xFF));
     }
 }

@@ -14,13 +14,17 @@ public final class Let implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int index = env.next();  // variable index
+        int targetLow = env.next() & 0xFF;
+        int targetHigh = env.next() & 0xFF;
+        int index = (targetHigh << 8) | targetLow;
         MangolangObject value;
 
         if (env.peek() == MangolangObjects.OBJECT_PREFIX) {
             value = env.readObject();
         } else {
-            int sourceIndex = env.next() & 0xFF;
+            int sourceLow = env.next() & 0xFF;
+            int sourceHigh = env.next() & 0xFF;
+            int sourceIndex = (sourceHigh << 8) | sourceLow;
             value = env.getLocal(sourceIndex);
         }
 
@@ -38,13 +42,16 @@ public final class Let implements Instruction {
 
         int index = ctx.hasVariable(name) ? ctx.getVariableIndex(name) : ctx.declareVariable(name);
 
-        output.add((byte) index);
+        output.add((byte) (index & 0xFF));
+        output.add((byte) ((index >> 8) & 0xFF));
 
         MangolangObject literal = MangolangObjects.literalFromToken(args[2].toString());
         if (literal != null) {
             MangolangObjects.emitObject(output, literal);
         } else {
-            output.add((byte) ctx.getVariableIndex(args[2].toString()));
+            int sourceIndex = ctx.getVariableIndex(args[2].toString());
+            output.add((byte) (sourceIndex & 0xFF));
+            output.add((byte) ((sourceIndex >> 8) & 0xFF));
         }
     }
 }

@@ -12,7 +12,9 @@ public final class Store implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
-        int index = env.next();           // get the local variable index
+        int low = env.next() & 0xFF;
+        int high = env.next() & 0xFF;
+        int index = (high << 8) | low;
         org.mangorage.mangolang.object.MangolangObject value = env.getStack().pop(); // pop value from stack
         env.setLocal(index, value);       // store into local
     }
@@ -27,6 +29,7 @@ public final class Store implements Instruction {
         // AUTO-DECLARE if it doesn’t exist
         int index = ctx.hasVariable(varName) ? ctx.getVariableIndex(varName) : ctx.declareVariable(varName);
 
-        output.add((byte) index);
+        output.add((byte) (index & 0xFF));
+        output.add((byte) ((index >> 8) & 0xFF));
     }
 }
