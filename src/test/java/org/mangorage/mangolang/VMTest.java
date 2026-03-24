@@ -65,6 +65,16 @@ public class VMTest {
     }
 
     @Test
+    public void objectsExposeNumericCapability() {
+        Assertions.assertTrue(new IntegerMLObject(1).isNumeric());
+        Assertions.assertTrue(new LongMLObject(1L).isNumeric());
+        Assertions.assertTrue(new FloatMLObject(1.0f).isNumeric());
+        Assertions.assertTrue(new DoubleMLObject(1.0d).isNumeric());
+        Assertions.assertFalse(new StringMLObject("mango").isNumeric());
+        Assertions.assertFalse(BooleanMLObject.TRUE.isNumeric());
+    }
+
+    @Test
     public void emittedObjectsRoundTripThroughVmDecoder() {
         assertRoundTrip(new IntegerMLObject(1337), IntegerMLObject.class, "1337");
         assertRoundTrip(new StringMLObject("hello world"), StringMLObject.class, "hello world");

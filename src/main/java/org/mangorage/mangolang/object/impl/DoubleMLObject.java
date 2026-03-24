@@ -17,12 +17,12 @@ public final class DoubleMLObject implements MangolangObject {
     @Override
     public MangolangObject operator(MangolangObject mangolangObject, OperationType type) {
         return switch (type) {
-            case ADD -> NumericMLObjects.isNumeric(mangolangObject)
-                    ? NumericMLObjects.applyBinaryOperation(this, mangolangObject, type)
+            case ADD -> mangolangObject.isNumeric()
+                    ? applyNumericOperation(mangolangObject, type)
                     : StringMLObject.concatenate(this, mangolangObject);
-            case SUBTRACT, MULTIPLY, DIVIDE, GREATER_THAN -> NumericMLObjects.applyBinaryOperation(this, mangolangObject, type);
-            case EQUALS -> NumericMLObjects.isNumeric(mangolangObject)
-                    ? NumericMLObjects.applyBinaryOperation(this, mangolangObject, type)
+            case SUBTRACT, MULTIPLY, DIVIDE, GREATER_THAN -> applyNumericOperation(mangolangObject, type);
+            case EQUALS -> mangolangObject.isNumeric()
+                    ? applyNumericOperation(mangolangObject, type)
                     : BooleanMLObject.FALSE;
         };
     }
@@ -40,6 +40,36 @@ public final class DoubleMLObject implements MangolangObject {
     @Override
     public String typeName() {
         return "double";
+    }
+
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
+
+    @Override
+    public int numericRank() {
+        return 3;
+    }
+
+    @Override
+    public int asIntValue() {
+        return (int) value;
+    }
+
+    @Override
+    public long asLongValue() {
+        return (long) value;
+    }
+
+    @Override
+    public float asFloatValue() {
+        return (float) value;
+    }
+
+    @Override
+    public double asDoubleValue() {
+        return value;
     }
 
     @Override
