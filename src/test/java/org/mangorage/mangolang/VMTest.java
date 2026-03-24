@@ -165,6 +165,19 @@ public class VMTest {
     }
 
     @Test
+    public void printlnFunctionSyntaxDefaultsToPrintInstruction() {
+        List<String> out = runProgram("""
+                let x = 999
+                println("Hello, world!")
+                println("Value: " .. x)
+                load x
+                println()
+                """);
+
+        Assertions.assertEquals(List.of("Hello, world!", "Value: 999", "999"), out);
+    }
+
+    @Test
     public void typeInstructionCanStoreAndPrintVariableTypes() {
         List<String> out = runProgram("""
                 let x = 999
@@ -256,19 +269,12 @@ public class VMTest {
     }
 
     @Test
-    public void exampleProgramCompilesAndRunsAsShowcase() throws Exception {
+    public void exampleProgramCompilesAndRunsWithPrintlnSyntax() throws Exception {
         String program = Files.readString(Path.of("example.ml"));
 
         List<String> out = runProgram(program);
 
-        Assertions.assertFalse(out.isEmpty());
-        Assertions.assertEquals("=== MangoLang Showcase Start ===", out.get(0));
-        Assertions.assertTrue(out.contains("Type of baseNumber: integer"));
-        Assertions.assertTrue(out.contains("Type of baseText: string"));
-        Assertions.assertTrue(out.contains("Type of baseTruth: boolean"));
-        Assertions.assertTrue(out.contains("Inside banner()"));
-        Assertions.assertTrue(out.contains("Late function demo reached"));
-        Assertions.assertEquals("=== MangoLang Showcase Complete ===", out.get(out.size() - 1));
+        Assertions.assertEquals(List.of("Hello, world!"), out);
     }
 
     @Test
@@ -395,6 +401,23 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("7"), out);
+    }
+
+    @Test
+    public void functionsCanBeCalledWithoutTheCallKeyword() {
+        List<String> out = runProgram("""
+                function testFunc(x)
+                    x = x + 1
+                    print "X: " .. x
+                    return x
+                end
+
+                testFunc(1)
+                let result = testFunc(4)
+                print "Result: " .. result
+                """);
+
+        Assertions.assertEquals(List.of("X: 2", "X: 5", "Result: 5"), out);
     }
 
     @Test

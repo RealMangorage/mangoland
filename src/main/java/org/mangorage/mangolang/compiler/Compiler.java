@@ -16,8 +16,12 @@ public final class Compiler {
     private static final Pattern PAREN_CALL_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\((.*)\\)");
     private static final Pattern LET_ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)");
+    private static final Set<String> PRINT_INSTRUCTION_NAMES = Set.of("print", "println");
 
     private record BinaryOperator(int index, int width, String token) {
+    }
+
+    private record FunctionCall(String name, List<String> arguments) {
     }
 
     private final InstructionSet set;
@@ -93,6 +97,7 @@ public final class Compiler {
             if (System.getProperty("mangolang.debug") != null) {
                 System.out.println("[Compiler] line='" + line + "' name='" + name + "' args='" + Arrays.toString(Arrays.copyOfRange(parts, 1, parts.length)) + "'");
             }
+
             int opcode = set.requireOpcode(name);
             boolean debug = System.getProperty("mangolang.debug") != null;
             if (debug) {
@@ -109,6 +114,7 @@ public final class Compiler {
                 for (int i = 0; i < out.size(); i++) System.out.print((out.get(i) & 0xFF) + (i + 1 < out.size() ? "," : ""));
                 System.out.println();
             }
+
         }
 
         if (!blocks.isEmpty()) throw new RuntimeException("Missing 'end' for block");
@@ -151,16 +157,45 @@ public final class Compiler {
             return true;
         }
 
-        if ("print".equals(name)) {
-            String rawArgs = joinArgs(parts, 1);
-            if (findTopLevelBinaryOperator(rawArgs, false) != null || findTopLevelBinaryOperator(rawArgs, true) != null) {
-                emitExpressionToStack(rawArgs, out, ctx);
-                out.add((byte) set.requireOpcode("print"));
-                return true;
-            }
+        if (emitPrintInstruction(line, parts, name, out, ctx)) {
+            return true;
+        }
+
+        if (isImplicitFunctionCall(line)) {
+            emitCallInstruction(line, out, ctx);
+            return true;
         }
 
         return false;
+    }
+
+    private boolean emitPrintInstruction(String line, String[] parts, String name, List<Byte> out, CompilerContext ctx) {
+        if (PRINT_INSTRUCTION_NAMES.contains(name)) {
+            emitPrintExpression(joinArgs(parts, 1), out, ctx);
+            return true;
+        }
+
+        Matcher matcher = PAREN_CALL_PATTERN.matcher(line.trim());
+        if (!matcher.matches() || !PRINT_INSTRUCTION_NAMES.contains(matcher.group(1).toLowerCase(Locale.ROOT))) {
+            return false;
+        }
+
+        List<String> arguments = splitCommaSeparatedRespectingQuotes(matcher.group(2));
+        if (arguments.size() > 1) {
+            throw new RuntimeException("Print expects at most 1 argument but got " + arguments.size());
+        }
+
+        emitPrintExpression(arguments.isEmpty() ? "" : arguments.get(0), out, ctx);
+        return true;
+    }
+
+    private void emitPrintExpression(String rawExpression, List<Byte> out, CompilerContext ctx) {
+        String expression = rawExpression.trim();
+        if (!expression.isEmpty()) {
+            emitExpressionToStack(expression, out, ctx);
+        }
+
+        out.add((byte) set.requireOpcode("print"));
     }
 
     private boolean emitLetAssignment(String line, List<Byte> out, CompilerContext ctx) {
@@ -219,25 +254,9 @@ public final class Compiler {
     }
 
     private void emitCallInstruction(String line, List<Byte> out, CompilerContext ctx) {
-        String rawCall = line.trim();
-        if (rawCall.regionMatches(true, 0, "call", 0, "call".length())) {
-            rawCall = rawCall.substring("call".length()).trim();
-        }
-        if (rawCall.isEmpty()) {
-            throw new RuntimeException("Call requires a function name");
-        }
-
-        String functionName;
-        List<String> arguments;
-        Matcher matcher = PAREN_CALL_PATTERN.matcher(rawCall);
-        if (matcher.matches()) {
-            functionName = matcher.group(1);
-            arguments = splitCommaSeparatedRespectingQuotes(matcher.group(2));
-        } else {
-            List<String> tokens = splitWhitespaceRespectingQuotes(rawCall);
-            functionName = normalizeFunctionName(tokens.get(0));
-            arguments = tokens.size() <= 1 ? List.of() : new ArrayList<>(tokens.subList(1, tokens.size()));
-        }
+        FunctionCall functionCall = parseFunctionCall(line);
+        String functionName = functionCall.name();
+        List<String> arguments = functionCall.arguments();
 
         CompilerContext.FunctionInfo functionInfo = ctx.getFunctionInfo(functionName);
         if (arguments.size() != functionInfo.parameterCount()) {
@@ -245,7 +264,7 @@ public final class Compiler {
         }
 
         for (String argument : arguments) {
-            emitValuePush(argument, out, ctx);
+            emitExpressionToStack(argument, out, ctx);
         }
 
         int opcode = set.requireOpcode("call");
@@ -254,7 +273,7 @@ public final class Compiler {
     }
 
     private void emitExpressionToStack(String rawExpression, List<Byte> out, CompilerContext ctx) {
-        String expression = rawExpression.trim();
+        String expression = stripEnclosingParentheses(rawExpression.trim());
         if (expression.isEmpty()) {
             throw new RuntimeException("Missing expression");
         }
@@ -278,6 +297,11 @@ public final class Compiler {
 
         if (expression.regionMatches(true, 0, "call", 0, "call".length())
                 && (expression.length() == 4 || Character.isWhitespace(expression.charAt(4)))) {
+            emitCallInstruction(expression, out, ctx);
+            return;
+        }
+
+        if (isImplicitFunctionCall(expression)) {
             emitCallInstruction(expression, out, ctx);
             return;
         }
@@ -306,6 +330,7 @@ public final class Compiler {
 
     private BinaryOperator findTopLevelBinaryOperator(String raw, boolean highPrecedence) {
         boolean inQuotes = false;
+        int parenthesisDepth = 0;
         for (int i = raw.length() - 1; i >= 0; i--) {
             char c = raw.charAt(i);
             if (c == '"') {
@@ -314,6 +339,24 @@ public final class Compiler {
             }
 
             if (!inQuotes) {
+                if (c == ')') {
+                    parenthesisDepth++;
+                    continue;
+                }
+
+                if (c == '(') {
+                    if (parenthesisDepth == 0) {
+                        throw new RuntimeException("Unmatched '(' in expression: " + raw);
+                    }
+
+                    parenthesisDepth--;
+                    continue;
+                }
+
+                if (parenthesisDepth > 0) {
+                    continue;
+                }
+
                 if (!highPrecedence) {
                     if (c == '+') {
                         return new BinaryOperator(i, 1, "+");
@@ -342,6 +385,10 @@ public final class Compiler {
 
         if (inQuotes) {
             throw new RuntimeException("Unterminated string literal: " + raw);
+        }
+
+        if (parenthesisDepth != 0) {
+            throw new RuntimeException("Unmatched ')' in expression: " + raw);
         }
 
         return null;
@@ -418,6 +465,7 @@ public final class Compiler {
         List<String> tokens = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
+        int parenthesisDepth = 0;
 
         for (int i = 0; i < raw.length(); i++) {
             char c = raw.charAt(i);
@@ -427,7 +475,24 @@ public final class Compiler {
                 continue;
             }
 
-            if (!inQuotes && c == ',') {
+            if (!inQuotes) {
+                if (c == '(') {
+                    parenthesisDepth++;
+                    current.append(c);
+                    continue;
+                }
+
+                if (c == ')') {
+                    if (parenthesisDepth == 0) {
+                        throw new RuntimeException("Unmatched ')' in call arguments: " + raw);
+                    }
+                    parenthesisDepth--;
+                    current.append(c);
+                    continue;
+                }
+            }
+
+            if (!inQuotes && parenthesisDepth == 0 && c == ',') {
                 String token = current.toString().trim();
                 if (!token.isEmpty()) {
                     tokens.add(token);
@@ -441,6 +506,10 @@ public final class Compiler {
 
         if (inQuotes) {
             throw new RuntimeException("Unterminated string literal: " + raw);
+        }
+
+        if (parenthesisDepth != 0) {
+            throw new RuntimeException("Unmatched '(' in call arguments: " + raw);
         }
 
         String trailing = current.toString().trim();
@@ -458,5 +527,104 @@ public final class Compiler {
             return trimmed.substring(0, trimmed.length() - 2);
         }
         return trimmed;
+    }
+
+    private FunctionCall parseFunctionCall(String line) {
+        String rawCall = line.trim();
+        if (rawCall.regionMatches(true, 0, "call", 0, "call".length())
+                && (rawCall.length() == 4 || Character.isWhitespace(rawCall.charAt(4)))) {
+            rawCall = rawCall.substring("call".length()).trim();
+        }
+
+        if (rawCall.isEmpty()) {
+            throw new RuntimeException("Call requires a function name");
+        }
+
+        Matcher matcher = PAREN_CALL_PATTERN.matcher(rawCall);
+        if (matcher.matches()) {
+            return new FunctionCall(
+                    normalizeFunctionName(matcher.group(1)),
+                    splitCommaSeparatedRespectingQuotes(matcher.group(2))
+            );
+        }
+
+        List<String> tokens = splitWhitespaceRespectingQuotes(rawCall);
+        if (tokens.isEmpty()) {
+            throw new RuntimeException("Call requires a function name");
+        }
+
+        return new FunctionCall(
+                normalizeFunctionName(tokens.get(0)),
+                tokens.size() <= 1 ? List.of() : new ArrayList<>(tokens.subList(1, tokens.size()))
+        );
+    }
+
+    private boolean isFunctionCallExpression(String rawExpression) {
+        String expression = rawExpression.trim();
+        if (expression.isEmpty()) {
+            return false;
+        }
+
+        if (expression.regionMatches(true, 0, "call", 0, "call".length())
+                && (expression.length() == 4 || Character.isWhitespace(expression.charAt(4)))) {
+            return true;
+        }
+
+        return isImplicitFunctionCall(expression);
+    }
+
+    private boolean isImplicitFunctionCall(String rawExpression) {
+        Matcher matcher = PAREN_CALL_PATTERN.matcher(rawExpression.trim());
+        return matcher.matches() && set.getOpcode(matcher.group(1)) == null;
+    }
+
+    private String stripEnclosingParentheses(String rawExpression) {
+        String expression = rawExpression;
+        while (isWrappedInMatchingParentheses(expression)) {
+            expression = expression.substring(1, expression.length() - 1).trim();
+        }
+        return expression;
+    }
+
+    private boolean isWrappedInMatchingParentheses(String rawExpression) {
+        if (rawExpression.length() < 2 || rawExpression.charAt(0) != '(' || rawExpression.charAt(rawExpression.length() - 1) != ')') {
+            return false;
+        }
+
+        boolean inQuotes = false;
+        int parenthesisDepth = 0;
+        for (int i = 0; i < rawExpression.length(); i++) {
+            char c = rawExpression.charAt(i);
+            if (c == '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+
+            if (inQuotes) {
+                continue;
+            }
+
+            if (c == '(') {
+                parenthesisDepth++;
+            } else if (c == ')') {
+                parenthesisDepth--;
+                if (parenthesisDepth == 0 && i < rawExpression.length() - 1) {
+                    return false;
+                }
+                if (parenthesisDepth < 0) {
+                    throw new RuntimeException("Unmatched ')' in expression: " + rawExpression);
+                }
+            }
+        }
+
+        if (inQuotes) {
+            throw new RuntimeException("Unterminated string literal: " + rawExpression);
+        }
+
+        if (parenthesisDepth != 0) {
+            throw new RuntimeException("Unmatched '(' in expression: " + rawExpression);
+        }
+
+        return true;
     }
 }

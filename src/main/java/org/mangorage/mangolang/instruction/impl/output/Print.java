@@ -10,6 +10,7 @@ import org.mangorage.mangolang.vm.VMEnvironment;
 import java.util.List;
 
 @AutoRegisterInstruction
+@AutoRegisterInstruction(id = "println")
 public final class Print implements Instruction {
 
     @Override
