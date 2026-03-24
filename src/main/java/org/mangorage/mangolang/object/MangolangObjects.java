@@ -1,10 +1,13 @@
 package org.mangorage.mangolang.object;
 
+import org.mangorage.mangolang.object.codec.MangolangObjectCodec;
+import org.mangorage.mangolang.object.codec.impl.BooleanMLCodec;
+import org.mangorage.mangolang.object.codec.impl.IntegerMLCodec;
+import org.mangorage.mangolang.object.codec.impl.StringMLCodec;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
 import org.mangorage.mangolang.object.impl.StringMLObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,83 +22,9 @@ public final class MangolangObjects {
     private static final Map<Class<?>, MangolangObjectCodec<? extends MangolangObject>> CODECS_BY_TYPE = new HashMap<>();
 
     static {
-        registerCodec(new MangolangObjectCodec<IntegerMLObject>() {
-            @Override
-            public int tag() {
-                return TAG_INTEGER;
-            }
-
-            @Override
-            public Class<IntegerMLObject> type() {
-                return IntegerMLObject.class;
-            }
-
-            @Override
-            public byte[] encodePayload(IntegerMLObject value) {
-                int intValue = value.getValue();
-                return new byte[]{
-                        (byte) ((intValue >> 24) & 0xFF),
-                        (byte) ((intValue >> 16) & 0xFF),
-                        (byte) ((intValue >> 8) & 0xFF),
-                        (byte) (intValue & 0xFF)
-                };
-            }
-
-            @Override
-            public IntegerMLObject decodePayload(byte[] payload) {
-                requirePayloadSize(TAG_INTEGER, payload, 4);
-                int val = ((payload[0] & 0xFF) << 24)
-                        | ((payload[1] & 0xFF) << 16)
-                        | ((payload[2] & 0xFF) << 8)
-                        | (payload[3] & 0xFF);
-                return new IntegerMLObject(val);
-            }
-        });
-
-        registerCodec(new MangolangObjectCodec<StringMLObject>() {
-            @Override
-            public int tag() {
-                return TAG_STRING;
-            }
-
-            @Override
-            public Class<StringMLObject> type() {
-                return StringMLObject.class;
-            }
-
-            @Override
-            public byte[] encodePayload(StringMLObject value) {
-                return value.getValue().getBytes(StandardCharsets.UTF_8);
-            }
-
-            @Override
-            public StringMLObject decodePayload(byte[] payload) {
-                return new StringMLObject(new String(payload, StandardCharsets.UTF_8));
-            }
-        });
-
-        registerCodec(new MangolangObjectCodec<BooleanMLObject>() {
-            @Override
-            public int tag() {
-                return TAG_BOOLEAN;
-            }
-
-            @Override
-            public Class<BooleanMLObject> type() {
-                return BooleanMLObject.class;
-            }
-
-            @Override
-            public byte[] encodePayload(BooleanMLObject value) {
-                return new byte[]{(byte) (value.value() ? 1 : 0)};
-            }
-
-            @Override
-            public BooleanMLObject decodePayload(byte[] payload) {
-                requirePayloadSize(TAG_BOOLEAN, payload, 1);
-                return BooleanMLObject.of((payload[0] & 0xFF) != 0);
-            }
-        });
+        registerCodec(new IntegerMLCodec());
+        registerCodec(new StringMLCodec());
+        registerCodec(new BooleanMLCodec());
     }
 
     private MangolangObjects() {
@@ -257,7 +186,7 @@ public final class MangolangObjects {
         }
     }
 
-    private static void requirePayloadSize(int tag, byte[] payload, int expectedLength) {
+    public static void requirePayloadSize(int tag, byte[] payload, int expectedLength) {
         if (payload.length != expectedLength) {
             throw new RuntimeException("Invalid payload size for object tag " + tag + ": expected " + expectedLength + " but got " + payload.length);
         }

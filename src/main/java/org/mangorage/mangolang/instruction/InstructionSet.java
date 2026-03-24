@@ -20,16 +20,22 @@ public final class InstructionSet {
         for (Class<? extends Instruction> aClass : classList) {
             List<BakedInstruction> bakedInstructions = registerHandler.bake(aClass);
             Map<Instruction, Integer> opcodeByInstruction = new IdentityHashMap<>();
+            Integer firstOpcode = null;
 
             for (BakedInstruction bakedInstruction : bakedInstructions) {
                 Integer opcode = opcodeByInstruction.get(bakedInstruction.instruction());
                 if (opcode == null) {
                     opcode = register(bakedInstruction.id(), bakedInstruction.instruction());
                     opcodeByInstruction.put(bakedInstruction.instruction(), opcode);
+                    if (firstOpcode == null) {
+                        firstOpcode = opcode;
+                    }
                 } else {
                     registerAlias(bakedInstruction.id(), opcode);
                 }
             }
+
+            registerDefaultAlias(aClass, bakedInstructions, firstOpcode);
         }
     }
 
@@ -87,5 +93,20 @@ public final class InstructionSet {
 
     public String getDebugInfo() {
         return "";
+    }
+
+    private void registerDefaultAlias(Class<? extends Instruction> instructionClass, List<BakedInstruction> bakedInstructions, Integer opcode) {
+        if (opcode == null) {
+            return;
+        }
+
+        String normalizedDefaultName = normalizeName(instructionClass.getSimpleName());
+        boolean alreadyRegistered = bakedInstructions.stream()
+                .anyMatch(bakedInstruction -> normalizeName(bakedInstruction.id()).equals(normalizedDefaultName));
+
+        if (!alreadyRegistered && !nameMap.containsKey(normalizedDefaultName)) {
+            registerAlias(normalizedDefaultName, opcode);
+            opcodeToNameMap.put(opcode, normalizedDefaultName);
+        }
     }
 }

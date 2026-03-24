@@ -39,8 +39,7 @@ public final class RegisterHandler {
                         ? normalizeId(instructionClass.getSimpleName())
                         : normalizeId(id);
 
-                Object[] args = parseParams(annotation.params());
-                Instruction instruction = instantiate(instructionClass, instructionCache, args);
+                Instruction instruction = instantiateForAnnotation(instructionClass, instructionCache, annotation.params());
                 BakedInstruction bakedInstruction = new BakedInstruction(bakedId, instruction);
 
                 if (!containsEquivalentEntry(bakedInstructions, bakedInstruction)) {
@@ -64,6 +63,29 @@ public final class RegisterHandler {
             args[i] = params[i].type().parse(params[i].value());
         }
         return args;
+    }
+
+    private Instruction instantiateForAnnotation(
+            Class<? extends Instruction> instructionClass,
+            Map<InstantiationKey, Instruction> instructionCache,
+            Parameter[] params
+    ) throws ReflectiveOperationException {
+        if (params.length == 0) {
+            return instantiate(instructionClass, instructionCache, new Object[0]);
+        }
+
+        IllegalArgumentException failure;
+        try {
+            return instantiate(instructionClass, instructionCache, parseParams(params));
+        } catch (IllegalArgumentException exception) {
+            failure = exception;
+        }
+
+        if (hasNoArgConstructor(instructionClass)) {
+            return instantiate(instructionClass, instructionCache, new Object[0]);
+        }
+
+        throw failure;
     }
 
     private Instruction instantiate(
@@ -133,6 +155,16 @@ public final class RegisterHandler {
         }
 
         return true;
+    }
+
+    private boolean hasNoArgConstructor(Class<? extends Instruction> instructionClass) {
+        for (Constructor<?> constructor : instructionClass.getDeclaredConstructors()) {
+            if (constructor.getParameterCount() == 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Class<?> wrap(Class<?> type) {

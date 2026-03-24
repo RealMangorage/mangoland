@@ -1,4 +1,6 @@
-package org.mangorage.mangolang.object;
+package org.mangorage.mangolang.object.codec;
+
+import org.mangorage.mangolang.object.MangolangObject;
 
 public interface MangolangObjectCodec<T extends MangolangObject> {
     int tag();

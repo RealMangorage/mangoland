@@ -7,7 +7,6 @@ import org.mangorage.mangolang.compiler.impl.IfStatementLexerNode;
 import org.mangorage.mangolang.compiler.impl.WhileLexerNode;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.instruction.InstructionSet;
-import org.mangorage.mangolang.object.MangolangObjects;
 
 import java.util.*;
 import java.util.regex.Matcher;
