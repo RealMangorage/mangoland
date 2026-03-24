@@ -60,17 +60,14 @@ public final class EndLexerNode implements LexerNode {
                     int target = out.size();
                     out.set(idx, (byte) (target & 0xFF));
                     out.set(idx + 1, (byte) ((target >> 8) & 0xFF));
-                    // Also patch the original conditional's false-target to point to the start of the then-body
-                    int p = b.getCondJumpAddress();
-                    out.set(p + 2, (byte) ((p + 3) & 0xFF));
-                    out.set(p + 3, (byte) (((p + 3) >> 8) & 0xFF));
                 } else {
                     // No ELSE: patch the conditional jump so that
                     // - the first placeholder (trueAddr) points to the instruction after the then-body (skip)
                     // - the second placeholder (falseAddr) points to the start of the then-body (immediately after the placeholders)
                     int p = b.getCondJumpAddress();
                     int trueAddr = out.size();
-                    int falseAddr = p + 3;
+                    // The then-body starts after the opcode + 4 placeholders: opcode at p, placeholders at p+1..p+4
+                    int falseAddr = p + 5;
                     out.set(p + 1, (byte) (trueAddr & 0xFF));
                     out.set(p + 2, (byte) ((trueAddr >> 8) & 0xFF));
                     out.set(p + 3, (byte) (falseAddr & 0xFF));

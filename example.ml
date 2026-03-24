@@ -10,3 +10,6 @@ while do
     decrement
     store x
 end
+
+print "Goodbye, world!"
+halt

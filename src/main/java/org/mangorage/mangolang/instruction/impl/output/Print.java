@@ -11,16 +11,20 @@ public final class Print implements Instruction {
 
     @Override
     public void execute(VMEnvironment env) {
+        // If the next byte is an encoded object tag (1=int, 2=string), read it directly
+        int next = env.peek();
+        if (next == 1 || next == 2) {
+            var obj = env.readObject();
+            env.getTerminal().println("" + obj.asString());
+            return;
+        }
+
+        // Otherwise, pop from the stack and print
         if (!env.getStack().isEmpty()) {
             var obj = env.getStack().pop();
             env.getTerminal().println("" + obj.asString());
             return;
         }
-
-        // No value on stack => expect an immediate string encoded in the bytecode
-        // Read an encoded object from bytecode
-        var obj = env.readObject();
-        env.getTerminal().println("" + obj.asString());
     }
 
     public void emitBytecode(List<Byte> output, CompilerContext ctx, Object... args) {

@@ -56,6 +56,12 @@ public final class VMEnvironment {
         return code[ip++];
     }
 
+    /** Peek next byte (unsigned) without advancing the instruction pointer. Returns -1 if out of bounds. */
+    public int peek() {
+        if (ip < 0 || ip >= code.length) return -1;
+        return code[ip] & 0xFF;
+    }
+
     /**
      * Read a MangolangObject previously emitted into the bytecode.
      * Encoding:
