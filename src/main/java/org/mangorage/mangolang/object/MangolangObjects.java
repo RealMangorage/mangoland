@@ -14,12 +14,10 @@ import java.util.Map;
 
 public final class MangolangObjects {
     public static final int OBJECT_PREFIX = 0xFF;
-    public static final int TAG_INTEGER = 1;
-    public static final int TAG_STRING = 2;
-    public static final int TAG_BOOLEAN = 3;
 
     private static final Map<Integer, MangolangObjectCodec<? extends MangolangObject>> CODECS_BY_TAG = new HashMap<>();
     private static final Map<Class<?>, MangolangObjectCodec<? extends MangolangObject>> CODECS_BY_TYPE = new HashMap<>();
+    private static int nextGeneratedTag = 1;
 
     static {
         registerCodec(new IntegerMLCodec());
@@ -28,6 +26,14 @@ public final class MangolangObjects {
     }
 
     private MangolangObjects() {
+    }
+
+    public static synchronized int generateTag() {
+        if (nextGeneratedTag > 0xFF) {
+            throw new RuntimeException("No object tags remaining");
+        }
+
+        return nextGeneratedTag++;
     }
 
     public static <T extends MangolangObject> void registerCodec(MangolangObjectCodec<T> codec) {

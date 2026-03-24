@@ -7,9 +7,11 @@ import org.mangorage.mangolang.object.impl.StringMLObject;
 import java.nio.charset.StandardCharsets;
 
 public final class StringMLCodec implements MangolangObjectCodec<StringMLObject> {
+    public static final int TAG = MangolangObjects.generateTag();
+
     @Override
     public int tag() {
-        return MangolangObjects.TAG_STRING;
+        return TAG;
     }
 
     @Override

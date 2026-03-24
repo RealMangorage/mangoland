@@ -5,9 +5,11 @@ import org.mangorage.mangolang.object.codec.MangolangObjectCodec;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
 
 public final class IntegerMLCodec implements MangolangObjectCodec<IntegerMLObject> {
+    public static final int TAG = MangolangObjects.generateTag();
+
     @Override
     public int tag() {
-        return MangolangObjects.TAG_INTEGER;
+        return TAG;
     }
 
     @Override

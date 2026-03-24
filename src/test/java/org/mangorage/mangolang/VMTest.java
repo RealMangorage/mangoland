@@ -10,6 +10,9 @@ import org.mangorage.mangolang.instruction.register.ParamType;
 import org.mangorage.mangolang.instruction.register.Parameter;
 import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.codec.impl.BooleanMLCodec;
+import org.mangorage.mangolang.object.codec.impl.IntegerMLCodec;
+import org.mangorage.mangolang.object.codec.impl.StringMLCodec;
 import org.mangorage.mangolang.object.OperationType;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
@@ -60,6 +63,14 @@ public class VMTest {
     }
 
     @Test
+    public void codecTagsAreUniqueAndFitInObjectHeaders() {
+        Assertions.assertEquals(3, java.util.Set.of(IntegerMLCodec.TAG, StringMLCodec.TAG, BooleanMLCodec.TAG).size());
+        Assertions.assertTrue(IntegerMLCodec.TAG >= 0 && IntegerMLCodec.TAG <= 0xFF);
+        Assertions.assertTrue(StringMLCodec.TAG >= 0 && StringMLCodec.TAG <= 0xFF);
+        Assertions.assertTrue(BooleanMLCodec.TAG >= 0 && BooleanMLCodec.TAG <= 0xFF);
+    }
+
+    @Test
     public void readObjectRejectsUnknownTags() {
         VMEnvironment env = new VMEnvironment(
                 new VM(MangoLang.createEnv()),
@@ -81,7 +92,7 @@ public class VMTest {
                 new VM(MangoLang.createEnv()),
                 new byte[]{
                         (byte) MangolangObjects.OBJECT_PREFIX,
-                        (byte) MangolangObjects.TAG_BOOLEAN,
+                        (byte) BooleanMLCodec.TAG,
                         (byte) 2,
                         (byte) 0,
                         (byte) 1,
@@ -90,13 +101,13 @@ public class VMTest {
         );
 
         RuntimeException booleanException = Assertions.assertThrows(RuntimeException.class, booleanEnv::readObject);
-        Assertions.assertTrue(booleanException.getMessage().contains("Invalid payload size for object tag 3"));
+        Assertions.assertTrue(booleanException.getMessage().contains("Invalid payload size for object tag " + BooleanMLCodec.TAG));
 
         VMEnvironment integerEnv = new VMEnvironment(
                 new VM(MangoLang.createEnv()),
                 new byte[]{
                         (byte) MangolangObjects.OBJECT_PREFIX,
-                        (byte) MangolangObjects.TAG_INTEGER,
+                        (byte) IntegerMLCodec.TAG,
                         (byte) 1,
                         (byte) 0,
                         (byte) 7
@@ -104,7 +115,7 @@ public class VMTest {
         );
 
         RuntimeException integerException = Assertions.assertThrows(RuntimeException.class, integerEnv::readObject);
-        Assertions.assertTrue(integerException.getMessage().contains("Invalid payload size for object tag 1"));
+        Assertions.assertTrue(integerException.getMessage().contains("Invalid payload size for object tag " + IntegerMLCodec.TAG));
     }
 
     @Test

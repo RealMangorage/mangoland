@@ -68,9 +68,10 @@ public final class VMEnvironment {
      * Read a MangolangObject previously emitted into the bytecode.
      * Encoding:
      *  - [0xFF][tag][lenLo][lenHi][payload...]
-     *  - tag 1: integer -> 4 byte big-endian payload
-     *  - tag 2: string  -> UTF-8 payload
-     *  - tag 3: boolean -> 1 byte payload (0 or 1)
+     *  - integer/object/string codecs define their own tags
+     *  - integer payloads use 4-byte big-endian encoding
+     *  - string payloads use UTF-8 encoding
+     *  - boolean payloads use 1 byte (0 or 1)
      */
     public MangolangObject readObject() {
         int prefix = next() & 0xFF;

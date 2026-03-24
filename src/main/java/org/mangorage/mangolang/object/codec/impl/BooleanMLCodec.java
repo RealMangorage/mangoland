@@ -5,9 +5,11 @@ import org.mangorage.mangolang.object.codec.MangolangObjectCodec;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
 
 public final class BooleanMLCodec implements MangolangObjectCodec<BooleanMLObject> {
+    public static final int TAG = MangolangObjects.generateTag();
+
     @Override
     public int tag() {
-        return MangolangObjects.TAG_BOOLEAN;
+        return TAG;
     }
 
     @Override
