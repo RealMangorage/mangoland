@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mangorage.mangolang.compiler.Compiler;
 import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.OperationType;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
 import org.mangorage.mangolang.object.impl.StringMLObject;
@@ -31,6 +32,19 @@ public class VMTest {
         Assertions.assertSame(BooleanMLObject.TRUE, equalBooleans);
         Assertions.assertEquals("12", new IntegerMLObject(12).toString());
         Assertions.assertEquals("true", BooleanMLObject.TRUE.toString());
+    }
+
+    @Test
+    public void unifiedObjectOperatorApiSupportsArithmeticAndComparison() {
+        IntegerMLObject ten = new IntegerMLObject(10);
+
+        Assertions.assertEquals("15", ten.operator(new IntegerMLObject(5), OperationType.ADD).toString());
+        Assertions.assertEquals("5", ten.operator(new IntegerMLObject(5), OperationType.SUBTRACT).toString());
+        Assertions.assertEquals("50", ten.operator(new IntegerMLObject(5), OperationType.MULTIPLY).toString());
+        Assertions.assertEquals("2", ten.operator(new IntegerMLObject(5), OperationType.DIVIDE).toString());
+        Assertions.assertSame(BooleanMLObject.TRUE, ten.operator(new IntegerMLObject(5), OperationType.GREATER_THAN));
+        Assertions.assertEquals("10 apples", ten.operator(new StringMLObject(" apples"), OperationType.ADD).toString());
+        Assertions.assertSame(BooleanMLObject.TRUE, new StringMLObject("mango").operator(new StringMLObject("mango"), OperationType.EQUALS));
     }
 
     @Test
@@ -229,6 +243,20 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("Total: 15"), out);
+    }
+
+    @Test
+    public void arithmeticExpressionsSupportSubtractMultiplyAndDivide() {
+        List<String> out = runProgram("""
+                let difference = 20 - 5
+                let product = 6 * 7
+                let quotient = 20 / 4
+                print "Diff: " .. difference
+                print "Product: " .. product
+                print "Quotient: " .. quotient
+                """);
+
+        Assertions.assertEquals(List.of("Diff: 15", "Product: 42", "Quotient: 5"), out);
     }
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {

@@ -135,8 +135,20 @@ public final class MangolangObjects {
         emitObject(out, codec, value);
     }
 
+    public static MangolangObject applyOperation(MangolangObject left, MangolangObject right, OperationType type) {
+        if (left == null) {
+            throw new RuntimeException("Cannot apply operation " + type + " to null left operand");
+        }
+
+        return left.operator(right, type);
+    }
+
     public static BooleanMLObject booleanObject(boolean value) {
         return BooleanMLObject.of(value);
+    }
+
+    public static StringMLObject concatenateAsStrings(MangolangObject left, MangolangObject right) {
+        return new StringMLObject(toDisplayString(left) + toDisplayString(right));
     }
 
     public static MangolangObject literalFromToken(String token) {
@@ -213,6 +225,11 @@ public final class MangolangObjects {
         }
 
         return value.getClass().getSimpleName() + "(" + toDisplayString(value) + ")";
+    }
+
+    public static RuntimeException unsupportedOperation(MangolangObject left, MangolangObject right, OperationType type) {
+        return new RuntimeException("Operation " + type + " is not supported for " + describe(left)
+                + (right == null ? "" : " and " + describe(right)));
     }
 
     private static MangolangObjectCodec<? extends MangolangObject> findCodec(MangolangObject value) {

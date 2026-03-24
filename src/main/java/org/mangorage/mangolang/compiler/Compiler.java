@@ -19,7 +19,7 @@ public final class Compiler {
     private static final Pattern LET_ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern ASSIGNMENT_PATTERN = Pattern.compile("([a-zA-Z_]\\w*)\\s*=\\s*(.+)");
 
-    private record BinaryOperator(int index, int width) {
+    private record BinaryOperator(int index, int width, String token) {
     }
 
     private final InstructionSet set;
@@ -142,7 +142,7 @@ public final class Compiler {
 
         if ("print".equals(name)) {
             String rawArgs = joinArgs(parts, 1);
-            if (findTopLevelBinaryOperator(rawArgs) != null) {
+            if (findTopLevelBinaryOperator(rawArgs, false) != null || findTopLevelBinaryOperator(rawArgs, true) != null) {
                 emitExpressionToStack(rawArgs, out, ctx);
                 out.add((byte) set.requireOpcode("print"));
                 return true;
@@ -248,7 +248,10 @@ public final class Compiler {
             throw new RuntimeException("Missing expression");
         }
 
-        BinaryOperator operator = findTopLevelBinaryOperator(expression);
+        BinaryOperator operator = findTopLevelBinaryOperator(expression, false);
+        if (operator == null) {
+            operator = findTopLevelBinaryOperator(expression, true);
+        }
         if (operator != null) {
             String left = expression.substring(0, operator.index()).trim();
             String right = expression.substring(operator.index() + operator.width()).trim();
@@ -258,7 +261,7 @@ public final class Compiler {
 
             emitExpressionToStack(left, out, ctx);
             emitExpressionToStack(right, out, ctx);
-            out.add((byte) set.requireOpcode("add"));
+            out.add((byte) set.requireOpcode(mapBinaryOperatorToInstruction(operator.token())));
             return;
         }
 
@@ -309,9 +312,9 @@ public final class Compiler {
         return builder.toString();
     }
 
-    private BinaryOperator findTopLevelBinaryOperator(String raw) {
+    private BinaryOperator findTopLevelBinaryOperator(String raw, boolean highPrecedence) {
         boolean inQuotes = false;
-        for (int i = 0; i < raw.length(); i++) {
+        for (int i = raw.length() - 1; i >= 0; i--) {
             char c = raw.charAt(i);
             if (c == '"') {
                 inQuotes = !inQuotes;
@@ -319,12 +322,28 @@ public final class Compiler {
             }
 
             if (!inQuotes) {
-                if (c == '+' ) {
-                    return new BinaryOperator(i, 1);
+                if (!highPrecedence) {
+                    if (c == '+') {
+                        return new BinaryOperator(i, 1, "+");
+                    }
+
+                    if (c == '-' && isBinaryMinus(raw, i)) {
+                        return new BinaryOperator(i, 1, "-");
+                    }
+
+                    if (c == '.' && i + 1 < raw.length() && raw.charAt(i + 1) == '.') {
+                        return new BinaryOperator(i, 2, "..");
+                    }
                 }
 
-                if (c == '.' && i + 1 < raw.length() && raw.charAt(i + 1) == '.') {
-                    return new BinaryOperator(i, 2);
+                if (highPrecedence) {
+                    if (c == '*') {
+                        return new BinaryOperator(i, 1, "*");
+                    }
+
+                    if (c == '/') {
+                        return new BinaryOperator(i, 1, "/");
+                    }
                 }
             }
         }
@@ -334,6 +353,38 @@ public final class Compiler {
         }
 
         return null;
+    }
+
+    private boolean isBinaryMinus(String raw, int index) {
+        if (index <= 0) {
+            return false;
+        }
+
+        for (int i = index - 1; i >= 0; i--) {
+            char previous = raw.charAt(i);
+            if (Character.isWhitespace(previous)) {
+                continue;
+            }
+
+            return previous != '+'
+                    && previous != '-'
+                    && previous != '*'
+                    && previous != '/'
+                    && previous != '.'
+                    && previous != '(';
+        }
+
+        return false;
+    }
+
+    private String mapBinaryOperatorToInstruction(String token) {
+        return switch (token) {
+            case "+", ".." -> "add";
+            case "-" -> "subtract";
+            case "*" -> "multiply";
+            case "/" -> "divide";
+            default -> throw new RuntimeException("Unsupported operator token: " + token);
+        };
     }
 
     private List<String> splitWhitespaceRespectingQuotes(String raw) {

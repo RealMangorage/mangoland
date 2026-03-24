@@ -1,6 +1,8 @@
 package org.mangorage.mangolang.object.impl;
 
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.OperationType;
 
 public record BooleanMLObject(boolean value) implements MangolangObject {
 
@@ -12,8 +14,12 @@ public record BooleanMLObject(boolean value) implements MangolangObject {
     }
 
     @Override
-    public MangolangObject equals(MangolangObject mangolangObject) {
-        return mangolangObject instanceof BooleanMLObject other ? of(this.value == other.value) : FALSE;
+    public MangolangObject operator(MangolangObject mangolangObject, OperationType type) {
+        return switch (type) {
+            case ADD -> MangolangObjects.concatenateAsStrings(this, mangolangObject);
+            case EQUALS -> mangolangObject instanceof BooleanMLObject other ? of(this.value == other.value) : FALSE;
+            default -> throw MangolangObjects.unsupportedOperation(this, mangolangObject, type);
+        };
     }
 
     @Override

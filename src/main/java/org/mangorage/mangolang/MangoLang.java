@@ -16,8 +16,10 @@ import org.mangorage.mangolang.instruction.impl.output.Print;
 import org.mangorage.mangolang.instruction.impl.stack.Push;
 import org.mangorage.mangolang.instruction.impl.stack.Dup;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Add;
+import org.mangorage.mangolang.instruction.impl.arithmetic.Divide;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Decrement;
 import org.mangorage.mangolang.instruction.impl.arithmetic.Multiply;
+import org.mangorage.mangolang.instruction.impl.arithmetic.Subtract;
 import org.mangorage.mangolang.instruction.impl.timing.Sleep;
 import org.mangorage.mangolang.terminal.ConsoleTerminal;
 import org.mangorage.mangolang.terminal.DeferredTerminal;
@@ -54,7 +56,9 @@ public final class MangoLang {
                         Jump.class,
                         Print.class,
                         Add.class,
+                        Subtract.class,
                         Decrement.class,
+                        Divide.class,
                         Multiply.class,
                         Equals.class,
                         Dup.class,

@@ -1,6 +1,8 @@
 package org.mangorage.mangolang.object.impl;
 
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
+import org.mangorage.mangolang.object.OperationType;
 
 public final class StringMLObject implements MangolangObject {
     private final String value;
@@ -14,11 +16,14 @@ public final class StringMLObject implements MangolangObject {
     }
 
     @Override
-    public MangolangObject equals(MangolangObject mangolangObject) {
-        if (mangolangObject instanceof StringMLObject other) {
-            return BooleanMLObject.of(this.value.equals(other.value));
-        }
-        return BooleanMLObject.FALSE;
+    public MangolangObject operator(MangolangObject mangolangObject, OperationType type) {
+        return switch (type) {
+            case ADD -> MangolangObjects.concatenateAsStrings(this, mangolangObject);
+            case EQUALS -> mangolangObject instanceof StringMLObject other
+                    ? BooleanMLObject.of(this.value.equals(other.value))
+                    : BooleanMLObject.FALSE;
+            default -> throw MangolangObjects.unsupportedOperation(this, mangolangObject, type);
+        };
     }
 
     @Override
