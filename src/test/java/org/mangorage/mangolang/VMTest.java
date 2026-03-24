@@ -134,6 +134,36 @@ public class VMTest {
     }
 
     @Test
+    public void typeInstructionCanStoreAndPrintVariableTypes() {
+        List<String> out = runProgram("""
+                let x = 999
+                type x
+                store typeresult
+                print "Type: " .. typeresult
+                """);
+
+        Assertions.assertEquals(List.of("Type: integer"), out);
+    }
+
+    @Test
+    public void typeInstructionReportsBuiltInObjectTypeNames() {
+        List<String> out = runProgram("""
+                let integerValue = 42
+                let stringValue = "mango"
+                let booleanValue = true
+
+                type integerValue
+                print
+                type stringValue
+                print
+                type booleanValue
+                print
+                """);
+
+        Assertions.assertEquals(List.of("integer", "string", "boolean"), out);
+    }
+
+    @Test
     public void whileLoopAndIfConditionsConsumeBooleanComparisonResults() {
         List<String> out = runProgram("""
                 let x = 2
@@ -378,7 +408,7 @@ public class VMTest {
     public void createEnvStillRegistersCompilerRequiredInstructionNames() {
         InstructionSet set = MangoLang.createEnv();
 
-        for (String instructionName : List.of("call", "return", "jump", "print", "halt", "jump_if_false")) {
+        for (String instructionName : List.of("call", "return", "jump", "print", "halt", "jump_if_false", "type")) {
             Assertions.assertNotNull(set.getOpcode(instructionName), instructionName + " should be registered");
         }
     }

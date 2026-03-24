@@ -24,4 +24,8 @@ public interface MangolangObject {
     default String describe() {
         return getClass().getSimpleName() + "(" + toDisplayString() + ")";
     }
+
+    default String typeName() {
+        return "object";
+    }
 }

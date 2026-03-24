@@ -45,6 +45,11 @@ public record BooleanMLObject(boolean value) implements MangolangObject {
     }
 
     @Override
+    public String typeName() {
+        return "boolean";
+    }
+
+    @Override
     public String toString() {
         return Boolean.toString(value);
     }

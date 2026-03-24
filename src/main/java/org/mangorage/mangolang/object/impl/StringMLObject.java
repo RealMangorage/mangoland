@@ -41,6 +41,11 @@ public final class StringMLObject implements MangolangObject {
     }
 
     @Override
+    public String typeName() {
+        return "string";
+    }
+
+    @Override
     public String toString() {
         return value;
     }

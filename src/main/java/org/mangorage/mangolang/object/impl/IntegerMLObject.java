@@ -80,6 +80,11 @@ public final class IntegerMLObject implements MangolangObject {
     }
 
     @Override
+    public String typeName() {
+        return "integer";
+    }
+
+    @Override
     public String toString() {
         return Integer.toString(value);
     }
