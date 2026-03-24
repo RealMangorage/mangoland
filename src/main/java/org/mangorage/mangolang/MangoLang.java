@@ -68,8 +68,9 @@ public final class MangoLang {
                         Exit.class
                 )
         );
+
         // Alias for legacy/compiler token "printstr" -> use Print instruction
-        set.register("printstr", new Print());
+
         set.register(
                 "jump_if_true", new JumpStatement(true)
         );

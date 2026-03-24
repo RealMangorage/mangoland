@@ -1,8 +1,12 @@
 package org.mangorage.mangolang.instruction;
 
+import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
+
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class InstructionSet {
     private final Map<Integer, Instruction> opcodeMap = new HashMap<>();
@@ -14,22 +18,51 @@ public final class InstructionSet {
     public void register(List<Class<? extends Instruction>> classList) {
         for (Class<? extends Instruction> aClass : classList) {
             try {
-                register(
-                        aClass.getSimpleName().toLowerCase(),
-                        aClass.newInstance()
-                );
-            } catch (InstantiationException | IllegalAccessException e) {
+                Instruction instruction = aClass.getDeclaredConstructor().newInstance();
+                Set<String> names = new LinkedHashSet<>();
+                names.add(normalizeName(aClass.getSimpleName()));
+
+                for (AutoRegisterInstruction annotation : aClass.getAnnotationsByType(AutoRegisterInstruction.class)) {
+                    String id = annotation.id();
+                    if (id != null && !id.isBlank()) {
+                        names.add(normalizeName(id));
+                    }
+                }
+
+                Integer opcode = null;
+                for (String name : names) {
+                    if (opcode == null) {
+                        opcode = register(name, instruction);
+                    } else {
+                        registerAlias(name, opcode);
+                    }
+                }
+            } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
     public int register(String name, Instruction inst) {
+        String normalizedName = normalizeName(name);
+        ensureNameAvailable(normalizedName);
+
         int opcode = nextOpcode++;
         opcodeMap.put(opcode, inst);
-        nameMap.put(name.toLowerCase(), opcode);
-        opcodeToNameMap.put(opcode, name.toLowerCase());
+        nameMap.put(normalizedName, opcode);
+        opcodeToNameMap.put(opcode, normalizedName);
         return opcode;
+    }
+
+    public void registerAlias(String name, int opcode) {
+        String normalizedName = normalizeName(name);
+        ensureNameAvailable(normalizedName);
+
+        if (!opcodeMap.containsKey(opcode)) {
+            throw new IllegalArgumentException("Instruction opcode not registered: " + opcode);
+        }
+
+        nameMap.put(normalizedName, opcode);
     }
 
     public Instruction get(int opcode) {
@@ -37,7 +70,7 @@ public final class InstructionSet {
     }
 
     public Integer getOpcode(String name) {
-        return nameMap.get(name.toLowerCase());
+        return nameMap.get(normalizeName(name));
     }
 
     public String getName(int opcode) {
@@ -45,11 +78,21 @@ public final class InstructionSet {
     }
 
     public int requireOpcode(String name) {
-        Integer op = nameMap.get(name.toLowerCase());
+        Integer op = nameMap.get(normalizeName(name));
         if (op == null) {
             throw new RuntimeException("Instruction not registered: " + name);
         }
         return op;
+    }
+
+    private String normalizeName(String name) {
+        return name.toLowerCase();
+    }
+
+    private void ensureNameAvailable(String normalizedName) {
+        if (nameMap.containsKey(normalizedName)) {
+            throw new IllegalStateException("Instruction already registered: " + normalizedName);
+        }
     }
 
     public String getDebugInfo() {

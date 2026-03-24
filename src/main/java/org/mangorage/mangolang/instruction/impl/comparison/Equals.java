@@ -1,6 +1,6 @@
 package org.mangorage.mangolang.instruction.impl.comparison;
 
-import org.mangorage.mangolang.instruction.AutoRegisterInstruction;
+import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.OperationType;

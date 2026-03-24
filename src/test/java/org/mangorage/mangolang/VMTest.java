@@ -3,6 +3,11 @@ package org.mangorage.mangolang;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mangorage.mangolang.compiler.Compiler;
+import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.instruction.InstructionSet;
+import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
+import org.mangorage.mangolang.instruction.register.ParamType;
+import org.mangorage.mangolang.instruction.register.Parameter;
 import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.OperationType;
@@ -329,6 +334,76 @@ public class VMTest {
                 """);
 
         Assertions.assertEquals(List.of("Diff: 15", "Product: 42", "Quotient: 5"), out);
+    }
+
+    @Test
+    public void repeatableAutoRegisterInstructionAliasesShareOneOpcode() {
+        InstructionSet set = new InstructionSet();
+        set.register(List.of(RepeatableAliasInstruction.class));
+
+        int defaultOpcode = set.requireOpcode("repeatablealiasinstruction");
+        int aliasOneOpcode = set.requireOpcode("call_alias");
+        int aliasTwoOpcode = set.requireOpcode("invoke_alias");
+
+        Assertions.assertEquals(defaultOpcode, aliasOneOpcode);
+        Assertions.assertEquals(aliasOneOpcode, aliasTwoOpcode);
+        Assertions.assertSame(set.get(aliasOneOpcode), set.get(aliasTwoOpcode));
+        Assertions.assertInstanceOf(RepeatableAliasInstruction.class, set.get(aliasOneOpcode));
+        Assertions.assertEquals("repeatablealiasinstruction", set.getName(aliasOneOpcode));
+    }
+
+    @Test
+    public void repeatableAutoRegisterInstructionWithoutIdsFallsBackToSimpleName() {
+        InstructionSet set = new InstructionSet();
+        set.register(List.of(RepeatableBlankIdInstruction.class));
+
+        int opcode = set.requireOpcode("repeatableblankidinstruction");
+
+        Assertions.assertInstanceOf(RepeatableBlankIdInstruction.class, set.get(opcode));
+    }
+
+    @Test
+    public void createEnvStillRegistersCompilerRequiredInstructionNames() {
+        InstructionSet set = MangoLang.createEnv();
+
+        for (String instructionName : List.of("call", "return", "jump", "print", "halt", "jump_if_false")) {
+            Assertions.assertNotNull(set.getOpcode(instructionName), instructionName + " should be registered");
+        }
+    }
+
+    @AutoRegisterInstruction(
+            id = "call_alias",
+            params = {
+                    @Parameter(type = ParamType.INT, value = "target")
+            }
+    )
+    @AutoRegisterInstruction(
+            id = "invoke_alias",
+            params = {
+                    @Parameter(type = ParamType.INT, value = "target"),
+                    @Parameter(type = ParamType.INT, value = "argc")
+            }
+    )
+    public static final class RepeatableAliasInstruction implements Instruction {
+        @Override
+        public void execute(VMEnvironment env) {
+        }
+    }
+
+    @AutoRegisterInstruction(
+            params = {
+                    @Parameter(type = ParamType.INT, value = "target")
+            }
+    )
+    @AutoRegisterInstruction(
+            params = {
+                    @Parameter(type = ParamType.INT, value = "argc")
+            }
+    )
+    public static final class RepeatableBlankIdInstruction implements Instruction {
+        @Override
+        public void execute(VMEnvironment env) {
+        }
     }
 
     private void assertRoundTrip(MangolangObject original, Class<? extends MangolangObject> expectedType, String expectedDisplay) {

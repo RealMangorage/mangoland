@@ -2,11 +2,32 @@ package org.mangorage.mangolang.instruction.impl.control;
 
 import org.mangorage.mangolang.compiler.CompilerContext;
 import org.mangorage.mangolang.instruction.Instruction;
+import org.mangorage.mangolang.instruction.register.AutoRegisterInstruction;
+import org.mangorage.mangolang.instruction.register.ParamType;
+import org.mangorage.mangolang.instruction.register.Parameter;
 import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.vm.VMEnvironment;
 
 import java.util.List;
 
+@AutoRegisterInstruction(
+        id = "jump_if_true",
+        params = {
+                @Parameter(
+                        type = ParamType.BOOLEAN,
+                        value = "true"
+                )
+        }
+)
+@AutoRegisterInstruction(
+        id = "jump_if_true",
+        params = {
+                @Parameter(
+                        type = ParamType.BOOLEAN,
+                        value = "false"
+                )
+        }
+)
 public final class JumpStatement implements Instruction {
     private final boolean value;
 
