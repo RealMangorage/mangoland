@@ -3,12 +3,8 @@ package org.mangorage.mangolang.vm;
 import org.mangorage.mangolang.instruction.Instruction;
 import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
-import org.mangorage.mangolang.object.impl.BooleanMLObject;
-import org.mangorage.mangolang.object.impl.IntegerMLObject;
-import org.mangorage.mangolang.object.impl.StringMLObject;
 import org.mangorage.mangolang.terminal.Terminal;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Stack;
 
 public final class VMEnvironment {
@@ -85,31 +81,15 @@ public final class VMEnvironment {
         int tag = next() & 0xFF;
         int len = (next() & 0xFF) | ((next() & 0xFF) << 8);
 
-        if (tag == MangolangObjects.TAG_INTEGER) {
-            if (len != 4) {
-                throw new RuntimeException("Invalid integer payload size: " + len);
-            }
+        byte[] payload = new byte[len];
+        for (int i = 0; i < len; i++) {
+            payload[i] = next();
+        }
 
-            int b1 = next() & 0xFF;
-            int b2 = next() & 0xFF;
-            int b3 = next() & 0xFF;
-            int b4 = next() & 0xFF;
-            int val = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
-            return new IntegerMLObject(val);
-        } else if (tag == MangolangObjects.TAG_STRING) {
-            byte[] bytes = new byte[len];
-            for (int i = 0; i < len; i++) {
-                bytes[i] = next();
-            }
-            return new StringMLObject(new String(bytes, StandardCharsets.UTF_8));
-        } else if (tag == MangolangObjects.TAG_BOOLEAN) {
-            if (len != 1) {
-                throw new RuntimeException("Invalid boolean payload size: " + len);
-            }
-
-            return BooleanMLObject.of((next() & 0xFF) != 0);
-        } else {
-            throw new RuntimeException("Unknown object tag: " + tag + " at ip=" + (ip - 1));
+        try {
+            return MangolangObjects.decode(tag, payload);
+        } catch (RuntimeException exception) {
+            throw new RuntimeException(exception.getMessage() + " at ip=" + (ip - 1), exception);
         }
     }
 

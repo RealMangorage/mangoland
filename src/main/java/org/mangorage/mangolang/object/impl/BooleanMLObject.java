@@ -31,7 +31,6 @@ public record BooleanMLObject(boolean value) implements MangolangObject {
 
     @Override
     public void emitBytes(List<Byte> out) {
-        MangolangObjects.emitHeader(out, MangolangObjects.TAG_BOOLEAN, 1);
-        out.add((byte) (value ? 1 : 0));
+        MangolangObjects.emitObject(out, this);
     }
 }

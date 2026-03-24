@@ -36,10 +36,6 @@ public final class IntegerMLObject implements MangolangObject {
 
     @Override
     public void emitBytes(List<Byte> out) {
-        MangolangObjects.emitHeader(out, MangolangObjects.TAG_INTEGER, 4);
-        out.add((byte) ((value >> 24) & 0xFF));
-        out.add((byte) ((value >> 16) & 0xFF));
-        out.add((byte) ((value >> 8) & 0xFF));
-        out.add((byte) (value & 0xFF));
+        MangolangObjects.emitObject(out, this);
     }
 }

@@ -3,7 +3,6 @@ package org.mangorage.mangolang.object.impl;
 import org.mangorage.mangolang.object.MangolangObject;
 import org.mangorage.mangolang.object.MangolangObjects;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class StringMLObject implements MangolangObject {
@@ -37,11 +36,7 @@ public final class StringMLObject implements MangolangObject {
 
     @Override
     public void emitBytes(List<Byte> out) {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        MangolangObjects.emitHeader(out, MangolangObjects.TAG_STRING, bytes.length);
-        for (byte aByte : bytes) {
-            out.add(aByte);
-        }
+        MangolangObjects.emitObject(out, this);
     }
 }
 

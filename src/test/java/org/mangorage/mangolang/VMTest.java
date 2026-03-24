@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mangorage.mangolang.compiler.Compiler;
 import org.mangorage.mangolang.object.MangolangObject;
+import org.mangorage.mangolang.object.MangolangObjects;
 import org.mangorage.mangolang.object.impl.BooleanMLObject;
 import org.mangorage.mangolang.object.impl.IntegerMLObject;
 import org.mangorage.mangolang.object.impl.StringMLObject;
@@ -37,6 +38,54 @@ public class VMTest {
         assertRoundTrip(new IntegerMLObject(1337), IntegerMLObject.class, "1337");
         assertRoundTrip(new StringMLObject("hello world"), StringMLObject.class, "hello world");
         assertRoundTrip(BooleanMLObject.TRUE, BooleanMLObject.class, "true");
+    }
+
+    @Test
+    public void readObjectRejectsUnknownTags() {
+        VMEnvironment env = new VMEnvironment(
+                new VM(MangoLang.createEnv()),
+                new byte[]{
+                        (byte) MangolangObjects.OBJECT_PREFIX,
+                        (byte) 99,
+                        (byte) 0,
+                        (byte) 0
+                }
+        );
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, env::readObject);
+        Assertions.assertTrue(exception.getMessage().contains("Unknown object tag: 99"));
+    }
+
+    @Test
+    public void readObjectRejectsInvalidPayloadLengths() {
+        VMEnvironment booleanEnv = new VMEnvironment(
+                new VM(MangoLang.createEnv()),
+                new byte[]{
+                        (byte) MangolangObjects.OBJECT_PREFIX,
+                        (byte) MangolangObjects.TAG_BOOLEAN,
+                        (byte) 2,
+                        (byte) 0,
+                        (byte) 1,
+                        (byte) 0
+                }
+        );
+
+        RuntimeException booleanException = Assertions.assertThrows(RuntimeException.class, booleanEnv::readObject);
+        Assertions.assertTrue(booleanException.getMessage().contains("Invalid payload size for object tag 3"));
+
+        VMEnvironment integerEnv = new VMEnvironment(
+                new VM(MangoLang.createEnv()),
+                new byte[]{
+                        (byte) MangolangObjects.OBJECT_PREFIX,
+                        (byte) MangolangObjects.TAG_INTEGER,
+                        (byte) 1,
+                        (byte) 0,
+                        (byte) 7
+                }
+        );
+
+        RuntimeException integerException = Assertions.assertThrows(RuntimeException.class, integerEnv::readObject);
+        Assertions.assertTrue(integerException.getMessage().contains("Invalid payload size for object tag 1"));
     }
 
     @Test
